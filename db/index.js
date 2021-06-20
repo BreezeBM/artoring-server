@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 module.exports = () => {
-  function connect() {
+  function connect () {
     mongoose.connect('localhost:27017', function (err) {
       if (err) {
         console.error('mongodb connection error', err);

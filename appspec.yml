@@ -4,6 +4,8 @@ files:
   - source: /
     destination: /home/ec2-user/artoring-server
 hooks:
+  BeforeBlockTraffic:
+    - location: scripts/blocking.sh
   ApplicationStop: 
     - location: scripts/stop_server.sh
       timeout: 300

@@ -8,7 +8,7 @@ app.use(express.json({ extended: false }));
 app.use(cors());
 
 app.get('/', (req, res) => {
-  res.send();
+  res.send('ok');
 });
 module.exports = app.listen(port, () => {
   console.log(`🚀 Server is starting on ${port}`);

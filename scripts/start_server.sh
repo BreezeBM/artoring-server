@@ -1,1 +1,1 @@
-cd /home/ec2-user/artoring-server && npm install && sudo npm start
+npm install && sudo npm start

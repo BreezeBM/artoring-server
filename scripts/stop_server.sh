@@ -1,0 +1,1 @@
+cd /home/ec2-use/artoring-server && sudo npx pm2 stop app.js

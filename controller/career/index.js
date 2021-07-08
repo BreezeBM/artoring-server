@@ -1,9 +1,7 @@
 const getHandler = require('./getTeachCards');
-const setTestData = require('./setTestCards');
 
 const careerCardController = {
-  getAllCard: getHandler,
-  setTestData
+  getAllCard: getHandler
 };
 
 module.exports = careerCardController

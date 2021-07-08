@@ -1,10 +1,13 @@
 const express = require('express');
 const cors = require('cors');
 const router = require('./routes');
+const db = require('./db');
 
 const port = 3000;
 
 const app = express();
+
+db();
 
 app.use(express.json({ extended: false }));
 app.use(cors());

@@ -4,8 +4,8 @@ const Schema = mongoose.Schema;
 const careerTeachSchema = new Schema({
   thumb: { type: String },
   title: { type: String },
-  startDate: { type: Date },
-  endDate: { type: Date },
+  startDate: { type: Number },
+  endDate: { type: Number },
   moderatorId: { type: Schema.ObjectId },
   category: String,
   subCategory: String,
@@ -17,8 +17,8 @@ const careerTeachSchema = new Schema({
   price: { type: Number, default: 0 },
   rate: { type: Number, default: 0 },
   reviews: [Schema.ObjectId],
-  createdAt: { type: Date, default: new Date() },
-  updatedAt: { type: Date, default: new Date() }
+  createdAt: { type: Number },
+  updatedAt: { type: Number }
 })
 ;
 

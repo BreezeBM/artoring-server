@@ -21,20 +21,8 @@ const userSchema = new Schema({
   interestedIn: [String],
   likedCareerEdu: [Schema.ObjectId],
   likedMentor: [Schema.ObjectId],
-  outdoorAct: [{
-    name: { type: String, required: true },
-    date: { type: Date },
-    text: { type: String }
-  }],
-  workHistory: [{
-    jobTitle: { type: String, required: true },
-    company: { type: String, required: true },
-    startDate: { type: Date, required: true },
-    endDate: { type: Date, required: true },
-    detailInfo: String,
-    createdAt: { type: Date, required: true, default: new Date() },
-    updatedAt: { type: Date, required: true, default: new Date() }
-  }]
+  outdoorAct: String,
+  workHistory: String
 })
 ;
 module.exports = userSchema;

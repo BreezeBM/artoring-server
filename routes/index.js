@@ -6,6 +6,7 @@ const uploader = require('./uploader');
 const userRouter = require('./user');
 
 router.use('/career', careerRouter);
+router.use('/user', userRouter);
 router.use('/upload', uploader);
 router.use('/', userRouter);
 

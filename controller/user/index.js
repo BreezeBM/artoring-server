@@ -1,9 +1,9 @@
+const getProfile = require('./getProfile');
+const putProfile = require('./putProfile');
 const loginWithEmail = require('./loginWithEmail');
 const signUpByEmail = require( './signUpByEmail');
 
-const careerCardController = {
-    signUpByEmail: signUpByEmail,
-    loginWithEmail:loginWithEmail,
-};
+const careerCardController = { getProfile, putProfile, loginWithEmail, signUpByEmail };
 
-module.exports = careerCardController;
+module.exports = careerCardController
+;

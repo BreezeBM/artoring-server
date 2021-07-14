@@ -14,11 +14,12 @@ const userSchema = new Schema({
   isMentor: Boolean,
   major: { type: String },
   current: {
-    title: { type: String },
+    jobTitle: { type: String },
     belongs: { type: String },
-    howLong: { type: String }
+    howLong: { type: String },
+    dept: String
   },
-  interestedIn: [String],
+  interestedIn: [{ name: String, val: Boolean }],
   likedCareerEdu: [Schema.ObjectId],
   likedMentor: [Schema.ObjectId],
   outdoorAct: String,

@@ -37,7 +37,7 @@ module.exports = async (req, res) => {
           default: {
             try {
               const { email, name } = decode;
-              const data = await userModel.findOne({ email, name }).select({ _id: 1 });
+              const userData = await userModel.findOne({ email, name }).select({ _id: 1 });
               const {
                 thumb,
                 title,
@@ -50,21 +50,21 @@ module.exports = async (req, res) => {
               } = req.body.postInfo;
 
               const purified = DOMPurify.sanitize(req.body.postInfo.dom);
-
+              console.log(purified);
               const postingData = {
                 thumb,
                 title,
                 startDate,
                 endDate,
                 tag,
-                moderatorId: data._id,
+                moderatorId: userData._id,
                 detailInfo: purified,
                 maximumParticipants,
                 availableTime,
                 price
               };
 
-              await careerTeachCardModel.create(postingData);
+              await careerTeachCardModel.findOneAndUpdate({ _id: req.params.id, moderatorId: userData._id }, postingData);
 
               res.status(201).send();
             } catch (e) {

@@ -15,7 +15,10 @@ router.get('/:subCategory', () => {});
 router.post('/', careerController.postCard);
 
 // 컨텐츠를 수정하는 경우에 사용합니다.
-router.put('/:id', () => {});
+router.put('/:id', careerController.putCard);
+
+// 하나의 카드를 제거할때 사용합니다.
+router.delete('/:id', careerController.deleteCard);
 
 module.exports = router
 ;

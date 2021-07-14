@@ -6,5 +6,4 @@ const careerCardController = {
   postCard: postCardHandler
 };
 
-module.exports = careerCardController
-;
+module.exports = careerCardController;

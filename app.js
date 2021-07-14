@@ -6,7 +6,7 @@ require('moment-timezone');
 moment.tz.setDefault('Asia/Seoul');
 const db = require('./db');
 
-const port = 3000;
+const port = 4000;
 
 const app = express();
 
@@ -20,6 +20,12 @@ app.use(cors({
 
 app.use('/', router);
 app.disable('X-Powered-By');
+
+
+app.get("/", (req, res) => {
+  res.send("Hello World")
+})
+
 
 module.exports = app.listen(port, () => {
   console.log(`🚀 Server is starting on ${port}`);

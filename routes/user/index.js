@@ -10,3 +10,6 @@ router.use('/login', loginRouter);
 router.use('/logout', logoutRouter);
 router.use('/profile', profileRouter);
 router.use('/singup', signupRouter);
+
+module.exports = router
+;

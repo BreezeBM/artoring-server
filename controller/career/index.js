@@ -4,5 +4,4 @@ const careerCardController = {
   getAllCard: getHandler
 };
 
-module.exports = careerCardController
-;
+module.exports = careerCardController;

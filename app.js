@@ -6,7 +6,7 @@ require('moment-timezone');
 moment.tz.setDefault('Asia/Seoul');
 const db = require('./db');
 
-const port = 3000;
+const port = 4000;
 
 const app = express();
 

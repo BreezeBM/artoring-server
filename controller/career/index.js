@@ -4,7 +4,7 @@ const deleteCardHandler = require('./deleteTeachCard');
 const putCardHandler = require('./putTeachCards');
 
 const careerCardController = {
-  getAllCard: getHandler,
+  getCard: getHandler,
   postCard: postCardHandler,
   deleteCard: deleteCardHandler,
   putCard: putCardHandler

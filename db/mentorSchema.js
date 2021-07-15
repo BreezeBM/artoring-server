@@ -4,7 +4,7 @@ const AutoIncrementFactory = require('mongoose-sequence');
 const Schema = mongoose.Schema;
 
 const mentorSchema = new Schema({
-  userId: { type: Schema.ObjectId },
+  userId: { type: Schema.ObjectId, required: true, unique: true },
   settledAmount: Number,
   category: [String],
   descriptionForMentor: { type: String, required: true },

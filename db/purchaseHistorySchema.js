@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const AutoIncrementFactory = require('mongoose-sequence');
+
 const Schema = mongoose.Schema;
 
 const purchaseHistorySchema = new Schema({
@@ -10,8 +12,11 @@ const purchaseHistorySchema = new Schema({
   bookedEndTime: { type: Date, required: true },
   zoomLink: String,
   createdAt: { type: Date, default: new Date() }
-})
-;
+});
+
+const AutoIncrement = AutoIncrementFactory(mongoose);
+const option = { id: 'purchase_id', inc_field: 'id' };
+purchaseHistorySchema.plugin(AutoIncrement, option);
 
 module.exports = purchaseHistorySchema
 ;

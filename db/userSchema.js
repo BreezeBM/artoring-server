@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const AutoIncrementFactory = require('mongoose-sequence');
+
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
@@ -24,6 +26,10 @@ const userSchema = new Schema({
   likedMentor: [Schema.ObjectId],
   outdoorAct: String,
   workHistory: String
-})
-;
+});
+
+const AutoIncrement = AutoIncrementFactory(mongoose);
+const option = { id: 'user_id', inc_field: 'id' };
+userSchema.plugin(AutoIncrement, option);
+
 module.exports = userSchema;

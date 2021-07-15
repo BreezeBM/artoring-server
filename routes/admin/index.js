@@ -9,5 +9,6 @@ const adminCareerTeachRouter = require('./adminCareerTeach');
 router.use('/grade', gradeRouter);
 router.use('/calculate', calculateRouter);
 router.use('/careerinfo', adminCareerInfoRouter);
-router.use('/careerteach', adminCareerTeachRouter)
-;
+router.use('/careerteach', adminCareerTeachRouter);
+
+router.use('/*', (req, res) => res.status(404).send());

@@ -3,7 +3,7 @@ const { userModel } = require('../../model');
 const { verifyJWTToken } = require('../tools');
 
 module.exports = async (req, res) => {
-  const { type } = req.query;
+  const { type, review } = req.query;
 
   if (type === 'email') {
     const decode = await verifyJWTToken(req);

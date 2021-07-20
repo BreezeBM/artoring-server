@@ -10,7 +10,7 @@ module.exports = () => {
 
   function dbconnect () {
     mongoose.connect(uri, {
-      dbName: 'artoring', useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true, useFindAndModify: false,
+      dbName: 'artoring', useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true, useFindAndModify: false
     }).then(function (err) {
       if (err) {
         console.error('mongodb connection error', err);

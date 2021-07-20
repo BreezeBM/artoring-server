@@ -37,6 +37,7 @@ module.exports = async (req, res) => {
           default: {
             try {
               const { email, name } = decode;
+              console.log(decode);
               const data = await userModel.findOne({ email, name }).select({ _id: 1 });
               const {
                 thumb,
@@ -46,10 +47,11 @@ module.exports = async (req, res) => {
                 tag,
                 maximumParticipants,
                 availableTime,
-                price
+                price,
+                dom
               } = req.body.postInfo;
 
-              const purified = DOMPurify.sanitize(req.body.postInfo.dom);
+              // const purified = DOMPurify.sanitize(req.body.postInfo.dom);
 
               const postingData = {
                 thumb,
@@ -58,7 +60,7 @@ module.exports = async (req, res) => {
                 endDate,
                 tag,
                 moderatorId: data._id,
-                detailInfo: purified,
+                detailInfo: dom,
                 maximumParticipants,
                 availableTime,
                 price
@@ -68,6 +70,7 @@ module.exports = async (req, res) => {
 
               res.status(201).send();
             } catch (e) {
+              console.log(e);
               res.status(500).send(e.message);
             }
             break;

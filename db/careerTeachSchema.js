@@ -21,7 +21,6 @@ const careerTeachSchema = new Schema({
   price: { type: Number, default: 0 },
   rate: { type: Number, default: 0 },
   reviews: [Number], // _id가 아닌 자동증가 id정보들이 담깁니다.
-  reviewCount: { type: Number, default: 0 },
   createdAt: { type: Date, default: new Date() },
   updatedAt: { type: Date, default: new Date() }
 });

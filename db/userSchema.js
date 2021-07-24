@@ -4,7 +4,7 @@ const AutoIncrementFactory = require('mongoose-sequence');
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
-  thumb: { type: String },
+  thumb: { type: String, default: 'https://artoring.com/img/1626851218536.png' },
   name: { type: String, required: true },
   nickName: { type: String },
   email: { type: String, required: true, unique: true },
@@ -22,8 +22,8 @@ const userSchema = new Schema({
     dept: String
   },
   interestedIn: [{ name: String, val: Boolean }],
-  likedCareerEdu: [Schema.ObjectId],
-  likedMentor: [Schema.ObjectId],
+  likedCareerEdu: [Number],
+  likedMentor: [Number],
   outdoorAct: String,
   workHistory: String
 });

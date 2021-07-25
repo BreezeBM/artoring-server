@@ -1,6 +1,8 @@
 const { careerTeachCardModel } = require('../../model');
 
 module.exports = async (req, res) => {
+  // params에 id가 담겨있으면 id에 해당하는 상세정보 리턴. 아니면 최신의 데이터 8개를 리턴
+
   try {
     if (req.params.id) {
       const data = await careerTeachCardModel.aggregate([
@@ -15,6 +17,7 @@ module.exports = async (req, res) => {
             rate: '$rate',
             reviews: '$reviews',
             thumb: '$thumb',
+            tags: '$tags',
             title: '$title',
             startDate: '$startDate',
             endDate: '$endDate',
@@ -34,6 +37,7 @@ module.exports = async (req, res) => {
       res.json(data);
     }
   } catch (e) {
+    console.log(e);
     res.status(500).json(e.message);
   }
 }

@@ -10,7 +10,7 @@ require('dotenv').config();
 moment.tz.setDefault('Asia/Seoul');
 const db = require('./db');
 
-const port = 4000;
+const port = 8081;
 
 const app = express();
 const env = process.env;

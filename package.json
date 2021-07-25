@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "pm2 start app.js --exp-backoff-restart-delay=100",
+    "start": "./node_modules/.bin/pm2 restart app.js --exp-backoff-restart-delay=100",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "stop": "pm2 stop app.js"
+    "stop": "./node_modules/.bin/pm2 stop app.js"
   },
   "repository": {
     "type": "git",

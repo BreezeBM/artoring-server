@@ -1,2 +1,4 @@
 cd /home/ec2-user/artoring-server
-npm install
+if test ! -f node_modules
+  npm install
+fi

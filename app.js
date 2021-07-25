@@ -23,16 +23,13 @@ app.use(cors({
   methods: env.NODE_ENV === 'production' ? '*' : 'GET,POST,PUT,DELETE,OPTION'
 }));
 
+// X-powered-by제외하는 간단한 보안 모듈
 app.use(helmet());
-app.use('/', router);
-
-app.get('/', (req, res) => {
-  res.send('Hello World');
-});
 
 app.get('/', (req, res) => {
   res.send('ok?');
 });
+app.use('/', router);
 module.exports = app.listen(port, () => {
   console.log(`🚀 Server is starting on ${port}`);
 });

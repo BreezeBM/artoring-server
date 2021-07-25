@@ -4,10 +4,10 @@ files:
   - source: /
     destination: /home/ec2-user/artoring-server
 hooks:
-  # ApplicationStop: 
-  #   - location: scripts/stop_server.sh
-  #     timeout: 300
-  #     runas: root
+  ApplicationStop: 
+    - location: scripts/stop_server.sh
+      timeout: 300
+      runas: root
   AfterInstall:
     - location: scripts/after_install.sh
       timeout: 300

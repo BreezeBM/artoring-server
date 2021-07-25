@@ -12,6 +12,7 @@ const careerTeachSchema = new Schema({
   moderatorId: { type: Schema.ObjectId },
   category: [String],
   subCategory: [String],
+  tags: [String],
   detailInfo: String,
   availableTime: { mon: [String], tue: [String], wed: [String], thu: [String], fri: [String], sat: [String], sun: [String] },
   likesCount: { type: Number, default: 0 },
@@ -19,7 +20,7 @@ const careerTeachSchema = new Schema({
   joinedParticipants: { type: Number, default: 0 },
   price: { type: Number, default: 0 },
   rate: { type: Number, default: 0 },
-  reviews: [Schema.ObjectId],
+  reviews: [Number], // _id가 아닌 자동증가 id정보들이 담깁니다.
   createdAt: { type: Date, default: new Date() },
   updatedAt: { type: Date, default: new Date() }
 });

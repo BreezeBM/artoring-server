@@ -3,7 +3,7 @@ const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 
 /**
- * * 자주 사용되는 함수들이 작성되어 있음
+ * * 자주 사용되는 함수, 생성자들이 작성되어 있음
  */
 
 const verifyJWTToken = async (req) => {

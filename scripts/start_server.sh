@@ -1,2 +1,2 @@
 cd /home/ec2-user/artoring-server
-sudo npm start
+sudo npm start -f

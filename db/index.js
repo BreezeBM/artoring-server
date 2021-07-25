@@ -10,16 +10,15 @@ module.exports = () => {
 
   function dbconnect () {
     mongoose.connect(uri, {
-      dbName: 'artoring', useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true, useFindAndModify: false,
-    }).then(function (err) {
-      if (err) {
-        console.error('mongodb connection error', err);
-      }
-      console.log('mongodb connected');
+      dbName: 'artoring', useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true, useFindAndModify: false
+    }).catch(e => console.log(e));
+    // If the connection throws an error
+    mongoose.connection.on('connected', () => {
+      console.log('connected');
+    });
+    mongoose.connection.on('disconnected', () => {
+      console.log('disconnected');
     });
   }
   dbconnect();
-  mongoose.connection.on('disconnected', () => {
-    console.log('disconnected');
-  });
 };

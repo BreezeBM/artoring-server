@@ -3,5 +3,5 @@ if [-f /home/ec2-user/artoring-server/app.js]; then
 
   rm -rf node_modules
 
-  npx pm2 delete app.js
+  pm2 delete app.js
 fi

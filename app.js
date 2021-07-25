@@ -30,6 +30,4 @@ app.get('/', (req, res) => {
   res.send('ok?');
 });
 app.use('/', router);
-module.exports = app.listen(port, () => {
-  console.log(`🚀 Server is starting on ${port}`);
-});
+module.exports = app;

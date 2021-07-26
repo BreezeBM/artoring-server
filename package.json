@@ -5,7 +5,7 @@
   "main": "app.js",
   "engines": { "node" : "14.17.0" },
   "scripts": {
-    "start": "node ./bin/www",
+    "start": "pm2 restart app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

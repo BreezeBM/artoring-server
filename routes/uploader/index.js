@@ -5,7 +5,7 @@ const { uploaderController } = require('../../controller');
 const multer = require('multer');
 const multers3 = require('multer-s3');
 const aws = require('aws-sdk');
-aws.config.loadFromPath(__dirname + '/../../config/s3.json');
+aws.config.loadFromPath(__dirname + '/../../config/s3.js');
 
 const s3 = new aws.S3();
 const upload = multer({

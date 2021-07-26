@@ -1,7 +1,19 @@
-require('dotenv').config();
+const dotenv = require('dotenv');
+const fs = require('fs');
 
-console.log(process.env);
+let path = '.env';
 
+try {
+  if (fs.existsSync(path)) {
+    // file exists
+
+    path = '.env';
+  }
+} catch (err) {
+  path = '/etc/profile.d/sh.local';
+}
+
+dotenv.config(path);
 const mongoose = require('mongoose');
 module.exports = () => {
   const pass = encodeURIComponent(process.env.MONGO_SEC_KEY);

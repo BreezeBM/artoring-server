@@ -5,7 +5,7 @@ const moment = require('moment');
 const helmet = require('helmet');
 
 require('moment-timezone');
-require('dotenv').config();
+const dotenv = require('dotenv');
 
 moment.tz.setDefault('Asia/Seoul');
 const db = require('./db');
@@ -16,6 +16,22 @@ const app = express();
 const env = process.env;
 
 db();
+
+const fs = require('fs');
+
+let path = '.env';
+
+try {
+  if (fs.existsSync(path)) {
+    // file exists
+
+    path = '.env';
+  }
+} catch (err) {
+  path = '/etc/profile.d/sh.local';
+}
+
+dotenv.config(path);
 
 app.use(express.json({ extended: false }));
 app.use(cors({

@@ -1,6 +1,22 @@
-require('dotenv').config();
+const dotenv = require('dotenv');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
+
+const fs = require('fs');
+
+let path = '.env';
+
+try {
+  if (fs.existsSync(path)) {
+    // file exists
+
+    path = '.env';
+  }
+} catch (err) {
+  path = '/etc/profile.d/sh.local';
+}
+
+dotenv.config(path);
 
 /**
  * * 자주 사용되는 함수, 생성자들이 작성되어 있음

@@ -4,10 +4,25 @@ const { uploaderController } = require('../../controller');
 
 const multer = require('multer');
 const multers3 = require('multer-s3');
-
-require('dotenv').config();
+const dotenv = require('dotenv');
 
 const aws = require('aws-sdk');
+
+const fs = require('fs');
+
+let path = '.env';
+
+try {
+  if (fs.existsSync(path)) {
+    // file exists
+
+    path = '.env';
+  }
+} catch (err) {
+  path = '/etc/profile.d/sh.local';
+}
+
+dotenv.config(path);
 aws.config.loadFromPath(__dirname + '/../../config/s3.json');
 aws.config.update({ secretAccessKey: process.env.S3_ACC_KEY });
 

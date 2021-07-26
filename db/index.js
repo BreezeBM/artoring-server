@@ -6,14 +6,16 @@ let path = '.env';
 try {
   if (fs.existsSync(path)) {
     // file exists
-
+    console.log('found');
     path = '.env';
   }
 } catch (err) {
+  console.log('not found');
   path = '/etc/profile.d/sh.local';
 }
 
 dotenv.config(path);
+console.lgg(process.env);
 const mongoose = require('mongoose');
 module.exports = () => {
   const pass = encodeURIComponent(process.env.MONGO_SEC_KEY);

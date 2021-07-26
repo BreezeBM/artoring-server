@@ -1,5 +1,7 @@
 require('dotenv').config();
 
+console.log(process.env);
+
 const mongoose = require('mongoose');
 module.exports = () => {
   const pass = encodeURIComponent(process.env.MONGO_SEC_KEY);

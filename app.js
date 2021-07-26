@@ -19,8 +19,8 @@ db();
 
 app.use(express.json({ extended: false }));
 app.use(cors({
-  origin: env.NODE_ENV === 'production' ? '*' : 'https://artoring.com',
-  methods: env.NODE_ENV === 'production' ? '*' : 'GET,POST,PUT,DELETE,OPTION'
+  origin: env.NODE_ENV !== 'production' ? '*' : 'https://artoring.com',
+  methods: env.NODE_ENV !== 'production' ? '*' : 'GET,POST,PUT,DELETE,OPTION'
 }));
 
 // X-powered-by제외하는 간단한 보안 모듈

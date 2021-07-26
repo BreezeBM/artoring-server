@@ -4,7 +4,8 @@
   "description": "",
   "engines": { "node" : "14.17.0" },
   "scripts": {
-    "start": "pm2 restart app.js",
+    "poststart": "node ./node_modules/pm2/bin/pm2 logs",
+    "start": "node ./node_modules/pm2/bin/pm2 start app.js --name server",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

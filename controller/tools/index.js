@@ -1,7 +1,7 @@
 require('dotenv').config();
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
-
+const { trimKakao, trimNaver } = require('./profileTrim');
 /**
  * * 자주 사용되는 함수들이 작성되어 있음
  */
@@ -65,4 +65,4 @@ function UserException (type, message) {
   };
 }
 
-module.exports = { verifyJWTToken, aesEncrypt, aesDecrypt, AdminAccessException, UserException };
+module.exports = { verifyJWTToken, aesEncrypt, aesDecrypt, AdminAccessException, UserException, trimKakao, trimNaver };

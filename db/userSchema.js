@@ -21,7 +21,10 @@ const userSchema = new Schema({
     howLong: { type: String },
     dept: String
   },
-  interestedIn: [{ name: String, val: Boolean }],
+  interestedIn: [{
+    name: String,
+    val: Boolean
+  }],
   likedCareerEdu: [Number],
   likedMentor: [Number],
   outdoorAct: String,

@@ -5,7 +5,11 @@ const { uploaderController } = require('../../controller');
 const multer = require('multer');
 const multers3 = require('multer-s3');
 const aws = require('aws-sdk');
+
+require('dotenv').config();
 aws.config.loadFromPath(__dirname + '/../../config/s3.json');
+aws.config.update({ accessKeyId: process.env.S3_KEY_ID });
+aws.config.update({ secretAccessKey: process.env.S3_ACC_KEY });
 
 const s3 = new aws.S3();
 const upload = multer({

@@ -3,7 +3,7 @@ const { verifyJWTToken } = require('../tools');
 
 module.exports = async (req, res) => {    
 
-    const {email, name, gender, birth, mobile, address, password } = req.body
+    const { email, name, gender, birth, mobile, address, password } = req.body;
     const salt = crypto.randomBytes(128).toString('base64');
     const hashPassword = crypto.createHash('sha512').update(password + salt).digest('hex');
 
@@ -20,7 +20,6 @@ module.exports = async (req, res) => {
     } else {
         res.send({message : "Invalid Access"})
     }
-
 
 
 }

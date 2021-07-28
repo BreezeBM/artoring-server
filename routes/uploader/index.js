@@ -19,7 +19,7 @@ const upload = multer({
   })
 }, 'NONE');
 
-router.post('/img', upload.any(), uploaderController.handler);
+router.post('/img', upload.single('file'), uploaderController.handler);
 
 router.use('/*', (req, res) => res.status(404).send());
 

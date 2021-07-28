@@ -27,6 +27,9 @@ app.get("/", (req, res) => {
 })
 
 
+app.get('/', (req, res) => {
+  res.send('ok?');
+});
 module.exports = app.listen(port, () => {
   console.log(`🚀 Server is starting on ${port}`);
 });

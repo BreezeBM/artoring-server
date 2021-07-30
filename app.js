@@ -32,18 +32,18 @@ try {
   path = 'env';
 }
 
-dotenv.config({ path: path });
+dotenv.config({ path });
 
 const whitelist = ['https://insideart-dev.artoring.com', 'https://artoring.com', undefined]; // undefined == EBS health check
 
 app.use(express.json({ extended: false }));
 app.use(cors({
-  origin: env.NODE_ENV !== 'production' ? '*' : function (origin, callback) {
+  origin: process.env.NODE_ENV !== 'production' ? '*' : function (origin, callback) {
     console.log('Origin : ', origin);
     if (whitelist.includes(origin)) callback(null, true);
     else callback(new Error('Not allowed by CORS'));
   },
-  methods: env.NODE_ENV !== 'production' ? '*' : 'GET,POST,PUT,DELETE,OPTIONS'
+  methods: process.env.NODE_ENV !== 'production' ? '*' : 'GET,POST,PUT,DELETE,OPTIONS'
 }));
 
 // X-powered-by제외하는 간단한 보안 모듈

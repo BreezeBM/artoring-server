@@ -1,5 +1,0 @@
-{
-    "accessKeyId": "IAM에서받은액세스키ID입력바람",
-    "secretAccessKey": "IAM에서받은시크릿액세스키입력바람",
-    "region": "ap-northeast-2" // 위치는 서울
-}

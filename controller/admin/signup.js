@@ -1,4 +1,19 @@
-require('dotenv').config();
+const dotenv = require('dotenv');
+const fs = require('fs');
+
+let path = '.env';
+
+try {
+  if (fs.existsSync(path)) {
+    // file exists
+
+    path = '.env';
+  }
+} catch (err) {
+  path = '/etc/profile.d/sh.local';
+}
+
+dotenv.config(path);
 
 const { sha256Encrypt } = require('../tools');
 const { adminModel } = require('../../model');

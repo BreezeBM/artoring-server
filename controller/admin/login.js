@@ -1,7 +1,22 @@
-require('dotenv').config();
+const dotenv = require('dotenv');
 const jwt = require('jsonwebtoken');
+const fs = require('fs');
 
-const { aesEncrypt, sha256Encrypt } = require('../tools');
+let path = '.env';
+
+try {
+  if (fs.existsSync(path)) {
+    // file exists
+
+    path = '.env';
+  }
+} catch (err) {
+  path = '/etc/profile.d/sh.local';
+}
+
+dotenv.config(path);
+
+const { aesEncrypt, sha512Encrypt } = require('../tools');
 const { adminModel } = require('../../model');
 
 module.exports = async (req, res) => {

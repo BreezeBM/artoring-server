@@ -12,7 +12,7 @@ try {
   path = 'env';
 }
 
-dotenv.config(path);
+dotenv.config({ path });
 
 const { sha256Encrypt } = require('../tools');
 const { adminModel } = require('../../model');

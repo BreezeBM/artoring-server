@@ -32,7 +32,7 @@ try {
   path = 'env';
 }
 
-dotenv.config({ path: path });
+dotenv.config({ path });
 
 const whitelist = ['https://insideart-dev.artoring.com', 'https://artoring.com', undefined]; // undefined == EBS health check
 

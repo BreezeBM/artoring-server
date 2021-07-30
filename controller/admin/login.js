@@ -13,9 +13,9 @@ try {
   path = 'env';
 }
 
-dotenv.config(path);
+dotenv.config({ path });
 
-const { aesEncrypt, sha512Encrypt } = require('../tools');
+const { aesEncrypt, sha256Encrypt } = require('../tools');
 const { adminModel } = require('../../model');
 
 module.exports = async (req, res) => {

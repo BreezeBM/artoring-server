@@ -1,8 +1,10 @@
 
 const { userModel } = require('../../model');
-const { verifyJWTToken } = require('../tools');
+const { verifyJWTToken, verifyAndCallback } = require('../tools');
 
 module.exports = async (req, res) => {
+  const accessToken = req.headers.authorization;
+
   const { type } = req.query;
   try {
     if (type === 'email') {
@@ -24,6 +26,12 @@ module.exports = async (req, res) => {
           res.json(data);
         }
       }
+    } else {
+      verifyAndCallback(async (responseData) => {
+        const userInfo = await userModel.findOne({ email: responseData.email }).select({ pwd: 0 });
+
+        res.status(200).json(userInfo);
+      }, type, accessToken, res);
     }
   } catch (e) {
     console.log(e.message);

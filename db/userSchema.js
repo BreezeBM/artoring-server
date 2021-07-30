@@ -13,7 +13,7 @@ const userSchema = new Schema({
   phone: { type: String },
   address: { type: String },
   pwd: { type: String, required: true },
-  isMentor: Boolean,
+  isMentor: { type: Boolean, default: false },
   major: { type: String },
   current: {
     jobTitle: { type: String },
@@ -28,7 +28,8 @@ const userSchema = new Schema({
   likedCareerEdu: [Number],
   likedMentor: [Number],
   outdoorAct: String,
-  workHistory: String
+  workHistory: String,
+  refOrLongTimeToken: String
 });
 
 const AutoIncrement = AutoIncrementFactory(mongoose);

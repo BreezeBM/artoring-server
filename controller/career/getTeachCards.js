@@ -26,7 +26,8 @@ module.exports = async (req, res) => {
             category: '$category',
             subCategory: '$subCategory',
             descriptionForMentor: '$mentor.descriptionForMentor',
-            intro: '$mentor.intro'
+            intro: '$mentor.intro',
+            id: '$id'
           }
         }
       ]);

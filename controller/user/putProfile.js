@@ -1,10 +1,9 @@
+const { default: axios } = require('axios');
 const { userModel } = require('../../model');
-const { verifyJWTToken } = require('../tools');
+const { verifyJWTToken, verifyAndCallback } = require('../tools');
 
 module.exports = async (req, res) => {
-  console.log(req.body);
   const { type } = req.body;
-
   if (type === 'email') {
     const decode = await verifyJWTToken(req);
 
@@ -25,6 +24,14 @@ module.exports = async (req, res) => {
         res.json(data);
       }
     }
+  } else {
+    const accessToken = req.headers.authorization;
+    verifyAndCallback(async (responseData) => {
+      console.log(responseData.email, req.body);
+      const data = await userModel.findOneAndUpdate({ email: responseData.email }, { $set: req.body.profile }, { new: true });
+      console.log('data', data);
+      res.send();
+    }, type, accessToken, res);
   }
 }
 ;

@@ -23,5 +23,53 @@ const trimKakao = (account) => {
   return result;
 };
 
-module.exports = { trimKakao, trimNaver }
+const trimFacebook = (data) => {
+  const result = {};
+
+  if (data.name) result.name = data.name;
+  if (data.picture && data.picture.data && data.picture.data.url) result.thumb = data.picture.data.url;
+  if (data.birthday) result.birthday = data.birthday;
+  if (data.email) result.email = data.email;
+  if (data.gender) result.gender = data.gender;
+
+  return result;
+};
+
+const trimUserData = (userData) => {
+  userData.pwd = 'Oauth aacount';
+  if (!userData.name) userData.name = '';
+  if (!userData.nickName) userData.nickName = '';
+  if (!userData.gender) userData.gender = '';
+  if (!userData.birth) userData.birth = '';
+  if (!userData.phone) userData.phone = '';
+  if (!userData.major) userData.major = '';
+  if (!userData.current) {
+    userData.current = {
+      jobTitle: '',
+      belongs: '',
+      howLong: '',
+      dept: ''
+    };
+  }
+  if (!userData.thumb) userData.thumb = 'https://artoring.com/img/1626851218536.png';
+  if (!userData.likedCareerEdu) userData.likedCareerEdu = [];
+  if (!userData.likedMentor) userData.likedMentor = [];
+  if (!userData.outdoorAct) userData.outdoorAct = '';
+  if (!userData.workHistory) userData.workHistory = '';
+  userData.isMentor = false;
+  userData.interestedIn = [
+    { name: '창업', val: false },
+    { name: '취업', val: false },
+    { name: '전문예술', val: false },
+    { name: '프리랜서', val: false },
+    { name: '대학원/유학', val: false },
+    { name: '예술교육', val: false },
+    { name: '연구개발', val: false },
+    { name: '기획/창작/제작', val: false },
+    { name: '크리에이터', val: false }, { name: '홍보마케팅', val: false },
+    { name: '경영지원(인사 및 회계)', val: false },
+    { name: '구분 외 관심사 or 기타', val: false }];
+};
+
+module.exports = { trimKakao, trimNaver, trimFacebook, trimUserData }
 ;

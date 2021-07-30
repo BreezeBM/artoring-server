@@ -1,7 +1,7 @@
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
 
-const { aesEncrypt, sha512Encrypt } = require('../tools');
+const { aesEncrypt, sha256Encrypt } = require('../tools');
 const { adminModel } = require('../../model');
 
 module.exports = async (req, res) => {
@@ -10,8 +10,9 @@ module.exports = async (req, res) => {
    */
   try {
     const hashingTime = process.env.NODE_ENV === 'development' ? process.env.HASHING_TIME_DEV : process.env.HASHING_TIME_PRO;
+    const salt = process.env.NODE_ENV === 'development' ? process.env.SALT_DEV : process.env.SALT_PRO;
     let { email, pwd } = req.body;
-    for (let i = 0; i < hashingTime; i++) { pwd = sha512Encrypt(999, pwd); }
+    for (let i = 0; i < hashingTime; i++) { pwd = sha256Encrypt(999, pwd, salt); }
 
     let { name, accessKey, authorityLevel } = await adminModel.find({ email, pwd });
 

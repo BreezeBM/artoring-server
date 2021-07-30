@@ -2,34 +2,6 @@ const express = require('express');
 const { careerController } = require('../../controller');
 const router = express.Router();
 
-const { careerTeachCardModel } = require('../../model');
-
-router.get('/test', async (req, res) => {
-  const test = [];
-
-  const { _id, price } = await careerTeachCardModel.findOne({ id: 1 });
-
-  careerTeachCardModel.findOne({ _id, in_transaction: { $exists: false } }, (err, data) => {
-    if (err) console.log(err);
-    console.log('after1', data.price);
-    test[0] = true;
-
-    if (test[0] && test[1]) res.send();
-  });
-
-  careerTeachCardModel.findOne({ _id, in_transaction: { $exists: false } }, (err, data) => {
-    if (err) console.log(err);
-    console.log('after2', data.price);
-
-    test[1] = true;
-
-    if (test[0] && test[1]) res.send();
-  });
-  setTimeout(() => {
-    res.send();
-  }, 1000);
-});
-
 // 교육, 모임등을 가진 모든 카테고리 정보를 리턴해야 합니다.
 router.get('/', careerController.getCard);
 

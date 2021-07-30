@@ -8,14 +8,14 @@ try {
     // file exists
     console.log('found');
     path = '.env';
-  }
+  } else path = 'env';
 } catch (err) {
   console.log('not found');
-  path = '/etc/profile.d/sh.local';
+  path = 'env';
 }
 
-dotenv.config(path);
-
+dotenv.config({ path });
+console.log(process.env);
 const mongoose = require('mongoose');
 module.exports = () => {
   const pass = encodeURIComponent(process.env.MONGO_SEC_KEY);

@@ -23,7 +23,7 @@ try {
   path = 'env';
 }
 
-dotenv.config(path);
+dotenv.config({ path });
 
 const s3 = new aws.S3();
 const upload = multer({

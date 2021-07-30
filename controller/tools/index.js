@@ -16,7 +16,7 @@ try {
   path = 'env';
 }
 
-dotenv.config(path);
+dotenv.config({ path });
 
 /**
  * * 자주 사용되는 함수, 생성자들이 작성되어 있음

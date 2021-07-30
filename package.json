@@ -2,7 +2,9 @@
   "name": "artoring-server",
   "version": "1.0.0",
   "description": "",
-  "engines": { "node" : "14.17.0" },
+  "engines": {
+    "node": "14.17.0"
+  },
   "scripts": {
     "poststart": "node ./node_modules/pm2/bin/pm2 logs",
     "start": "node ./node_modules/pm2/bin/pm2 start app.js --name server",

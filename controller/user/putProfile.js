@@ -1,4 +1,4 @@
-const { default: axios } = require('axios');
+
 const { userModel } = require('../../model');
 const { verifyJWTToken, verifyAndCallback } = require('../tools');
 

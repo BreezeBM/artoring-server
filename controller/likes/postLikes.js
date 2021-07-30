@@ -1,6 +1,5 @@
 const { careerTeachCardModel, mentorModel, userModel } = require('../../model');
 const { verifyJWTToken } = require('../tools');
-const axios = require('axios');
 
 const { verifyAndCallback } = require('../tools');
 

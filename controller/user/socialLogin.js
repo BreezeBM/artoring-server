@@ -1,10 +1,21 @@
-require('dotenv').config();
+const dotenv = require('dotenv');
 
 const axios = require('axios');
 const { userModel } = require('../../model');
 const { trimNaver, trimKakao, trimFacebook, trimUserData } = require('../tools');
 const { sha256Encrypt } = require('../tools');
 
+let path;
+try {
+  if (fs.existsSync(path)) {
+    // file exists
+    path = '.env';
+  } else path = 'env';
+} catch (err) {
+  path = 'env';
+}
+
+dotenv.config({ path });
 module.exports = async (req, res) => {
   try {
     const { type } = req.params;

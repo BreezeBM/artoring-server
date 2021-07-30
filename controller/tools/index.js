@@ -10,11 +10,10 @@ let path = '.env';
 try {
   if (fs.existsSync(path)) {
     // file exists
-
     path = '.env';
-  }
+  } else path = 'env';
 } catch (err) {
-  path = '/etc/profile.d/sh.local';
+  path = 'env';
 }
 
 dotenv.config(path);

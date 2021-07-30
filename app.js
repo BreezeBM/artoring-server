@@ -40,7 +40,7 @@ dotenv.config(path);
 
 app.use(express.json({ extended: false }));
 app.use(cors({
-  origin: env.NODE_ENV !== 'production' ? '*' : 'https://insideart-dev.artoring.com',
+  origin: env.NODE_ENV !== 'production' ? '*' : ['https://insideart-dev.artoring.com','172.31.0.172'],
   methods: env.NODE_ENV !== 'production' ? '*' : 'GET,POST,PUT,DELETE,OPTION'
 }));
 

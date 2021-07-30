@@ -21,33 +21,29 @@ db();
 app.use(express.json({ extended: false }));
 app.use(helmet());
 
-
-const fs = require('fs');
-
 let path = '.env';
 
 try {
   if (fs.existsSync(path)) {
     // file exists
-
     path = '.env';
-  }
+  } else path = 'env';
 } catch (err) {
-  path = '/etc/profile.d/sh.local';
+  path = 'env';
 }
 
-dotenv.config(path);
+dotenv.config({ path: path });
 
-const whitelist=['https://insideart-dev.artoring.com', 'https://artoring.com', 'undefined' ] // undefined == EBS health check 
+const whitelist = ['https://insideart-dev.artoring.com', 'https://artoring.com', undefined]; // undefined == EBS health check
 
 app.use(express.json({ extended: false }));
 app.use(cors({
-  origin: env.NODE_ENV !== 'production' ? '*' : function(origin,callback){
-    console.log('Origin : ',origin);
-    if(whitelist.includes(origin)) callback(null,true);
-    else callback(new Error('Not allowed by CORS')); 
+  origin: process.env.NODE_ENV !== 'production' ? '*' : function (origin, callback) {
+    console.log('Origin : ', origin);
+    if (whitelist.includes(origin)) callback(null, true);
+    else callback(new Error('Not allowed by CORS'));
   },
-  methods: env.NODE_ENV !== 'production' ? '*' : 'GET,POST,PUT,DELETE,OPTIONS'
+  methods: process.env.NODE_ENV !== 'production' ? '*' : 'GET,POST,PUT,DELETE,OPTIONS'
 }));
 
 // X-powered-by제외하는 간단한 보안 모듈

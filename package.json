@@ -2,9 +2,10 @@
   "name": "artoring-server",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "engines": { "node" : "14.17.0" },
   "scripts": {
-    "start": "./node_modules/pm2/bin/pm2 start app.js --exp-backoff-restart-delay=100",
+    "poststart": "node ./node_modules/pm2/bin/pm2 logs",
+    "start": "node ./node_modules/pm2/bin/pm2 start app.js --name server",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

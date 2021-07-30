@@ -1,10 +1,26 @@
-require('dotenv').config();
+const dotenv = require('dotenv');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
-const { trimKakao, trimNaver, trimFacebook, trimUserData } = require('./profileTrim');
 const axios = require('axios');
+const fs = require('fs');
+
+const { trimKakao, trimNaver, trimFacebook, trimUserData } = require('./profileTrim');
+let path = '.env';
+
+try {
+  if (fs.existsSync(path)) {
+    // file exists
+
+    path = '.env';
+  }
+} catch (err) {
+  path = '/etc/profile.d/sh.local';
+}
+
+dotenv.config(path);
+
 /**
- * * 자주 사용되는 함수들이 작성되어 있음
+ * * 자주 사용되는 함수, 생성자들이 작성되어 있음
  */
 
 const verifyJWTToken = async (req) => {

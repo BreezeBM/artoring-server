@@ -4,7 +4,9 @@ const loginWithEmail = require('./loginWithEmail');
 const signUpByEmail = require('./signUpByEmail');
 const socialLogin = require('./socialLogin');
 
-const careerCardController = { getProfile, putProfile, loginWithEmail, signUpByEmail, socialLogin };
+const logout = require('./logout');
+
+const careerCardController = { getProfile, putProfile, loginWithEmail, signUpByEmail, socialLogin, logout };
 
 module.exports = careerCardController
 ;

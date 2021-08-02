@@ -20,7 +20,6 @@ module.exports = async (req, res) => {
           break;
         }
         default: {
-          console.log('decoded form get', decode);
           const { email, name } = decode;
           const data = await userModel.findOne({ email, name }).select({ pwd: 0 });
           res.json(data);

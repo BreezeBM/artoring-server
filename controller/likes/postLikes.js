@@ -1,7 +1,5 @@
 const { careerTeachCardModel, mentorModel, userModel } = require('../../model');
-const { verifyJWTToken } = require('../tools');
-
-const { verifyAndCallback } = require('../tools');
+const { verifyJWTToken, verifyAndCallback } = require('../tools');
 
 // 에러시 throw를 하기위한 템플릿
 function UserException (type, message) {
@@ -20,6 +18,7 @@ module.exports = async (req, res) => {
   const accessToken = req.headers.authorization;
 
   // 각 타입에 대해 유저프로필을 각 오어스 서버에 요청하고, 이를 바탕으로 서버에 등록애함.
+  // 템플릿 사용해야한다.
   if (type) {
     if (type === 'email') {
       const decode = await verifyJWTToken(req);

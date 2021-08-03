@@ -25,7 +25,7 @@ module.exports = async (req, res) => {
           try {
             // 즉시만료 JWT 토큰을 생성하여 리턴. 유출되어도 염려 없다.
             const fakeToken = await createJWT({ email: 'expired' }, 0);
-            res.status(201).josn({});
+            res.status(201).josn({ accessToken: fakeToken });
           } catch (e) {
             console.log(e);
             if (e.type) { res.status(404).send(e.message); } else { res.status(500).send(e.message); }

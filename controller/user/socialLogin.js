@@ -24,6 +24,7 @@ module.exports = async (req, res) => {
 
     const redirect_uri = process.env.NODE_ENV === 'development' ? `https://localhost:3000/callback/${type}` : `https://artoring.com/callback/${type}`;
     let url, clientSecret, clientId, contentType;
+
     if (type === 'kakao' || type === 'naver') {
       if (type === 'kakao') {
         url = 'https://kauth.kakao.com/oauth/token?';
@@ -41,6 +42,7 @@ module.exports = async (req, res) => {
         'Content-Type': contentType
       });
 
+      // 선언없이 구조분해 할당을 사용/
       ({ access_token, refresh_token } = response.data);
     }
     let proof;

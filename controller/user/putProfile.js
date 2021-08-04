@@ -17,9 +17,8 @@ module.exports = async (req, res) => {
         break;
       }
       default: {
-        console.log('decoded from put', decode);
         const { email, name } = decode;
-        console.log(req.body);
+
         const data = await userModel.findOneAndUpdate({ email, name }, req.body.profile);
         res.json(data);
       }
@@ -27,9 +26,9 @@ module.exports = async (req, res) => {
   } else {
     const accessToken = req.headers.authorization;
     verifyAndCallback(async (responseData) => {
-      console.log(responseData.email, req.body);
-      const data = await userModel.findOneAndUpdate({ email: responseData.email }, { $set: req.body.profile }, { new: true });
-      console.log('data', data);
+      // 몽고디비 aggregate를 moogoose에서는 이런 메서드로도 지원해준다. 적용후 데이터를 볼수있도록 new: true설정이되어있다.
+      await userModel.findOneAndUpdate({ email: responseData.email }, { $set: req.body.profile }, { new: true });
+
       res.send();
     }, type, accessToken, res);
   }

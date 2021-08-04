@@ -3,19 +3,20 @@ const fs = require('fs');
 
 let path = '.env';
 
+// .env 파일을 찾거나 없으면 env 파일을 찾아서 환경변수를 등록함
+// 근데 빈즈토크에선 필요가 없다.
 try {
   if (fs.existsSync(path)) {
     // file exists
-    console.log('found');
+
     path = '.env';
   } else path = 'env';
 } catch (err) {
-  console.log('not found');
   path = 'env';
 }
 
 dotenv.config({ path });
-console.log(process.env);
+
 const mongoose = require('mongoose');
 module.exports = () => {
   const pass = encodeURIComponent(process.env.MONGO_SEC_KEY);

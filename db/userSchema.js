@@ -8,6 +8,7 @@ const userSchema = new Schema({
   name: { type: String, required: true },
   nickName: { type: String },
   email: { type: String, required: true, unique: true },
+  verifiedEmail: { type: Boolean, default: false },
   gender: { type: String },
   birth: { type: String },
   phone: { type: String },
@@ -29,6 +30,7 @@ const userSchema = new Schema({
   likedMentor: [Number],
   outdoorAct: String,
   workHistory: String,
+  createdAt: { type: Date, default: new Date() },
   refOrLongTimeToken: String
 });
 

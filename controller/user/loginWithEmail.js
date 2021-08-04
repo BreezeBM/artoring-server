@@ -11,7 +11,7 @@ module.exports = async (req, res) => {
     for (let i = 0; i < hashingTime; i++) { password = sha256Encrypt(999, password, salt); }
 
     if (email) {
-      const data = await userModel.find({ email, pwd: password }).select({ thumb: 1, nickName: 1, email: 1, isMentro: 1, likedCareerEdu: 1, likedMentor: 1 });
+      const data = await userModel.find({ email, pwd: password }).select({ thumb: 1, nickName: 1, email: 1, isMentro: 1, likedCareerEdu: 1, likedMentor: 1, verifiedEmail: 1 });
       if (data) {
         res.status(200).send({ message: '이미 가입된 이메일입니다.' });
       } else {

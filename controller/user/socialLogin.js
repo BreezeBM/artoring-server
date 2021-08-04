@@ -80,6 +80,8 @@ module.exports = async (req, res) => {
     } else {
       trimUserData(userData);
 
+      userData.verifiedEmail = true;
+
       await userModel.create(userData);
 
       res.status(200).json({ accessToken: returnToken || token, userData, signup: true });

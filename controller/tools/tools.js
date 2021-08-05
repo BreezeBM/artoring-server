@@ -1,21 +1,9 @@
-const dotenv = require('dotenv');
+
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const axios = require('axios');
-const fs = require('fs');
 
-let path = '.env';
-
-try {
-  if (fs.existsSync(path)) {
-    // file exists
-    path = '.env';
-  } else path = 'env';
-} catch (err) {
-  path = 'env';
-}
-
-dotenv.config({ path });
+require('dotenv').config();
 
 /**
  * * 자주 사용되는 함수, 생성자들이 작성되어 있음
@@ -49,13 +37,10 @@ const verifyJWTToken = async (req) => {
  */
 const createJWT = (data, time = 60) => {
   const option = {
-    secretKey: process.env.NODE_ENV === 'development' ? process.env.JWT_SEC_KEY_DEVELOP : process.env.JWT_SEC_KEY_PRODUCTION,
-    option: {
-      algorithm: 'HS256', // 해싱 알고리즘
-      expiresIn: time, // 토큰 유효 기간
-      issuer: sha256Encrypt(999, 'https://back.artoring.com', Math.random()), // 발행자
-      audience: sha256Encrypt(999, data.email, 'https://back.artoring.com')
-    }
+    algorithm: 'HS256', // 해싱 알고리즘
+    expiresIn: time, // 토큰 유효 기간
+    issuer: sha256Encrypt(999, 'https://back.artoring.com', (Math.random() * 10000).toString()), // 발행자
+    audience: sha256Encrypt(999, data.email ? data.email : data.encryptEmail ? data.encryptEmail : undefined, 'https://back.artoring.com')
   };
 
   return jwt.sign(data, process.env.NODE_ENV === 'development' ? process.env.JWT_SEC_KEY_DEVELOP : process.env.JWT_SEC_KEY_PRODUCTION, option);
@@ -72,9 +57,15 @@ const sha256Encrypt = (slice, key, salt) => {
 
 // 어드민 데이터 암호화에 사용됨
 const aesEncrypt = (string) => {
-  const key = sha256Encrypt(32, process.env.NODE_ENV === 'development' ? process.env.KEY_FROM_DEVELOP : process.env.KEY_FROM_PRODUCTION);
+  const key = sha256Encrypt(32,
+    process.env.NODE_ENV === 'development' ? process.env.KEY_FROM_DEVELOP : process.env.KEY_FROM_PRODUCTION,
+    process.env.NODE_ENV === 'development' ? process.env.SALT_DEV : process.env.SALT_PRO
+  );
 
-  const iv = sha256Encrypt(16, process.env.NODE_ENV === 'development' ? process.env.KEY_IV_DEVELOP : process.env.KEY_IV_PRODUCTION);
+  const iv = sha256Encrypt(16,
+    process.env.NODE_ENV === 'development' ? process.env.KEY_IV_DEVELOPMENT : process.env.KEY_IV_PRODUCTION,
+    process.env.NODE_ENV === 'development' ? process.env.SALT_DEV : process.env.SALT_PRO
+  );
 
   const cipher = crypto.createCipheriv('aes-256-ctr', key, iv);
   let result = cipher.update(string, 'utf8', 'hex');
@@ -85,9 +76,15 @@ const aesEncrypt = (string) => {
 
 // 어드민 데이터 복호화에 사용됨.
 const aesDecrypt = (string) => {
-  const key = sha256Encrypt(32, process.env.NODE_ENV === 'development' ? process.env.KEY_FROM_DEVELOP : process.env.KEY_FROM_PRODUCTION);
+  const key = sha256Encrypt(32,
+    process.env.NODE_ENV === 'development' ? process.env.KEY_FROM_DEVELOP : process.env.KEY_FROM_PRODUCTION,
+    process.env.NODE_ENV === 'development' ? process.env.SALT_DEV : process.env.SALT_PRO
+  );
 
-  const iv = sha256Encrypt(16, process.env.NODE_ENV === 'development' ? process.env.KEY_IV_DEVELOP : process.env.KEY_IV_PRODUCTION);
+  const iv = sha256Encrypt(16,
+    process.env.NODE_ENV === 'development' ? process.env.KEY_IV_DEVELOPMENT : process.env.KEY_IV_PRODUCTION,
+    process.env.NODE_ENV === 'development' ? process.env.SALT_DEV : process.env.SALT_PRO
+  );
 
   const decipher = crypto.createDecipheriv('aes-256-ctr', key, iv);
   let result = decipher.update(string, 'hex', 'utf8');

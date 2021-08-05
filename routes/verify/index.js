@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
 
-const { verifyEmail } = require('../../controller/user');
+const { verifyEmail, retryVerify } = require('../../controller/user');
 
 router.post('/email', verifyEmail);
 
-router.post('/retry', () => {});
+router.post('/retry', retryVerify);
 
 module.exports = router;

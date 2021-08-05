@@ -10,30 +10,31 @@ const nodemailer = require('nodemailer');
  * @param {*} res response 객체
  */
 module.exports = async (data, res) => {
-  const token = await createJWT({ eamil: data.email, name: data.name });
-
+  console.log(data);
   // 이메일 검증용 링크에 담길 토큰에 저장할 이메일 정보를 암호화한다. URL에 저장되기도 하고, JWT는 인코딩된 데이터이기 때문에, 암호화를 진행한다.
   const encryptEmail = await aesEncrypt(data.email);
 
   // 암호화된 데이터를 바탕으로 10분짜리 JWT 토큰을 생성한다.
-  const verifyToken = await createJWT({ encryptEmail }, 10);
+  const verifyToken = await createJWT({ encryptEmail }, 600);
 
   // 메일을 보내기위한 메일서버 설정
   const smtpTransport = nodemailer.createTransport({
-    service: 'gmail',
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true,
+    host: 'smtp.naver.com',
+    port: 587,
+    secure: false,
+    requireTLS: true,
     auth: {
-      user: process.env.STMP_USER_ID,
-      pass: process.env.STMP_USER_PASSWORD
+      user: process.env.STMP_NAVER_USER_ID,
+      pass: process.env.STMP_NAVER_USER_PASSWORD
+      //      user: "scm0222@naver.com",
+      //      pass: 'cN#arGn3b3tgDzv'
     }
   });
 
   const mailOptions = {
-    from: '인사이드아트',
-    to: 'scm0222@naver.com',
-    subject: '[아토링]인증 관련 이메일 입니다',
+    from: `"no@reploy.com" <${process.env.STMP_NAVER_USER_ID}@naver.com>`,
+    to: data.email,
+    subject: '[아토링] 인증 관련 이메일 입니다',
     html: `<div style="height: 100%; width: 100%; background-color: #c8c8c8;">
 <table style="border-collapse: collapse; width: 67.7898%; height: 185px; margin-left: auto; margin-right: auto; background-color: #ffffff;" border="1">
 <tbody>
@@ -50,7 +51,7 @@ module.exports = async (data, res) => {
 <br>
 <p>다음 링크를 클릭하여 계정을 활성화 합니다. 해당 링크는 10분 동안만 유효합니다.</p>
 <br>
-<a href="https://insideart-dev.artoring.com/verify?token=${verifyToken}">https://insideart-dev.artoring.com/verify?token=${verifyToken}</a>
+<a href=${process.env.NODE_ENV !== 'development' ? `https://insideart-dev.artoring.com/verify?token=${verifyToken}` : `https://localhost:3000/verify?token=${verifyToken}`}>${process.env.NODE_ENV !== 'development' ? `https://insideart-dev.artoring.com/verify?token=${verifyToken}` : `https://localhost:3000/verify?token=${verifyToken}`}</a>
 <br>
 <p>감사합니다!<br />인사이드 아트</p>
 </td>
@@ -59,9 +60,7 @@ module.exports = async (data, res) => {
 </table>
 </div>`
   };
-
-  // 메일을 보낸이후 진행할 로직. 보내기 성공한 이후 엑세스토큰과 링크에 필요한 토큰을 리턴
-  smtpTransport.sendMail(mailOptions, (error, responses) => {
+  await smtpTransport.sendMail(mailOptions, (error, responses) => {
     if (error) {
       smtpTransport.close();
       console.log(error);
@@ -69,7 +68,7 @@ module.exports = async (data, res) => {
     } else {
       /* 클라이언트에게 인증 번호를 보내서 사용자가 맞게 입력하는지 확인! */
       smtpTransport.close();
-      return res.status(201).json({ accessToken: token });
+      return res.status(200).json(responses);
     }
   });
 }

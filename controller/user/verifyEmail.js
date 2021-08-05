@@ -1,11 +1,12 @@
 const { userModel } = require('../../model');
-const { verifyJWTToken } = require('../tools');
+const { verifyJWTToken, aesDecrypt } = require('../tools');
 
 module.exports = async (req, res) => {
   const { token } = req.body;
-  req.body.authorization = token;
+  req.headers.authorization = `Bearer ${token}`;
+  console.log(req.headers.authorization);
 
-  const decode = verifyJWTToken(req);
+  const decode = await verifyJWTToken(req);
 
   switch (decode) {
     case 401: {
@@ -18,7 +19,9 @@ module.exports = async (req, res) => {
     }
     default: {
       try {
-        const { email } = decode;
+        const { encryptEmail } = decode;
+        console.log(decode);
+        const email = aesDecrypt(encryptEmail);
         // 멘터 혹은 커리어 교육 카드 좋아요에대해 공통으로 사용하기 위함.
         await userModel.findOneAndUpdate({ email }, { $set: { verifiedEmail: true } });
 

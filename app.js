@@ -50,13 +50,13 @@ app.use(cors({
 app.use(helmet());
 
 app.get('/', (req, res) => {
-  res.send('ok?');
+  res.send();
 });
 
 app.use('/', router);
 
 module.exports = process.env.NODE_ENV === 'development'
-  ? https.createServer({ key: fs.readFileSync('./key.pem'), cert: fs.readFileSync('./cert.pem') }, app).listen(port, () => console.log(`🚀 Server is starting on ${port}`))
+  ? https.createServer({ key: fs.readFileSync('./key.pem'), cert: fs.readFileSync('./cert.pem') }, app).listen(port, () => console.log(`🚀 https Server is starting on ${port}`))
   : app.listen(port, () => {
     console.log(`🚀 Server is starting on ${port}`);
   });

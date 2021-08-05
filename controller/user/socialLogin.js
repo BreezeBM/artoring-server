@@ -75,6 +75,7 @@ module.exports = async (req, res) => {
       trimedData.isMentor = registered.isMentor;
       trimedData.likedCareerEdu = registered.likedCareerEdu;
       trimedData.likedMentor = registered.likedMentor;
+      trimedData.verifiedEmail = registered.verifiedEmail;
 
       res.status(200).json({ accessToken: returnToken || token, trimedData });
     } else {

@@ -26,8 +26,6 @@ module.exports = async (data, res) => {
     auth: {
       user: process.env.STMP_NAVER_USER_ID,
       pass: process.env.STMP_NAVER_USER_PASSWORD
-      //      user: "scm0222@naver.com",
-      //      pass: 'cN#arGn3b3tgDzv'
     }
   });
 

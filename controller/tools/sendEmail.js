@@ -9,10 +9,10 @@ const nodemailer = require('nodemailer');
  * @param {*} data 유저데이터
  * @param {*} res response 객체
  */
-module.exports = async (data, res) => {
-  console.log(data);
+module.exports = async (data, email = data.email, res) => {
+  const { userData, accessToken } = data;
   // 이메일 검증용 링크에 담길 토큰에 저장할 이메일 정보를 암호화한다. URL에 저장되기도 하고, JWT는 인코딩된 데이터이기 때문에, 암호화를 진행한다.
-  const encryptEmail = await aesEncrypt(data.email);
+  const encryptEmail = await aesEncrypt(email);
 
   // 암호화된 데이터를 바탕으로 10분짜리 JWT 토큰을 생성한다.
   const verifyToken = await createJWT({ encryptEmail }, 600);
@@ -31,7 +31,7 @@ module.exports = async (data, res) => {
 
   const mailOptions = {
     from: `no-reply <${process.env.STMP_NAVER_USER_ID}@naver.com>`,
-    to: data.email,
+    to: userData.email,
     subject: '[아토링] 인증 관련 이메일 입니다',
     html: `<table style="border-collapse: collapse; width: 490px; margin-left: auto; margin-right: auto; height: 435px;" border="0">
 <tbody>
@@ -71,7 +71,7 @@ module.exports = async (data, res) => {
     } else {
       /* 클라이언트에게 인증 번호를 보내서 사용자가 맞게 입력하는지 확인! */
       smtpTransport.close();
-      return res.status(200).json(responses);
+      return res.status(200).json({ responses, accessToken });
     }
   });
 }

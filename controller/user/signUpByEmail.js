@@ -11,6 +11,7 @@ module.exports = async (req, res) => {
     if (email) {
       const data = await userModel.findOne({ email }).select({ thumb: 1, nickName: 1, email: 1, isMentor: 1, likedCareerEdu: 1, likedMentor: 1, createdAt: 1 });
       // 데이터가 존재하는 경우라면, 이미 가입한 경우
+
       if (data) {
         const accessToken = await createJWT({ _id: data._id, name: data.name }, 3600);
         res.status(409).send({ message: '이미 가입된 이메일입니다.', userData: data, accessToken });
@@ -45,8 +46,10 @@ module.exports = async (req, res) => {
             { name: '구분 외 관심사 or 기타', val: false }]
         });
 
+        const accessToken = await createJWT({ _id: userData._id, name: userData.name }, 3600);
+
         // 유저정보를 이용하여 구글 메일 서버를 활용하여 이메일을 보낸다
-        sendEmail(userData, res);
+        await sendEmail({ userData, accessToken }, userData.email, res);
       }
     } else {
       // 이메일이 없는경우

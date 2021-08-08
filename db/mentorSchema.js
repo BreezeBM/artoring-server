@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const AutoIncrementFactory = require('mongoose-sequence');
 
 const Schema = mongoose.Schema;
 
@@ -13,9 +12,5 @@ const mentorSchema = new Schema({
   likesCount: { type: Number, default: 0 },
   price: { type: Number, required: true }
 });
-
-const AutoIncrement = AutoIncrementFactory(mongoose);
-const option = { id: 'mentor_id', inc_field: 'id' };
-mentorSchema.plugin(AutoIncrement, option);
 
 module.exports = mentorSchema;

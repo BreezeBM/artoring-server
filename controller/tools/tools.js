@@ -36,11 +36,12 @@ const verifyJWTToken = async (req) => {
  * @returns
  */
 const createJWT = (data, time = 60) => {
+  console.log(data._id.toString());
   const option = {
     algorithm: 'HS256', // 해싱 알고리즘
     expiresIn: time, // 토큰 유효 기간
     issuer: sha256Encrypt(999, 'https://back.artoring.com', (Math.random() * 10000).toString()), // 발행자
-    audience: sha256Encrypt(999, data.email ? data.email : data.encryptEmail ? data.encryptEmail : undefined, 'https://back.artoring.com')
+    audience: sha256Encrypt(999, data._id ? data._id.toString() : data.encryptEmail ? data.encryptEmail : undefined, 'https://back.artoring.com')
   };
 
   return jwt.sign(data, process.env.NODE_ENV === 'development' ? process.env.JWT_SEC_KEY_DEVELOP : process.env.JWT_SEC_KEY_PRODUCTION, option);
@@ -119,7 +120,7 @@ function UserException (type, message) {
  * @param {*} res // req, res할때 그것
  */
 
-const verifyAndCallback = async function (callback, type, accessToken, res) {
+const verifyAndCallback = async function (callback, type, accessToken, res, userModel) {
   let appSecret;
   if (type === 'facebook') {
     const response = await axios.get(`https://graph.facebook.com/oauth/access_token?client_id=${process.env.FACEBOOK_ID}&client_secret=${process.env.FACEBOOK_SEC}&grant_type=client_credentials`);
@@ -130,7 +131,6 @@ const verifyAndCallback = async function (callback, type, accessToken, res) {
   const proof = sha256Encrypt(999, accessToken.split(' ')[1], process.env.FACEBOOK_SEC);
   // 3사간 토큰검증 URL들
   const checkTokenUrl = type === 'kakao' ? 'https://kapi.kakao.com/v1/user/access_token_info' : type === 'naver' ? 'https://openapi.naver.com/v1/nid/verify' : `https://graph.facebook.com/debug_token?input_token=${accessToken.split(' ')[1]}&access_token=${appSecret}&appsecret_proof=${proof}`;
-  let getUserDataUrl = type === 'kakao' ? 'https://kapi.kakao.com/v2/user/me' : 'https://openapi.naver.com/v1/nid/me';
   axios.get(checkTokenUrl, type !== 'facebook'
     ? {
         headers: {
@@ -139,32 +139,12 @@ const verifyAndCallback = async function (callback, type, accessToken, res) {
       }
     : null)
     .then(async response => {
-      if (type === 'facebook') {
-        // 페북 토큰 유효성 검증 결과
-        const { data } = response.data;
-        const { is_valid: isValid, user_id: userId } = data;
-        if (!isValid) {
-          console.log('facbook token dead, ', response);
-          res.status(400).json({ code: 400, desc: 'token expired' });
-          return;
-        }
-        // 유효성 통과하면 유저정보를 요청함. 콜백에서 해당 유저정보를 바탕으로 쿼리를 진행.
-        getUserDataUrl = `https://graph.facebook.com/v11.0/${userId}?fields=email&appsecret_proof=${proof}&access_token=${accessToken.split(' ')[1]}`;
-      }
-      const { data } = await axios.get(getUserDataUrl, type !== 'facebook'
-        ? {
-            headers: {
-              authorization: accessToken
-            }
-          }
-        : null);
-
-      callback(data, accessToken);
+      callback();
 
       // 토큰 검증 에러 핸들러
     }).catch(err => {
       console.log(err);
-      // 카카오 토큰 에러. -1, -2는 주로 서버응답없음에 해당된.
+      // 카카오 토큰 에러. -1, -2는 카카오의 서버응답이 없거나 인수를 잘못 적었을때
       if (err.message.code !== -1 || err.message.code !== -2) {
         console.log('token expired', err);
         res.status(400).json({ code: 400, desc: 'token expired' });
@@ -186,15 +166,8 @@ const verifyAndCallback = async function (callback, type, accessToken, res) {
                     }
                   }
                 : null);
-              const UserInfo = await axios.get(getUserDataUrl, type !== 'facebook'
-                ? {
-                    headers: {
-                      authorization: accessToken
-                    }
-                  }
-                : null);
 
-              callback(UserInfo, accessToken);
+              callback();
             } catch (e) {
               count++;
             }

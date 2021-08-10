@@ -20,12 +20,17 @@ require('dotenv').config();
 const verifyJWTToken = async (req) => {
   if (!req.headers.authorization) return 401;
   else {
-    if (req.headers.authorization.indexOf('Bearer') < 0) return 401;
-    const token = req.headers.authorization.split(' ')[1];
-    const decode = await jwt.verify(token, process.env.NODE_ENV === 'development' ? process.env.JWT_SEC_KEY_DEVELOP : process.env.JWT_SEC_KEY_PRODUCTION);
+    try {
+      if (req.headers.authorization.indexOf('Bearer') < 0) return 401;
+      const token = req.headers.authorization.split(' ')[1];
 
-    if (!decode) return 403;
-    else return decode;
+      const decode = jwt.verify(token, process.env.NODE_ENV === 'development' ? process.env.JWT_SEC_KEY_DEVELOP : process.env.JWT_SEC_KEY_PRODUCTION);
+
+      if (!decode) return 403;
+      else return decode;
+    } catch (e) {
+      return 401;
+    }
   }
 };
 
@@ -39,9 +44,9 @@ const createJWT = (data, time = 60) => {
   console.log(data);
   const option = {
     algorithm: 'HS256', // 해싱 알고리즘
-    expiresIn: time, // 토큰 유효 기간
-    issuer: sha256Encrypt(999, 'https://back.artoring.com', (Math.random() * 10000).toString()), // 발행자
-    audience: sha256Encrypt(999, data._id ? data._id.toString() : data.encryptEmail ? data.encryptEmail : undefined, 'https://back.artoring.com')
+    expiresIn: time // 토큰 유효 기간
+    // issuer: sha256Encrypt(999, 'https://back.artoring.com', (Math.random() * 10000).toString()) // 발행자
+    // audience: sha256Encrypt(999, data._id ? data._id.toString() : data.encryptEmail ? data.encryptEmail : undefined, 'https://back.artoring.com')
   };
 
   return jwt.sign(data, process.env.NODE_ENV === 'development' ? process.env.JWT_SEC_KEY_DEVELOP : process.env.JWT_SEC_KEY_PRODUCTION, option);

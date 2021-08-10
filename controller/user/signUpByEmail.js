@@ -4,7 +4,7 @@ const { sha256Encrypt, sendEmail, createJWT } = require('../tools');
 require('dotenv').config();
 
 module.exports = async (req, res) => {
-  const { email, name, gender, birth, mobile, address } = req.body;
+  const { email, name, gender, birth, phone, address } = req.body;
   let { password } = req.body;
 
   try {
@@ -29,7 +29,7 @@ module.exports = async (req, res) => {
           name,
           gender,
           birth,
-          mobile,
+          phone,
           address,
           pwd: password,
           interestedIn: [

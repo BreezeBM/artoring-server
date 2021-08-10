@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
   thumb: { type: String, default: 'https://artoring.com/image/1626851218536.png' },
-  name: { type: String, required: true },
+  name: { type: String },
   nickName: { type: String },
   email: { type: String, required: true, unique: true },
   verifiedEmail: { type: Boolean, default: false },

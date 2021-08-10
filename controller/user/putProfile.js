@@ -17,7 +17,7 @@ module.exports = async (req, res) => {
         break;
       }
       default: {
-        const { id: _id, name } = decode;
+        const { _id, name } = decode;
 
         const data = await userModel.findOneAndUpdate({ _id, name }, req.body.profile);
         res.json(data);

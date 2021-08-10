@@ -54,7 +54,9 @@ module.exports = async (req, res) => {
         : response.data.kakao_account
           ? trimKakao(response.data.kakao_account)
           : trimFacebook(response.data);
-    const registered = await userModel.findOne({ email: userData.email }).select({ _id: 1, thumb: 1, nickName: 1, email: 1, isMentor: 1, likedCareerEdu: 1, likedMentor: 1, verifiedEmail: 1, createdAt: 1 });
+    const registered = await userModel
+      .findOne({ email: userData.email })
+      .select({ _id: 1, thumb: 1, nickName: 1, email: 1, isMentor: 1, likedCareerEdu: 1, likedMentor: 1, verifiedEmail: 1, createdAt: 1 });
     const returnToken = access_token || token;
 
     if (registered) {
@@ -63,10 +65,11 @@ module.exports = async (req, res) => {
       trimUserData(userData);
 
       userData.verifiedEmail = true;
+      console.log(userData, response.data);
+      const createdDoc = await userModel.create(userData);
+      userData._id = createdDoc._id;
 
-      await userModel.create(userData);
-
-      res.status(200).json({ accessToken: returnToken || token, userData, signup: true });
+      res.status(200).json({ accessToken: returnToken || token, trimedData: userData, signup: true });
     }
   } catch (e) {
     console.log('\n', e, e.response ? e.response.data : '');

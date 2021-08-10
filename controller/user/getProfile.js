@@ -20,7 +20,7 @@ module.exports = async (req, res) => {
           break;
         }
         default: {
-          const { id: _id, name } = decode;
+          const { _id, name } = decode;
           const data = await userModel.findOne({ _id, name }).select({ pwd: 0 });
           res.json(data);
         }

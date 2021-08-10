@@ -29,10 +29,10 @@ module.exports = async (req, res) => {
           }
           default: {
             try {
-              const { email, name } = decode;
+              const { id: _id, name } = decode;
               const { originType, targetId, text, rate } = req.body;
 
-              const userData = await reviewModel.findOne({ email, name });
+              const userData = await reviewModel.findOne({ _id, name });
 
               await reviewModel.create({
                 userThumb: userData.thumb, userName: userData.name, originType, targetId, text, rate

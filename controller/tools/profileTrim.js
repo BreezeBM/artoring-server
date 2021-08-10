@@ -6,8 +6,8 @@ const trimNaver = (profile) => {
   if (profile.nickname) result.nickName = profile.nickname;
   if (profile.email) result.email = profile.email;
   if (profile.name) result.name = profile.name;
-  if (profile.phone) result.mobile = profile.mobile;
-  if (profile.birth && profile.birthyear) { result.birth = profile.birthyear.concat(' ', profile.birth); }
+  if (profile.mobile) result.phone = profile.mobile;
+  if (profile.birthday && profile.birthyear) { result.birth = profile.birthyear.concat(' ', profile.birthday); }
 
   return result;
 };
@@ -28,7 +28,7 @@ const trimFacebook = (data) => {
 
   if (data.name) result.name = data.name;
   if (data.picture && data.picture.data && data.picture.data.url) result.thumb = data.picture.data.url;
-  if (data.birthday) result.birthday = data.birthday;
+  if (data.birthday) result.birth = data.birthday;
   if (data.email) result.email = data.email;
   if (data.gender) result.gender = data.gender;
 
@@ -51,7 +51,7 @@ const trimUserData = (userData) => {
       dept: ''
     };
   }
-  if (!userData.thumb) userData.thumb = 'https://artoring.com/img/1626851218536.png';
+  if (!userData.thumb) userData.thumb = 'https://artoring.com/image/1626851218536.png';
   if (!userData.likedCareerEdu) userData.likedCareerEdu = [];
   if (!userData.likedMentor) userData.likedMentor = [];
   if (!userData.outdoorAct) userData.outdoorAct = '';

@@ -27,11 +27,11 @@ module.exports = async (req, res) => {
             subCategory: '$subCategory',
             descriptionForMentor: '$mentor.descriptionForMentor',
             intro: '$mentor.intro',
-            id: '$id'
+            _id: '$_id'
           }
         }
       ]);
-
+      console.log(data);
       res.json(data);
     } else {
       const data = await careerTeachCardModel.find({}).limit(8);

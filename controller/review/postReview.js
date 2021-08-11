@@ -3,7 +3,6 @@ const { reviewModel } = require('../../model');
 const { verifyJWTToken } = require('../tools');
 module.exports = async (req, res) => {
   const { type } = req.body;
-  console.log(type);
   if (type) {
     switch (type) {
       case 'naver': {

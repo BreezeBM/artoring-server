@@ -41,7 +41,6 @@ const verifyJWTToken = async (req) => {
  * @returns
  */
 const createJWT = (data, time = 60) => {
-  console.log(data);
   const option = {
     algorithm: 'HS256', // 해싱 알고리즘
     expiresIn: time // 토큰 유효 기간

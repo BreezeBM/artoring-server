@@ -2,7 +2,6 @@ const { userModel } = require('../../model');
 const { verifyJWTToken, sendEmail } = require('../tools');
 
 module.exports = async (req, res) => {
-  console.log(req.body);
   const { accessToken: token } = req.body;
 
   req.headers.authorization = `Bearer ${token}`;
@@ -22,7 +21,6 @@ module.exports = async (req, res) => {
         const { _id } = decode;
 
         const userData = await userModel.findOne({ _id });
-        console.log(userData);
         sendEmail(userData, res);
 
         break;

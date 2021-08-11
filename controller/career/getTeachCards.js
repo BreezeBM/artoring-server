@@ -31,7 +31,6 @@ module.exports = async (req, res) => {
           }
         }
       ]);
-      console.log(data);
       res.json(data);
     } else {
       const data = await careerTeachCardModel.find({}).limit(8);

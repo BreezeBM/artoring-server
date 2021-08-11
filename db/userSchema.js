@@ -1,10 +1,14 @@
-const mongoose = require('mongoose');
-const AutoIncrementFactory = require('mongoose-sequence');
+const mongoose = require("mongoose");
+const AutoIncrementFactory = require("mongoose-sequence");
 
 const Schema = mongoose.Schema;
+const { Types: { ObjectId } } = mongoose.Schema;
 
 const userSchema = new Schema({
-  thumb: { type: String, default: 'https://artoring.com/img/1626851218536.png' },
+  thumb: {
+    type: String,
+    default: "https://artoring.com/img/1626851218536.png",
+  },
   name: { type: String, required: true },
   nickName: { type: String },
   email: { type: String, required: true, unique: true },
@@ -19,21 +23,21 @@ const userSchema = new Schema({
     jobTitle: { type: String },
     belongs: { type: String },
     howLong: { type: String },
-    dept: String
+    dept: String,
   },
   interestedIn: [{
     name: String,
-    val: Boolean
+    val: Boolean,
   }],
-  likedCareerEdu: [Number],
-  likedMentor: [Number],
+  likedCareerEdu: [ObjectId],
+  likedMentor: [ObjectId],
   outdoorAct: String,
   workHistory: String,
-  refOrLongTimeToken: String
+  refOrLongTimeToken: String,
 });
 
 const AutoIncrement = AutoIncrementFactory(mongoose);
-const option = { id: 'user_id', inc_field: 'id' };
+const option = { id: "user_id", inc_field: "id" };
 userSchema.plugin(AutoIncrement, option);
 
 module.exports = userSchema;

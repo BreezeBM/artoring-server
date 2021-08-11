@@ -3,7 +3,7 @@ const putProfile = require("./putProfile");
 const loginWithEmail = require("./loginWithEmail");
 const signUpByEmail = require("./signUpByEmail");
 const socialLogin = require("./socialLogin");
-const getLikeList = require("./getLikeList");
+const getLike = require("./getLike");
 
 const logout = require("./logout");
 
@@ -14,7 +14,7 @@ const careerCardController = {
   signUpByEmail,
   socialLogin,
   logout,
-  getLikeList,
+  getLike,
 };
 
 module.exports = careerCardController;

@@ -15,5 +15,5 @@ router.get("/", userController.getProfile);
 router.put("/", userController.putProfile);
 
 // 유저의 좋아요 리스트를 요청할 때 사용합니다.
-router.get("/getLikeList", userController.getLikeList);
+router.get("/likes/teach", userController.getLike);
 module.exports = router;

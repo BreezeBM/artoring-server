@@ -57,10 +57,6 @@ app.use(cors({
 // X-powered-by제외하는 간단한 보안 모듈
 app.use(helmet());
 
-app.get("/", (req, res) => {
-  res.send("ok?");
-});
-
 app.use("/", router);
 
 module.exports = process.env.NODE_ENV === "development"

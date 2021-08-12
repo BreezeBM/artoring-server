@@ -33,8 +33,39 @@ module.exports = async (req, res) => {
       ]);
       res.json(data);
     } else {
-      const data = await careerTeachCardModel.find({}).limit(8);
-      res.json(data);
+      const query = {};
+      const option = {};
+
+      Object.keys(req.query);
+      let data;
+
+      if (Object.keys(req.query).length >= 1) {
+        if (req.query.category) query.tags = { $in: [req.query.category] };
+        if (req.query.orderby) {
+          const order = req.query.orderby;
+          if (order === 'new') option.sort = { startDate: -1 };
+          else if (order === 'high') option.sort = { price: -1, startDate: -1 };
+          else if (order === 'low') option.sort = { price: 1, startDate: -1 };
+          else option.sort = { likesCount: 1 };
+        }
+        if (req.query.page) {
+          option.skip = (req.query.page - 1) * 16;
+          option.limit = 16;
+        }
+        if (req.query.size) option.limit = Number(req.query.size);
+
+        data = await careerTeachCardModel.find(query, null, option);
+        res.status(200).json({ cardList: data });
+      } else {
+        const basic = await careerTeachCardModel.countDocuments();
+        const edu = await careerTeachCardModel.countDocuments({ tags: { $in: ['교육'] } });
+        const lecture = await careerTeachCardModel.countDocuments({ tags: { $in: ['특강'] } });
+        const gether = await careerTeachCardModel.countDocuments({ tags: { $in: ['모임'] } });
+
+        const total = { basic, edu, lecture, gether };
+
+        res.status(200).json({ total });
+      }
     }
   } catch (e) {
     console.log(e);

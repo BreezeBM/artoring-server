@@ -2,7 +2,7 @@ const searchEngine = require('./index');
 
 module.exports = (req, res) => {
   let { keyword, model } = req.query;
-  keyword = keyword.split(' ');
+  keyword = decodeURIComponent(keyword).split(' ');
 
   searchEngine((error, data) => {
     if (error) {

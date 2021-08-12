@@ -14,10 +14,10 @@ const client = new Client({
 
 const searchEngine = async (callback, keyword, model) => {
   if (model) {
-    client.search(model === 'career'
-      ? {
-          index: `${model}`,
-          body: {
+    client.search({
+      index: `${model}`,
+      body: keyword[0] !== ''
+        ? {
             query: {
               bool: {
                 should: [{
@@ -36,30 +36,13 @@ const searchEngine = async (callback, keyword, model) => {
               }
             }
           }
-
-        }
-      : {
-          index: `${model}`,
-          body: {
+        : {
             query: {
-              bool: {
-                should: [{
-                  terms: {
-                    name: keyword
-                  }
-                }, {
-                  terms: {
-                    descriptionText: keyword
-                  }
-                }, {
-                  terms: {
-                    tags: keyword
-                  }
-                }]
-              }
+              match_all: {}
             }
           }
-        }, (error, data) => {
+
+    }, (error, data) => {
       if (error) {
         callback(error, null);
       } else {
@@ -72,55 +55,78 @@ const searchEngine = async (callback, keyword, model) => {
     });
   } else {
     try {
-      const teachData = await client.search({
-        index: 'career',
-        size: 8,
-        body: {
-          query: {
-            bool: {
-              should: [{
-                terms: {
-                  detailInfo: keyword
+      const teachData = await client.search(keyword[0] !== ''
+        ? {
+            index: 'career',
+            from: 0,
+            size: 8,
+            body: {
+              query: {
+                bool: {
+                  should: [{
+                    terms: {
+                      detailInfo: keyword
+                    }
+                  }, {
+                    terms: {
+                      title: keyword
+                    }
+                  }, {
+                    terms: {
+                      tags: keyword
+                    }
+                  }]
                 }
-              }, {
-                terms: {
-                  title: keyword
-                }
-              }, {
-                terms: {
-                  tags: keyword
-                }
-              }]
+              }
             }
           }
-        }
-      });
+        : {
+            index: 'career',
+            from: 0,
+            size: 8,
+            body: {
+              query: {
+                match_all: {}
+              }
+            }
+          });
 
       const { hits: teachQueryResult } = teachData.body;
 
-      const mentorData = await client.search({
-        index: 'mentor',
-        size: 8,
-        body: {
-          query: {
-            bool: {
-              should: [{
-                terms: {
-                  name: keyword
+      const mentorData = await client.search(keyword[0] === ''
+        ? {
+            index: 'mentor',
+            size: 8,
+            body: {
+              query: {
+                bool: {
+                  should: [{
+                    terms: {
+                      name: keyword
+                    }
+                  }, {
+                    terms: {
+                      descriptionText: keyword
+                    }
+                  }, {
+                    terms: {
+                      tags: keyword
+                    }
+                  }]
                 }
-              }, {
-                terms: {
-                  descriptionText: keyword
-                }
-              }, {
-                terms: {
-                  tags: keyword
-                }
-              }]
+              }
             }
           }
-        }
-      });
+        : {
+            index: 'mentor',
+            from: 0,
+            size: 8,
+            body: {
+              query: {
+                match_all: {}
+              }
+            }
+          });
       const { hits: mentorQueryResult } = mentorData.body;
 
       const result = { teachQueryResult, mentorQueryResult };

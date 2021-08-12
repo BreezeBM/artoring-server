@@ -27,7 +27,6 @@ module.exports = async (req, res) => {
       }
     }
   } catch (e) {
-    console.log('here', e);
     if (e.type) { res.status(404).send(e.message); } else { res.status(500).send(e.message); }
   }
 }

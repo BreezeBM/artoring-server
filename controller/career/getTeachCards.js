@@ -33,8 +33,20 @@ module.exports = async (req, res) => {
       ]);
       res.json(data);
     } else {
-      const data = await careerTeachCardModel.find({}).limit(8);
-      res.json(data);
+      const query = {};
+      const option = {};
+
+      if (req.query.category) query.tags = { $in: [req.query.category] };
+      if (req.query.size) option.limit = req.query.size;
+      else option.limit = 8;
+      if (req.query.page) {
+        option.skip = (req.query.page - 1) * 16;
+        option.limit = 16;
+      }
+      console.log(query, option);
+      const data = await careerTeachCardModel.find(query, null, option);
+
+      res.status(200).json(data);
     }
   } catch (e) {
     console.log(e);

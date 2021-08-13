@@ -15,7 +15,7 @@ const client = new Client({
 const searchEngine = async (callback, keyword, model) => {
   if (model) {
     client.search({
-      index: `${model}`,
+      index: 'mentoring',
       body: keyword[0] !== ''
         ? {
             query: {
@@ -32,13 +32,20 @@ const searchEngine = async (callback, keyword, model) => {
                   terms: {
                     tags: keyword
                   }
-                }]
+                }],
+                must: {
+                  isGroup: model === 'career'
+                }
               }
             }
           }
         : {
             query: {
-              match_all: {}
+              bool: {
+                must: {
+                  isGroup: model === 'career'
+                }
+              }
             }
           }
 
@@ -57,7 +64,7 @@ const searchEngine = async (callback, keyword, model) => {
     try {
       const teachData = await client.search(keyword[0] !== ''
         ? {
-            index: 'career',
+            index: 'mentoring',
             from: 0,
             size: 8,
             body: {
@@ -75,18 +82,25 @@ const searchEngine = async (callback, keyword, model) => {
                     terms: {
                       tags: keyword
                     }
-                  }]
+                  }],
+                  must: {
+                    isGroup: true
+                  }
                 }
               }
             }
           }
         : {
-            index: 'career',
+            index: 'mentoring',
             from: 0,
             size: 8,
             body: {
               query: {
-                match_all: {}
+                bool: {
+                  must: {
+                    isGroup: true
+                  }
+                }
               }
             }
           });
@@ -95,7 +109,7 @@ const searchEngine = async (callback, keyword, model) => {
 
       const mentorData = await client.search(keyword[0] === ''
         ? {
-            index: 'mentor',
+            index: 'mentoring',
             size: 8,
             body: {
               query: {
@@ -112,18 +126,25 @@ const searchEngine = async (callback, keyword, model) => {
                     terms: {
                       tags: keyword
                     }
-                  }]
+                  }],
+                  must: {
+                    isGroup: false
+                  }
                 }
               }
             }
           }
         : {
-            index: 'mentor',
+            index: 'mentoring',
             from: 0,
             size: 8,
             body: {
               query: {
-                match_all: {}
+                bood: {
+                  must: {
+                    isGroup: false
+                  }
+                }
               }
             }
           });

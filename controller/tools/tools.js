@@ -43,8 +43,8 @@ const verifyJWTToken = async (req) => {
 const createJWT = (data, time = 60) => {
   const option = {
     algorithm: 'HS256', // 해싱 알고리즘
-    expiresIn: time // 토큰 유효 기간
-    // issuer: sha256Encrypt(999, 'https://back.artoring.com', (Math.random() * 10000).toString()) // 발행자
+    expiresIn: time, // 토큰 유효 기간
+    issuer: 'https://back.artoring.com' // 발행자
     // audience: sha256Encrypt(999, data._id ? data._id.toString() : data.encryptEmail ? data.encryptEmail : undefined, 'https://back.artoring.com')
   };
 

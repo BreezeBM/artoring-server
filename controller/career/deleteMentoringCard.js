@@ -1,4 +1,4 @@
-const { careerTeachCardModel, adminModel } = require('../../model');
+const { mentoringCardModel, adminModel } = require('../../model');
 const { verifyJWTToken, aesDecrypt, AdminAccessException } = require('../tools');
 
 module.exports = async (req, res) => {
@@ -10,11 +10,11 @@ module.exports = async (req, res) => {
 
   switch (decode) {
     case 401: {
-      res.staus(401).send();
+      res.status(401).send();
       break;
     }
     case 403: {
-      res.staus(403).send();
+      res.status(403).send();
       break;
     }
     default: {
@@ -33,7 +33,7 @@ module.exports = async (req, res) => {
         if (!adminData) throw new AdminAccessException('no match found');
 
         // 해당 카드 제거.
-        await careerTeachCardModel.findOneAndDelete({ _id });
+        await mentoringCardModel.findOneAndDelete({ _id });
 
         res.status(204).send();
       } catch (e) {

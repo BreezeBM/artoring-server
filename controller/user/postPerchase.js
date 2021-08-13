@@ -50,7 +50,6 @@ module.exports = async (req, res) => {
         }
       }
     } else {
-      console.log(req.body);
       verifyAndCallback(async () => {
         const session = await purchaseHistoryModel.startSession();
 

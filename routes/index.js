@@ -16,7 +16,7 @@ router.use('/reviews', reviewRouter);
 router.use('/likes', likesRouter);
 router.use('/verify', verifyRouter);
 router.use('/search', searchRouter);
-router.use('/purchase', purchaseRouter);
+router.use('/reserve', purchaseRouter);
 
 router.use('/', userRouter);
 

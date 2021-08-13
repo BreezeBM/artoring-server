@@ -1,12 +1,11 @@
-const { mentoringModel } = require('../../model');
+const { mentoringModel, mongoose } = require('../../model');
 
 module.exports = async (req, res) => {
   // params에 id가 담겨있으면 id에 해당하는 상세정보 리턴. 아니면 최신의 데이터 8개를 리턴
-
   try {
     if (req.params.id) {
       const data = await mentoringModel.aggregate([
-        { $match: { _id: Number(req.params._id), isGroup: true } },
+        { $match: { _id: mongoose.Types.ObjectId(req.params.id), isGroup: true } },
         { $lookup: { from: 'mentormodels', localField: 'moderatorId', foreignField: 'userId', as: 'mentor' } },
         {
           $project: {

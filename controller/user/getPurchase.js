@@ -20,15 +20,13 @@ module.exports = async (req, res) => {
         }
         default: {
           const { _id: userId, name } = decode;
-          // const targetData = await purchaseHistoryModel.findOne(query, null, queryOption).select({ zoomLink: 0, cratedAt: 0 });
+
           console.log(userId, req.query);
           const targetData = await purchaseHistoryModel.aggregate([
             { $match: { userId: mongoose.Types.ObjectId(userId) } },
             {
               $lookup: {
                 from: 'mentoringmodels',
-                // localField: 'targetId',
-                // foreignField: '_id',
                 as: 'mentoring',
                 let: { targetId: '$targetId' },
                 pipeline: [

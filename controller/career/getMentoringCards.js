@@ -1,12 +1,11 @@
-const { careerTeachCardModel } = require('../../model');
+const { mentoringModel, mongoose } = require('../../model');
 
 module.exports = async (req, res) => {
   // params에 id가 담겨있으면 id에 해당하는 상세정보 리턴. 아니면 최신의 데이터 8개를 리턴
-
   try {
     if (req.params.id) {
-      const data = await careerTeachCardModel.aggregate([
-        { $match: { id: Number(req.params.id) } },
+      const data = await mentoringModel.aggregate([
+        { $match: { _id: mongoose.Types.ObjectId(req.params.id), isGroup: true } },
         { $lookup: { from: 'mentormodels', localField: 'moderatorId', foreignField: 'userId', as: 'mentor' } },
         {
           $project: {
@@ -33,7 +32,7 @@ module.exports = async (req, res) => {
       ]);
       res.json(data);
     } else {
-      const query = {};
+      const query = { isGroup: true };
       const option = {};
 
       Object.keys(req.query);
@@ -54,13 +53,13 @@ module.exports = async (req, res) => {
         }
         if (req.query.size) option.limit = Number(req.query.size);
 
-        data = await careerTeachCardModel.find(query, null, option);
+        data = await mentoringModel.find(query, null, option);
         res.status(200).json({ cardList: data });
       } else {
-        const basic = await careerTeachCardModel.countDocuments();
-        const edu = await careerTeachCardModel.countDocuments({ tags: { $in: ['교육'] } });
-        const lecture = await careerTeachCardModel.countDocuments({ tags: { $in: ['특강'] } });
-        const gether = await careerTeachCardModel.countDocuments({ tags: { $in: ['모임'] } });
+        const basic = await mentoringModel.countDocuments();
+        const edu = await mentoringModel.countDocuments({ tags: { $in: ['교육'] } });
+        const lecture = await mentoringModel.countDocuments({ tags: { $in: ['특강'] } });
+        const gether = await mentoringModel.countDocuments({ tags: { $in: ['모임'] } });
 
         const total = { basic, edu, lecture, gether };
 

@@ -12,12 +12,19 @@ const client = new Client({
   }
 });
 
-const searchEngine = async (callback, keyword, model) => {
+const searchEngine = async (callback, keyword, model, page) => {
   if (model) {
+    console.log(1);
     client.search({
-      index: `${model}`,
+      index: 'mentoring',
+      from: (Number(page) - 1) * 16,
+      size: 16,
       body: keyword[0] !== ''
         ? {
+            sort: [
+              { startDate: { order: 'desc', format: 'strict_date_optional_time_nanos' } },
+              '_score'
+            ],
             query: {
               bool: {
                 should: [{
@@ -32,13 +39,28 @@ const searchEngine = async (callback, keyword, model) => {
                   terms: {
                     tags: keyword
                   }
-                }]
+                }],
+                must: {
+                  term: {
+                    isGroup: model === 'career'
+                  }
+                }
               }
             }
           }
         : {
+            sort: [
+              { startDate: { order: 'desc', format: 'strict_date_optional_time_nanos' } },
+              '_score'
+            ],
             query: {
-              match_all: {}
+              bool: {
+                must: {
+                  term: {
+                    isGroup: model === 'career'
+                  }
+                }
+              }
             }
           }
 
@@ -57,10 +79,14 @@ const searchEngine = async (callback, keyword, model) => {
     try {
       const teachData = await client.search(keyword[0] !== ''
         ? {
-            index: 'career',
+            index: 'mentoring',
             from: 0,
             size: 8,
             body: {
+              sort: [
+                { startDate: { order: 'desc', format: 'strict_date_optional_time_nanos' } },
+                '_score'
+              ],
               query: {
                 bool: {
                   should: [{
@@ -75,29 +101,48 @@ const searchEngine = async (callback, keyword, model) => {
                     terms: {
                       tags: keyword
                     }
-                  }]
+                  }],
+                  must: {
+                    term: {
+                      isGroup: true
+                    }
+                  }
                 }
               }
             }
           }
         : {
-            index: 'career',
+            index: 'mentoring',
             from: 0,
             size: 8,
             body: {
+              sort: [
+                { startDate: { order: 'desc', format: 'strict_date_optional_time_nanos' } },
+                '_score'
+              ],
               query: {
-                match_all: {}
+                bool: {
+                  must: {
+                    term: {
+                      isGroup: true
+                    }
+                  }
+                }
               }
             }
           });
 
       const { hits: teachQueryResult } = teachData.body;
 
-      const mentorData = await client.search(keyword[0] === ''
+      const mentorData = await client.search(keyword[0] !== ''
         ? {
-            index: 'mentor',
+            index: 'mentoring',
             size: 8,
             body: {
+              sort: [
+                { startDate: { order: 'desc', format: 'strict_date_optional_time_nanos' } },
+                '_score'
+              ],
               query: {
                 bool: {
                   should: [{
@@ -112,24 +157,40 @@ const searchEngine = async (callback, keyword, model) => {
                     terms: {
                       tags: keyword
                     }
-                  }]
+                  }],
+                  must: {
+                    term: {
+                      isGroup: false
+                    }
+                  }
                 }
               }
             }
           }
         : {
-            index: 'mentor',
+            index: 'mentoring',
             from: 0,
             size: 8,
             body: {
+              sort: [
+                { startDate: { order: 'desc', format: 'strict_date_optional_time_nanos' } },
+                '_score'
+              ],
               query: {
-                match_all: {}
+                bool: {
+                  must: {
+                    term: {
+                      isGroup: false
+                    }
+                  }
+                }
               }
             }
           });
       const { hits: mentorQueryResult } = mentorData.body;
 
       const result = { teachQueryResult, mentorQueryResult };
+      console.log(result);
       callback(null, result);
     } catch (e) {
       callback(e, null);

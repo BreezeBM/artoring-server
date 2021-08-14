@@ -1,4 +1,4 @@
-const { careerTeachCardModel, mentorModel, userModel } = require('../../model');
+const { mentoringModel, userModel } = require('../../model');
 const { verifyJWTToken, verifyAndCallback } = require('../tools');
 
 // 에러시 throw를 하기위한 템플릿
@@ -25,17 +25,17 @@ module.exports = async (req, res) => {
 
       switch (decode) {
         case 401: {
-          res.staus(401).send();
+          res.status(401).send();
           break;
         }
         case 403: {
-          res.staus(403).send();
+          res.status(403).send();
           break;
         }
         default: {
           try {
             // 멘터 혹은 커리어 교육 카드 좋아요에대해 공통으로 사용하기 위함.
-            const careerOrMentorModel = targetModel === 'teach' ? careerTeachCardModel : mentorModel;
+
             const { _id } = decode;
 
             // 어디서 좋아요를 눌렀는지에따라 유저 필드의 업데이트하는곳이 달라짐.
@@ -47,7 +47,7 @@ module.exports = async (req, res) => {
             if (!userData) throw new UserException('user fail', 'matched user not found');
 
             // 좋아요한곳에서 좋아요 숫자를 하나 증가시킴
-            await careerOrMentorModel.updateOne({ _id: targetId }, { $inc: { likesCount: 1 } });
+            await mentoringModel.updateOne({ _id: targetId }, { $inc: { likesCount: 1 } });
             res.status(201).send();
           } catch (e) {
             console.log(e);
@@ -58,8 +58,6 @@ module.exports = async (req, res) => {
       }
     } else {
       verifyAndCallback(async () => {
-        const careerOrMentorModel = targetModel === 'teach' ? careerTeachCardModel : mentorModel;
-
         const userData = targetModel === 'teach'
           ? await userModel.findOneAndUpdate({ _id }, { $push: { likedCareerEdu: targetId } }, { new: true })
           : await userModel.findOneAndUpdate({ _id }, { $push: { likedMentor: targetId } }, { new: true });
@@ -67,7 +65,7 @@ module.exports = async (req, res) => {
         if (!userData) throw new UserException('user fail', 'matched user not found');
 
         // 좋아요한곳에서 좋아요 숫자를 하나 증가시킴
-        await careerOrMentorModel.updateOne({ id: targetId }, { $inc: { likesCount: 1 } });
+        await mentoringModel.updateOne({ id: targetId }, { $inc: { likesCount: 1 } });
         res.status(201).send();
       }, type, accessToken, res);
     }

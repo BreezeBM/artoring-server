@@ -4,7 +4,7 @@ const { JSDOM } = require('jsdom');
 const window = new JSDOM('').window;
 const DOMPurify = createDOMPurify(window);
 
-const { careerTeachCardModel, adminModel } = require('../../model');
+const { mentoringModel, adminModel } = require('../../model');
 const { verifyJWTToken, aesDecrypt, AdminAccessException } = require('../tools');
 
 module.exports = async (req, res) => {
@@ -12,11 +12,11 @@ module.exports = async (req, res) => {
   const decode = await verifyJWTToken(req);
   switch (decode) {
     case 401: {
-      res.staus(401).send();
+      res.status(401).send();
       break;
     }
     case 403: {
-      res.staus(403).send();
+      res.status(403).send();
       break;
     }
     // verify  성공.
@@ -63,10 +63,11 @@ module.exports = async (req, res) => {
           detailInfo: purified,
           maximumParticipants,
           availableTime,
-          price
+          price,
+          isGroup: true
         };
 
-        await careerTeachCardModel.create(postingData);
+        await mentoringModel.create(postingData);
 
         res.status(201).send();
       } catch (e) {

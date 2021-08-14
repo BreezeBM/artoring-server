@@ -2,7 +2,8 @@ const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
-const careerTeachSchema = new Schema({
+// 디자인을 확인한 결과, 커리어 교육과 개인 멘토링은 스키마의 차이가 매우 적음
+const mentoringSchema = new Schema({
   thumb: { type: String },
   title: { type: String },
   seq: { type: Number, default: 0 },
@@ -13,6 +14,7 @@ const careerTeachSchema = new Schema({
   subCategory: [String],
   tags: [String],
   detailInfo: String,
+  isGroup: Boolean,
   availableTime: { mon: [String], tue: [String], wed: [String], thu: [String], fri: [String], sat: [String], sun: [String] },
   likesCount: { type: Number, default: 0 },
   maximumParticipants: Number,
@@ -24,5 +26,5 @@ const careerTeachSchema = new Schema({
   updatedAt: { type: Date, default: new Date() }
 });
 
-module.exports = careerTeachSchema
+module.exports = mentoringSchema
 ;

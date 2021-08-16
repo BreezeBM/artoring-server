@@ -2,8 +2,8 @@ const { purchaseHistoryModel, mentoringModel, mongoose } = require('../../model'
 const { verifyJWTToken, verifyAndCallback } = require('../tools');
 
 module.exports = async (req, res) => {
-  const { loginType: type, id } = req.body;
-  const { accessToken } = req.headers.authorization;
+  const { loginType: type, id, page, purchasedType = true } = req.query;
+  const accessToken = req.headers.authorization;
 
   try {
     if (type === 'email') {
@@ -34,7 +34,7 @@ module.exports = async (req, res) => {
                     $match: {
                       $expr: {
                         $and: [
-                          { $eq: ['$isGroup', true] },
+                          { $eq: ['$isGroup', purchasedType] },
                           {
                             $eq: ['$_id', '$$targetId']
                           }
@@ -62,7 +62,7 @@ module.exports = async (req, res) => {
                 startDate: -1
               }
             }, {
-              $skip: (req.query.page - 1) * 8
+              $skip: page ? (page - 1) * 8 : 0
             }, {
               $limit: 8
             }
@@ -79,9 +79,22 @@ module.exports = async (req, res) => {
           {
             $lookup: {
               from: 'mentoringmodels',
-              localField: 'targetId',
-              foreignField: '_id',
-              as: 'mentoring'
+              as: 'mentoring',
+              let: { targetId: '$targetId' },
+              pipeline: [
+                {
+                  $match: {
+                    $expr: {
+                      $and: [
+                        { $eq: ['$isGroup', purchasedType] },
+                        {
+                          $eq: ['$_id', '$$targetId']
+                        }
+                      ]
+                    }
+                  }
+                }
+              ]
             }
           },
           {
@@ -92,10 +105,7 @@ module.exports = async (req, res) => {
               startDate: '$bookedStartTime',
               endDate: '$bookedEndTime',
               tags: '$mentoring.tags',
-              inprogress: '$inprogress',
-              isGroup: {
-                $filter: req.query.purchasedType === 'teaching'
-              }
+              inprogress: '$inprogress'
             }
           },
           {
@@ -103,12 +113,15 @@ module.exports = async (req, res) => {
               startDate: -1
             }
           }, {
-            $skip: (req.query.page - 1) * 8
+            $skip: page ? (page - 1) * 8 : 0
           }, {
             $limit: 8
           }
         ]);
-
+        targetData.map(index => {
+          index.tags = index.tags.flat();
+          return index;
+        });
         res.status(200).json(targetData);
       }, type, accessToken, res);
     }

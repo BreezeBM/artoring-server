@@ -21,7 +21,7 @@ module.exports = async (req, res) => {
           const { _id, name } = decode;
           const session = await purchaseHistoryModel.startSession();
 
-          const targetData = await mentoringModel.findOne({ _id: cardId }).select({ price: 1 });
+          const targetData = await mentoringModel.findOne({ _id: cardId }).select({ price: 1, startDate: 1, endDate: 1 });
 
           // 같은 멘토링 5회 초과 예약 금지
           const reserveTimes = await purchaseHistoryModel.find({ targetId: cardId, userId: _id });
@@ -33,11 +33,14 @@ module.exports = async (req, res) => {
               writeConcern: { w: 'majority' }
             };
             await session.withTransaction(async () => {
+              console.log(targetData);
               return await purchaseHistoryModel.create(
                 {
                   userId: _id,
                   targetId: cardId,
                   price: targetData.price,
+                  bookedStartTime: startDate || targetData.startDate,
+                  bookedEndTime: endDate || targetData.endDate,
                   originType: reservationType,
                   loginType: type,
                   startDate,
@@ -53,7 +56,7 @@ module.exports = async (req, res) => {
       verifyAndCallback(async () => {
         const session = await purchaseHistoryModel.startSession();
 
-        const targetData = await mentoringModel.findOne({ _id: cardId }).select({ price: 1 });
+        const targetData = await mentoringModel.findOne({ _id: cardId }).select({ price: 1, startDate: 1, endDate: 1 });
 
         const transactionOptions = {
           readPreference: 'primary',
@@ -61,11 +64,14 @@ module.exports = async (req, res) => {
           writeConcern: { w: 'majority' }
         };
         await session.withTransaction(async () => {
+          console.log(targetData);
           return await purchaseHistoryModel.create(
             {
               userId,
               targetId: cardId,
               price: targetData.price,
+              bookedStartTime: startDate || targetData.startDate,
+              bookedEndTime: endDate || targetData.endDate,
               originType: reservationType,
               loginType: type,
               startDate,

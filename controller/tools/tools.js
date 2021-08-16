@@ -148,7 +148,7 @@ const verifyAndCallback = async function (callback, type, accessToken, res, user
       }
     : null)
     .then(async response => {
-      callback();
+      if (type === 'facebook') { callback(response.data.data); } else { callback(); }
 
       // 토큰 검증 에러 핸들러
     }).catch(err => {

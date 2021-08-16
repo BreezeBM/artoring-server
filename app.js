@@ -12,7 +12,7 @@ require('dotenv').config();
 moment.tz.setDefault('Asia/Seoul');
 const db = require('./db');
 
-const port = process.env.PORT ? process.env.PORT : 4000;
+const port = 443;
 
 const app = express();
 
@@ -36,6 +36,9 @@ app.use(cors({
 app.use(helmet());
 
 app.get('/', (req, res) => {
+  res.cookie('test', true, {
+    secure: true
+  });
   res.send();
 });
 
@@ -43,4 +46,6 @@ app.use('/', router);
 
 module.exports = process.env.NODE_ENV === 'development'
   ? https.createServer({ key: fs.readFileSync('./key.pem'), cert: fs.readFileSync('./cert.pem') }, app).listen(port, () => console.log(`🚀 https Server is starting on ${port}`))
-  : https.createServer({ key: fs.readFileSync(`/etc/letsencrypt/live/${process.env.DOMAIN}/privkey.pem`), cert: fs.readFileSync(`/etc/letsencrypt/live/${process.env.DOMAIN}/fullchain.pem`) }, app).listen(port, () => console.log(`🚀 https Server is starting on ${port}`));
+  : app.listen(port, () => {
+    console.log(`🚀 Server is starting on ${port}`);
+  });

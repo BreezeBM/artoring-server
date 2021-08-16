@@ -3,7 +3,6 @@ const { reviewModel } = require('../../model');
 const { verifyJWTToken } = require('../tools');
 module.exports = async (req, res) => {
   const { type } = req.body;
-  console.log(type);
   if (type) {
     switch (type) {
       case 'naver': {
@@ -20,11 +19,11 @@ module.exports = async (req, res) => {
 
         switch (decode) {
           case 401: {
-            res.staus(401).send();
+            res.status(401).send();
             break;
           }
           case 403: {
-            res.staus(403).send();
+            res.status(403).send();
             break;
           }
           default: {

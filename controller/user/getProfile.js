@@ -12,11 +12,11 @@ module.exports = async (req, res) => {
 
       switch (decode) {
         case 401: {
-          res.staus(401).send();
+          res.status(401).send();
           break;
         }
         case 403: {
-          res.staus(403).send();
+          res.status(403).send();
           break;
         }
         default: {

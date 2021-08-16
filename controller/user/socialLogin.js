@@ -65,7 +65,7 @@ module.exports = async (req, res) => {
       trimUserData(userData);
 
       userData.verifiedEmail = true;
-      console.log(userData, response.data);
+
       const createdDoc = await userModel.create(userData);
       userData._id = createdDoc._id;
 

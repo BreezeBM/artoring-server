@@ -1,6 +1,6 @@
-const getHandler = require('./getTeachCards');
-const postCardHandler = require('./postTeachCards');
-const deleteCardHandler = require('./deleteTeachCard');
+const getHandler = require('./getMentoringCards');
+const postCardHandler = require('./postMentoringCards');
+const deleteCardHandler = require('./deleteMentoringCard');
 
 const careerCardController = {
   getCard: getHandler,

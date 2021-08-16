@@ -5,6 +5,7 @@ const moment = require('moment');
 const helmet = require('helmet');
 const fs = require('fs');
 const https = require('https');
+const cookieParser = require('cookie-parser');
 
 require('moment-timezone');
 require('dotenv').config();
@@ -12,12 +13,13 @@ require('dotenv').config();
 moment.tz.setDefault('Asia/Seoul');
 const db = require('./db');
 
-const port = 443;
+const port = 4000;
 
 const app = express();
 
 db();
 
+app.use(cookieParser());
 app.use(express.json({ extended: false }));
 app.use(helmet());
 const whitelist = ['https://insideart-dev.artoring.com', 'https://artoring.com', undefined]; // undefined == EBS health check
@@ -39,6 +41,7 @@ app.get('/', (req, res) => {
   res.cookie('test', true, {
     secure: true
   });
+  console.log(req.cookies);
   res.send();
 });
 

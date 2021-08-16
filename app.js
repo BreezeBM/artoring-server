@@ -12,7 +12,7 @@ require('dotenv').config();
 moment.tz.setDefault('Asia/Seoul');
 const db = require('./db');
 
-const port = 443;
+const port = process.env.PORT || 4000;
 
 const app = express();
 
@@ -36,9 +36,6 @@ app.use(cors({
 app.use(helmet());
 
 app.get('/', (req, res) => {
-  res.cookie('test', true, {
-    secure: true
-  });
   res.send();
 });
 

@@ -4,10 +4,11 @@ module.exports = async (req, res) => {
   // params에 id가 담겨있으면 id에 해당하는 상세정보 리턴. 아니면 최신의 데이터 8개를 리턴
   try {
     // 특정 카드의 상세 데이터 요청시
+
     if (req.params.id) {
       const data = await mentoringModel.aggregate([
-        // 모델에서 _id가 일치하고 단체 멘토링인것만 찾아옴
-        { $match: { _id: mongoose.Types.ObjectId(req.params.id), isGroup: true } },
+        // 모델에서 _id가 일치한것
+        { $match: { _id: mongoose.Types.ObjectId(req.params.id) } },
         // 관계형 DB의 Join과 같이 다른 콜렉션(mentor 콜렉션)에서 특정 조건에 해당되는 도큐먼트들을 임포트. === inner join
         { $lookup: { from: 'mentormodels', localField: 'moderatorId', foreignField: 'userId', as: 'mentor' } },
         {
@@ -34,18 +35,16 @@ module.exports = async (req, res) => {
           }
         }
       ]);
-      res.json(data);
+      res.json(data[0]);
       // 카드 리스트들을 요청시
     } else {
       // 몽고디비 쿼리
-      const query = { isGroup: true };
+      const query = { isGroup: req.query.isGroup };
       // 몽고디비 쿼리 옵션
       const option = {};
-
       let data;
-
       // 쿼리스트링으로 세부 필터링 요청 정보가 넘어올 경우
-      if (Object.keys(req.query).length >= 1) {
+      if (Object.keys(req.query).length >= 2) {
         // 카테고리가 넘어온 경우 쿼리에 명시
         if (req.query.category) query.tags = { $in: [req.query.category] };
 
@@ -77,15 +76,16 @@ module.exports = async (req, res) => {
         if (req.query.size) option.limit = Number(req.query.size);
 
         data = await mentoringModel.find(query, null, option);
+
         res.status(200).json({ cardList: data });
       // 쿼리스트링에 아무것도 없음 == 최신순으로 8개 요청
       // 커리어 교육 페이지 메인에서 사용됨
       } else {
         // 각 특성에 맞는 문서들의 수를 리턴.
-        const basic = await mentoringModel.countDocuments();
-        const edu = await mentoringModel.countDocuments({ tags: { $in: ['교육'] } });
-        const lecture = await mentoringModel.countDocuments({ tags: { $in: ['특강'] } });
-        const gether = await mentoringModel.countDocuments({ tags: { $in: ['모임'] } });
+        const basic = await mentoringModel.countDocuments({ isGroup: req.query.isGroup });
+        const edu = await mentoringModel.countDocuments({ isGroup: req.query.isGroup, tags: { $in: ['교육'] } });
+        const lecture = await mentoringModel.countDocuments({ isGroup: req.query.isGroup, tags: { $in: ['특강'] } });
+        const gether = await mentoringModel.countDocuments({ isGroup: req.query.isGroup, tags: { $in: ['모임'] } });
 
         const total = { basic, edu, lecture, gether };
 

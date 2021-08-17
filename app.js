@@ -26,12 +26,12 @@ app.get('/', (req, res) => {
   res.cookie('test', true, {
     secure: true
   });
-  console.log(req);
+  console.log(req.cookies);
   res.send();
 });
 
 app.use(helmet());
-const whitelist = ['https://insideart-dev.artoring.com', 'https://artoring.com', undefined]; // undefined == EBS health check
+const whitelist = ['https://insideart-dev.artoring.com', 'https://artoring.com']; // undefined == EBS health check
 
 app.use(express.json({ extended: false }));
 app.use(cors({

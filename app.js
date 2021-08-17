@@ -19,8 +19,17 @@ const app = express();
 db();
 
 app.use(express.json({ extended: false }));
+
+app.get('/', (req, res) => {
+  res.cookie('test', true, {
+    secure: true
+  });
+  console.log(req.cookies);
+  res.send();
+});
+
 app.use(helmet());
-const whitelist = ['https://insideart-dev.artoring.com', 'https://artoring.com', undefined]; // undefined == EBS health check
+const whitelist = ['https://insideart-dev.artoring.com', 'https://artoring.com']; // undefined == EBS health check
 
 app.use(express.json({ extended: false }));
 app.use(cors({
@@ -34,10 +43,6 @@ app.use(cors({
 
 // X-powered-by제외하는 간단한 보안 모듈
 app.use(helmet());
-
-app.get('/', (req, res) => {
-  res.send();
-});
 
 app.use('/', router);
 

@@ -1,20 +1,11 @@
 
-const { reviewModel } = require('../../model');
+const { reviewModel, userModel } = require('../../model');
 const { verifyJWTToken } = require('../tools');
 module.exports = async (req, res) => {
   const { type } = req.body;
   if (type) {
-    switch (type) {
-      case 'naver': {
-        break;
-      }
-      case 'kakao': {
-        break;
-      }
-      case 'facebook': {
-        break;
-      }
-      default: {
+    if (type === 'email') {
+      try {
         const decode = await verifyJWTToken(req);
 
         switch (decode) {
@@ -27,26 +18,31 @@ module.exports = async (req, res) => {
             break;
           }
           default: {
-            try {
-              const { id: _id, name } = decode;
-              const { originType, targetId, text, rate } = req.body;
+            const { id: _id, name } = decode;
+            const { originType, targetId, text, rate } = req.body;
 
-              const userData = await reviewModel.findOne({ _id, name });
+            const userData = await userModel.findOne({ _id, name });
 
-              await reviewModel.create({
-                userThumb: userData.thumb, userName: userData.name, originType, targetId, text, rate
-              });
-              res.send();
-            } catch (e) {
-              console.log(e);
-              res.json(e.message);
-            }
-            break;
+            await reviewModel.create({
+              userThumb: userData.thumb, userName: userData.name, originType, targetId, text, rate
+            });
+            res.send();
           }
+            break;
         }
-        break;
+      } catch (e) {
+        console.log(e);
+        res.json(e.message);
       }
+    } else {
+      const { originType, id, targetId, text, rate } = req.body;
+
+      const userData = await userModel.findOne({ _id: id });
+
+      await reviewModel.create({
+        userThumb: userData.thumb, userName: userData.name, originType, targetId, text, rate
+      });
+      res.send();
     }
   }
-}
-;
+};

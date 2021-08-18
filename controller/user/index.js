@@ -1,3 +1,4 @@
+
 const getProfile = require('./getProfile');
 const putProfile = require('./putProfile');
 const loginWithEmail = require('./loginWithEmail');
@@ -10,5 +11,5 @@ const logout = require('./logout');
 
 const careerCardController = { getProfile, putProfile, loginWithEmail, verifyEmail, retryVerify, signUpByEmail, socialLogin, logout };
 
-module.exports = careerCardController
-;
+
+module.exports = careerCardController;

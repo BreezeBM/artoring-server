@@ -5,25 +5,16 @@ const { userModel } = require('../../model');
 const { trimNaver, trimKakao, trimFacebook, trimUserData } = require('../tools');
 const { sha256Encrypt } = require('../tools');
 
-let path;
-try {
-  if (fs.existsSync(path)) {
-    // file exists
-    path = '.env';
-  } else path = 'env';
-} catch (err) {
-  path = 'env';
-}
-
-dotenv.config({ path });
+dotenv.config();
 module.exports = async (req, res) => {
   try {
     const { type } = req.params;
-    const { code, state, token, id } = req.body;
+    const { code, state, token, id } = req.body; // 여기의 id는 페이스북만의 특수한 숫자 아이디.
     let access_token, refresh_token;
 
     const redirect_uri = process.env.NODE_ENV === 'development' ? `https://localhost:3000/callback/${type}` : `https://artoring.com/callback/${type}`;
     let url, clientSecret, clientId, contentType;
+
     if (type === 'kakao' || type === 'naver') {
       if (type === 'kakao') {
         url = 'https://kauth.kakao.com/oauth/token?';
@@ -41,6 +32,7 @@ module.exports = async (req, res) => {
         'Content-Type': contentType
       });
 
+      // 선언없이 구조분해 할당을 사용/
       ({ access_token, refresh_token } = response.data);
     }
     let proof;
@@ -62,25 +54,22 @@ module.exports = async (req, res) => {
         : response.data.kakao_account
           ? trimKakao(response.data.kakao_account)
           : trimFacebook(response.data);
-    const registered = await userModel.findOne({ email: userData.email });
+    const registered = await userModel
+      .findOne({ email: userData.email })
+      .select({ _id: 1, thumb: 1, nickName: 1, email: 1, isMentor: 1, likedCareerEdu: 1, likedMentor: 1, verifiedEmail: 1, createdAt: 1 });
     const returnToken = access_token || token;
 
-    const trimedData = {};
-
     if (registered) {
-      trimedData.interestedIn = registered.interestedIn;
-      trimedData.email = registered.email;
-      trimedData.isMentor = registered.isMentor;
-      trimedData.likedCareerEdu = registered.likedCareerEdu;
-      trimedData.likedMentor = registered.likedMentor;
-
-      res.status(200).json({ accessToken: returnToken || token, trimedData });
+      res.status(200).json({ accessToken: returnToken || token, trimedData: registered });
     } else {
       trimUserData(userData);
 
-      await userModel.create(userData);
+      userData.verifiedEmail = true;
 
-      res.status(200).json({ accessToken: returnToken || token, userData, signup: true });
+      const createdDoc = await userModel.create(userData);
+      userData._id = createdDoc._id;
+
+      res.status(200).json({ accessToken: returnToken || token, trimedData: userData, signup: true });
     }
   } catch (e) {
     console.log('\n', e, e.response ? e.response.data : '');

@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 
-const userContorller = require('../../controller/user');
+const search = require('../../controller/search/search');
 
-router.get('/', userContorller.logout);
+router.get('/', search);
 
 module.exports = router;

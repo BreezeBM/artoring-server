@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const AutoIncrementFactory = require('mongoose-sequence');
 const Schema = mongoose.Schema;
 
 const careerInfoSchema = new Schema({
@@ -14,10 +13,6 @@ const careerInfoSchema = new Schema({
   updatedAt: { type: Date, required: true, default: new Date() },
   likesCount: { type: Number, default: 0 }
 });
-
-const AutoIncrement = AutoIncrementFactory(mongoose);
-const option = { id: 'careerInfo_id', inc_field: 'id' };
-careerInfoSchema.plugin(AutoIncrement, option);
 
 module.exports = careerInfoSchema
 ;

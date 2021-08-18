@@ -5,7 +5,7 @@ const { verifyJWTToken, verifyAndCallback } = require('../tools');
 module.exports = async (req, res) => {
   const accessToken = req.headers.authorization;
 
-  const { type } = req.query;
+  const { type, id } = req.query;
   try {
     if (type === 'email') {
       const decode = await verifyJWTToken(req);
@@ -20,15 +20,14 @@ module.exports = async (req, res) => {
           break;
         }
         default: {
-          console.log('decoded form get', decode);
-          const { email, name } = decode;
-          const data = await userModel.findOne({ email, name }).select({ pwd: 0 });
+          const { _id, name } = decode;
+          const data = await userModel.findOne({ _id, name }).select({ pwd: 0 });
           res.json(data);
         }
       }
     } else {
-      verifyAndCallback(async (responseData) => {
-        const userInfo = await userModel.findOne({ email: responseData.email }).select({ pwd: 0 });
+      verifyAndCallback(async () => {
+        const userInfo = await userModel.findOne({ _id: id }).select({ pwd: 0 });
 
         res.status(200).json(userInfo);
       }, type, accessToken, res);

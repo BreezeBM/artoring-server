@@ -3,7 +3,6 @@ const { reviewModel } = require('../../model');
 const { verifyJWTToken } = require('../tools');
 module.exports = async (req, res) => {
   const { type } = req.body;
-  console.log(type);
   if (type) {
     switch (type) {
       case 'naver': {
@@ -29,10 +28,10 @@ module.exports = async (req, res) => {
           }
           default: {
             try {
-              const { email, name } = decode;
+              const { id: _id, name } = decode;
               const { originType, targetId, text, rate } = req.body;
 
-              const userData = await reviewModel.findOne({ email, name });
+              const userData = await reviewModel.findOne({ _id, name });
 
               await reviewModel.create({
                 userThumb: userData.thumb, userName: userData.name, originType, targetId, text, rate

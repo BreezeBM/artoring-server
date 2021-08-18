@@ -7,7 +7,7 @@ const fs = require('fs');
 const https = require('https');
 
 require('moment-timezone');
-const dotenv = require('dotenv');
+require('dotenv').config();
 
 moment.tz.setDefault('Asia/Seoul');
 const db = require('./db');
@@ -20,20 +20,6 @@ db();
 
 app.use(express.json({ extended: false }));
 app.use(helmet());
-
-let path = '.env';
-
-try {
-  if (fs.existsSync(path)) {
-    // file exists
-    path = '.env';
-  } else path = 'env';
-} catch (err) {
-  path = 'env';
-}
-
-dotenv.config({ path });
-
 const whitelist = ['https://insideart-dev.artoring.com', 'https://artoring.com', undefined]; // undefined == EBS health check
 
 app.use(express.json({ extended: false }));
@@ -50,13 +36,13 @@ app.use(cors({
 app.use(helmet());
 
 app.get('/', (req, res) => {
-  res.send('ok?');
+  res.send();
 });
 
 app.use('/', router);
 
 module.exports = process.env.NODE_ENV === 'development'
-  ? https.createServer({ key: fs.readFileSync('./key.pem'), cert: fs.readFileSync('./cert.pem') }, app).listen(port, () => console.log(`🚀 Server is starting on ${port}`))
+  ? https.createServer({ key: fs.readFileSync('./key.pem'), cert: fs.readFileSync('./cert.pem') }, app).listen(port, () => console.log(`🚀 https Server is starting on ${port}`))
   : app.listen(port, () => {
     console.log(`🚀 Server is starting on ${port}`);
   });

@@ -5,7 +5,7 @@ module.exports = async (req, res) => {
   const ids = JSON.parse(decodeURIComponent(req.params.cardids));
 
   // 몽고디비 쿼리를 이용하여 배열로전달받은 모든 일치하는 데이터들을 반환.
-  const reviews = await reviewModel.find({ id: { $in: ids } });
+  const reviews = await reviewModel.find({ _id: { $in: ids } });
 
   res.json(reviews);
 }

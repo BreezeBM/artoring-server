@@ -25,7 +25,7 @@ module.exports = async (req, res) => {
           try {
             // 즉시만료 JWT 토큰을 생성하여 리턴. 유출되어도 염려 없다.
             const fakeToken = await createJWT({ email: 'expired' }, 0);
-            res.status(201).josn({ accessToken: fakeToken });
+            res.status(201).json({ accessToken: fakeToken });
           } catch (e) {
             console.log(e);
             if (e.type) { res.status(404).send(e.message); } else { res.status(500).send(e.message); }
@@ -34,7 +34,7 @@ module.exports = async (req, res) => {
         }
       }
     } else {
-      verifyAndCallback(async (userinfo, accessToken) => {
+      verifyAndCallback(async () => {
         let proof;
         if (type === 'facebook') {
           // 시크릿코드, 엑세스 토큰을 활용하여 증명데이터를 생성하고 이를 제거하고자하는 엑세스토큰과 함께 전송.

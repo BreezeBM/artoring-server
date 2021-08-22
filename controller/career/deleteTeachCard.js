@@ -19,8 +19,8 @@ module.exports = async (req, res) => {
     }
     default: {
       try {
-        // 클라이언트에서 전달받은 삭제할 카드의 id. _id가 아님. auto inc되는 필드
-        const { id } = req.params;
+        // 클라이언트에서 전달받은 삭제할 카드의 id
+        const { id: _id } = req.params;
         const { name, accessKey } = decode;
 
         // 해당 핸들러는 어드민만 접근해야 하기때문에, 어드민 권한이 존재하는지 확인하는 용도.
@@ -33,7 +33,7 @@ module.exports = async (req, res) => {
         if (!adminData) throw new AdminAccessException('no match found');
 
         // 해당 카드 제거.
-        await careerTeachCardModel.findOneAndDelete({ id });
+        await careerTeachCardModel.findOneAndDelete({ _id });
 
         res.status(204).send();
       } catch (e) {

@@ -10,37 +10,38 @@ module.exports = async (req, res) => {
 
   if (type) {
     if (type === 'email') {
-      const decode = await verifyJWTToken(req);
+      try {
+        const decode = await verifyJWTToken(req);
 
-      switch (decode) {
-        case 401: {
-          res.staus(401).send();
-          break;
-        }
-        case 403: {
-          res.staus(403).send();
-          break;
-        }
-        default: {
-          try {
+        switch (decode) {
+          case 401: {
+            res.status(401).send();
+            break;
+          }
+          case 403: {
+            res.status(403).send();
+            break;
+          }
+          default: {
             // 즉시만료 JWT 토큰을 생성하여 리턴. 유출되어도 염려 없다.
             const fakeToken = await createJWT({ email: 'expired' }, 0);
             res.status(201).json({ accessToken: fakeToken });
-          } catch (e) {
-            console.log(e);
-            if (e.type) { res.status(404).send(e.message); } else { res.status(500).send(e.message); }
+
+            break;
           }
-          break;
         }
+      } catch (e) {
+        console.log(e);
+        if (e.type) { res.status(404).send(e.message); } else { res.status(500).send(e.message); }
       }
     } else {
-      verifyAndCallback(async () => {
+      verifyAndCallback(async (userinfo) => {
         let proof;
         if (type === 'facebook') {
           // 시크릿코드, 엑세스 토큰을 활용하여 증명데이터를 생성하고 이를 제거하고자하는 엑세스토큰과 함께 전송.
 
           proof = sha256Encrypt(999, accessToken.split(' ')[1], process.env.FACEBOOK_SEC);
-          const response = await axios.get(`https://graph.facebook.com/${userinfo.id}/permissions?appsecret_proof=${proof}&access_token=${accessToken.split(' ')[1]}`);
+          const response = await axios.get(`https://graph.facebook.com/${Number(userinfo.user_id)}/permissions?appsecret_proof=${proof}&access_token=${accessToken.split(' ')[1]}`);
 
           res.status(200).send();
         } else {

@@ -43,8 +43,8 @@ const verifyJWTToken = async (req) => {
 const createJWT = (data, time = 60) => {
   const option = {
     algorithm: 'HS256', // 해싱 알고리즘
-    expiresIn: time // 토큰 유효 기간
-    // issuer: sha256Encrypt(999, 'https://back.artoring.com', (Math.random() * 10000).toString()) // 발행자
+    expiresIn: time, // 토큰 유효 기간
+    issuer: 'https://back.artoring.com' // 발행자
     // audience: sha256Encrypt(999, data._id ? data._id.toString() : data.encryptEmail ? data.encryptEmail : undefined, 'https://back.artoring.com')
   };
 
@@ -126,15 +126,20 @@ function UserException (type, message) {
 
 const verifyAndCallback = async function (callback, type, accessToken, res, userModel) {
   let appSecret;
+  let proof;
+  console.log(type === 'kakao');
   if (type === 'facebook') {
     const response = await axios.get(`https://graph.facebook.com/oauth/access_token?client_id=${process.env.FACEBOOK_ID}&client_secret=${process.env.FACEBOOK_SEC}&grant_type=client_credentials`);
     appSecret = response.data.access_token;
-  }
 
-  // 페이스북은 시크릿키, 엑세스 토큰을 이용하면 HMAC으로 해싱하여 전달해준 데이터를 검증함. `Bearer `는 빼고 엑세스토큰을 HMAC으로 해싱한다.
-  const proof = sha256Encrypt(999, accessToken.split(' ')[1], process.env.FACEBOOK_SEC);
+    // 페이스북은 시크릿키, 엑세스 토큰을 이용하면 HMAC으로 해싱하여 전달해준 데이터를 검증함. `Bearer `는 빼고 엑세스토큰을 HMAC으로 해싱한다.
+    proof = sha256Encrypt(999, accessToken.split(' ')[1], process.env.FACEBOOK_SEC);
+  }
   // 3사간 토큰검증 URL들
+  //
+
   const checkTokenUrl = type === 'kakao' ? 'https://kapi.kakao.com/v1/user/access_token_info' : type === 'naver' ? 'https://openapi.naver.com/v1/nid/verify' : `https://graph.facebook.com/debug_token?input_token=${accessToken.split(' ')[1]}&access_token=${appSecret}&appsecret_proof=${proof}`;
+
   axios.get(checkTokenUrl, type !== 'facebook'
     ? {
         headers: {
@@ -143,7 +148,7 @@ const verifyAndCallback = async function (callback, type, accessToken, res, user
       }
     : null)
     .then(async response => {
-      callback();
+      if (type === 'facebook') { callback(response.data.data); } else { callback(); }
 
       // 토큰 검증 에러 핸들러
     }).catch(err => {

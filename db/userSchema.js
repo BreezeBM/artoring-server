@@ -32,6 +32,7 @@ const userSchema = new Schema({
 
   likedCareerEdu: [Schema.ObjectId],
   likedMentor: [Schema.ObjectId],
+  likedInfo: [Schema.ObjectId],
   outdoorAct: String,
   workHistory: String,
   createdAt: { type: Date, default: new Date() },

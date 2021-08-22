@@ -14,7 +14,7 @@ module.exports = async (req, res) => {
         break;
       }
       case 403: {
-        res.staus(409).send();
+        res.status(409).send();
         break;
       }
       default: {

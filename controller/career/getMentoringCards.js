@@ -17,6 +17,7 @@ module.exports = async (req, res) => {
             availableTime: '$availableTime',
             likesCount: '$likesCount',
             joinedParticipants: '$joinedParticipants',
+            moderatorId: '$moderatorId',
             price: '$price',
             rate: '$rate',
             reviews: '$reviews',
@@ -35,11 +36,13 @@ module.exports = async (req, res) => {
           }
         }
       ]);
+
       res.json(data[0]);
       // 카드 리스트들을 요청시
     } else {
       // 몽고디비 쿼리
       const query = { isGroup: req.query.isGroup };
+
       // 몽고디비 쿼리 옵션
       const option = {};
       let data;
@@ -67,21 +70,23 @@ module.exports = async (req, res) => {
         // 페이지네이션에 필요한 페이지 요청시
         if (req.query.page) {
           // (req.query.page - 1) * 16 개를 뛰어넘고
-          option.skip = (req.query.page - 1) * 16;
+          option.skip = (Number(req.query.page) - 1) * 16;
+          if (req.query.limit) option.skip = (Number(req.query.page) - 1) * req.query.limit;
 
           // 이후 16개를 쿼리한다.
           option.limit = 16;
         }
         // 리턴되는 문서의 크기정보가 있다면, 그만큼의 데이터를 전송한다.
         if (req.query.size) option.limit = Number(req.query.size);
-
+        console.log(req.query, query, option);
         data = await mentoringModel.find(query, null, option);
-
+        console.log(data);
         res.status(200).json({ cardList: data });
       // 쿼리스트링에 아무것도 없음 == 최신순으로 8개 요청
       // 커리어 교육 페이지 메인에서 사용됨
       } else {
         // 각 특성에 맞는 문서들의 수를 리턴.
+
         const basic = await mentoringModel.countDocuments({ isGroup: req.query.isGroup });
         const edu = await mentoringModel.countDocuments({ isGroup: req.query.isGroup, tags: { $in: ['교육'] } });
         const lecture = await mentoringModel.countDocuments({ isGroup: req.query.isGroup, tags: { $in: ['특강'] } });

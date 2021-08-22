@@ -25,6 +25,7 @@
     "aws-sdk": "^2.942.0",
     "aws4": "^1.11.0",
     "axios": "^0.21.1",
+    "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
     "dompurify": "^2.3.0",
     "dotenv": "^10.0.0",
@@ -41,7 +42,8 @@
     "multer-s3": "^2.9.0",
     "nodemailer": "^6.6.3",
     "nodemon": "^2.0.10",
-    "pm2": "^5.1.0"
+    "pm2": "^5.1.0",
+    "random-words": "^1.1.1"
   },
   "devDependencies": {
     "mocha": "^9.0.1",

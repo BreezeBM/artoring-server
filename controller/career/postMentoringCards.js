@@ -9,19 +9,19 @@ const { verifyJWTToken, aesDecrypt, AdminAccessException } = require('../tools')
 
 module.exports = async (req, res) => {
   // 어드민 토큰 검증
-  const decode = await verifyJWTToken(req);
-  switch (decode) {
-    case 401: {
-      res.status(401).send();
-      break;
-    }
-    case 403: {
-      res.status(403).send();
-      break;
-    }
-    // verify  성공.
-    default: {
-      try {
+  try {
+    const decode = await verifyJWTToken(req);
+    switch (decode) {
+      case 401: {
+        res.status(401).send();
+        break;
+      }
+      case 403: {
+        res.status(403).send();
+        break;
+      }
+      // verify  성공.
+      default: {
         // 어드민 토큰은 항상 유니크한 엑세스 키를 가지고 있어야 하며
         // 엑세스키는 AES256으로 암호화 처리되어 있음.
 
@@ -46,7 +46,8 @@ module.exports = async (req, res) => {
           maximumParticipants,
           availableTime,
           price,
-          dom
+          dom,
+          isGroup
         } = req.body;
 
         // 돔 퓨리파이어로 전달받은 돔을 살균함. 물론 전달받은 데이터는 URI 인코드 되어있음.
@@ -64,18 +65,18 @@ module.exports = async (req, res) => {
           maximumParticipants,
           availableTime,
           price,
-          isGroup: true
+          isGroup
         };
 
         await mentoringModel.create(postingData);
 
         res.status(201).send();
-      } catch (e) {
-        console.log(e);
-        res.status(500).send(e.message);
       }
-      break;
+        break;
     }
+  } catch (e) {
+    console.log(e);
+    res.status(500).send(e.message);
   }
 }
 ;

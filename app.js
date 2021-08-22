@@ -5,6 +5,7 @@ const moment = require('moment');
 const helmet = require('helmet');
 const fs = require('fs');
 const https = require('https');
+const cookieParser = require('cookie-parser');
 
 require('moment-timezone');
 require('dotenv').config();
@@ -19,7 +20,7 @@ const app = express();
 db();
 
 app.use(express.json({ extended: false }));
-
+app.use(cookieParser());
 app.get('/', (req, res) => {
   res.cookie('test', true, {
     secure: true
@@ -29,16 +30,18 @@ app.get('/', (req, res) => {
 });
 
 app.use(helmet());
-const whitelist = ['https://insideart-dev.artoring.com', 'https://artoring.com']; // undefined == EBS health check
+const whitelist = ['https://insideart-dev.artoring.com', 'https://artoring.com', 'https://localhost:3000']; // undefined == EBS health check
 
 app.use(express.json({ extended: false }));
 app.use(cors({
-  origin: process.env.NODE_ENV !== 'production' ? '*' : function (origin, callback) {
+  origin: function (origin, callback) {
     console.log('Origin : ', origin);
     if (whitelist.includes(origin)) callback(null, true);
     else callback(new Error('Not allowed by CORS'));
+    // callback(null, true);
   },
-  methods: process.env.NODE_ENV !== 'production' ? '*' : 'GET,POST,PUT,DELETE,OPTIONS'
+  methods: process.env.NODE_ENV !== 'production' ? '*' : 'GET,POST,PUT,DELETE,OPTIONS',
+  credentials: true
 }));
 
 // X-powered-by제외하는 간단한 보안 모듈
@@ -51,3 +54,5 @@ module.exports = process.env.NODE_ENV === 'development'
   : app.listen(port, () => {
     console.log(`🚀 Server is starting on ${port}`);
   });
+
+// module.exports = https.createServer({ key: fs.readFileSync('./key.pem'), cert: fs.readFileSync('./cert.pem') }, app).listen(port, () => console.log(`🚀 https Server is starting on ${port}`));

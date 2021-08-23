@@ -209,7 +209,7 @@ const searchEngine = async (callback, keyword, model, page) => {
       const { hits: mentorQueryResult } = mentorData.body;
 
       const result = { teachQueryResult, mentorQueryResult };
-      console.log(result);
+
       callback(null, result);
     } catch (e) {
       callback(e, null);

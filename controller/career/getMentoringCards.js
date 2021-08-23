@@ -78,9 +78,9 @@ module.exports = async (req, res) => {
         }
         // 리턴되는 문서의 크기정보가 있다면, 그만큼의 데이터를 전송한다.
         if (req.query.size) option.limit = Number(req.query.size);
-        console.log(req.query, query, option);
+
         data = await mentoringModel.find(query, null, option);
-        console.log(data);
+
         res.status(200).json({ cardList: data });
       // 쿼리스트링에 아무것도 없음 == 최신순으로 8개 요청
       // 커리어 교육 페이지 메인에서 사용됨

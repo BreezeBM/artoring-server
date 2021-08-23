@@ -19,7 +19,6 @@ module.exports = async (req, res) => {
           }
         }
       ]);
-      console.log('here?', req.query, data);
       res.json(data[0]);
       // 카드 리스트들을 요청시
     } else {

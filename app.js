@@ -30,17 +30,21 @@ app.get('/', (req, res) => {
 });
 
 app.use(helmet());
-const whitelist = ['https://insideart-dev.artoring.com', 'https://artoring.com', 'https://localhost:3000']; // undefined == EBS health check
+
+const whitelist = ['https://insideart-dev.artoring.com', 'https://artoring.com']; // undefined == EBS health check
 
 app.use(express.json({ extended: false }));
 app.use(cors({
-  origin: function (origin, callback) {
-    console.log('Origin : ', origin);
-    if (whitelist.includes(origin)) callback(null, true);
-    else callback(new Error('Not allowed by CORS'));
-    // callback(null, true);
-  },
-  methods: process.env.NODE_ENV !== 'production' ? '*' : 'GET,POST,PUT,DELETE,OPTIONS',
+  origin: process.env.NODE_ENV !== 'production'
+    ? '*'
+    : function (origin, callback) {
+      console.log('Origin : ', origin);
+      if (whitelist.includes(origin)) callback(null, true);
+      else callback(new Error('Not allowed by CORS'));
+    },
+  methods: process.env.NODE_ENV !== 'production'
+    ? '*'
+    : 'GET,POST,PUT,DELETE,OPTIONS',
   credentials: true
 }));
 

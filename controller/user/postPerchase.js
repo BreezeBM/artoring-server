@@ -35,7 +35,6 @@ module.exports = async (req, res) => {
             // 사실 몽고디비는 하나의 도큐먼트에 대해 atomic 하다...
             // 혹시몰라 우선은 transaction을 사용함.
             await session.withTransaction(async () => {
-              console.log(targetData);
               return await purchaseHistoryModel.create(
                 {
                   userId: _id,
@@ -66,7 +65,6 @@ module.exports = async (req, res) => {
           writeConcern: { w: 'majority' }
         };
         await session.withTransaction(async () => {
-          console.log(targetData);
           return await purchaseHistoryModel.create(
             {
               userId,

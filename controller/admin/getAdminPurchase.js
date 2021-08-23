@@ -99,8 +99,6 @@ module.exports = async (req, res) => {
           }
         ]);
 
-        console.log(cardList);
-
         res.status(200).json({ total, cardList });
       }
         break;

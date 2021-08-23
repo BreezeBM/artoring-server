@@ -18,16 +18,23 @@ require('dotenv').config();
  * decode: JWT 해독 결과 데이터
  */
 const verifyJWTToken = async (req) => {
-  if (!req.headers.authorization) return 401;
+  if (!req.headers.authorization && !req.cookies.auth) return 401;
   else {
     try {
-      if (req.headers.authorization.indexOf('Bearer') < 0) return 401;
-      const token = req.headers.authorization.split(' ')[1];
+      if (req.cookies.auth) {
+        const decode = jwt.verify(req.cookies.auth, process.env.NODE_ENV === 'development' ? process.env.JWT_SEC_KEY_DEVELOP : process.env.JWT_SEC_KEY_PRODUCTION);
 
-      const decode = jwt.verify(token, process.env.NODE_ENV === 'development' ? process.env.JWT_SEC_KEY_DEVELOP : process.env.JWT_SEC_KEY_PRODUCTION);
+        if (!decode) return 403;
+        else return decode;
+      } else {
+        if (req.headers.authorization.indexOf('Bearer') < 0) return 401;
+        const token = req.headers.authorization.split(' ')[1];
 
-      if (!decode) return 403;
-      else return decode;
+        const decode = jwt.verify(token, process.env.NODE_ENV === 'development' ? process.env.JWT_SEC_KEY_DEVELOP : process.env.JWT_SEC_KEY_PRODUCTION);
+
+        if (!decode) return 403;
+        else return decode;
+      }
     } catch (e) {
       return 401;
     }
@@ -127,7 +134,7 @@ function UserException (type, message) {
 const verifyAndCallback = async function (callback, type, accessToken, res, userModel) {
   let appSecret;
   let proof;
-  console.log(type === 'kakao');
+
   if (type === 'facebook') {
     const response = await axios.get(`https://graph.facebook.com/oauth/access_token?client_id=${process.env.FACEBOOK_ID}&client_secret=${process.env.FACEBOOK_SEC}&grant_type=client_credentials`);
     appSecret = response.data.access_token;

@@ -56,7 +56,7 @@ module.exports = async (req, res) => {
           : trimFacebook(response.data);
     const registered = await userModel
       .findOne({ email: userData.email })
-      .select({ _id: 1, thumb: 1, nickName: 1, email: 1, isMentor: 1, likedCareerEdu: 1, likedMentor: 1, verifiedEmail: 1, createdAt: 1 });
+      .select({ _id: 1, thumb: 1, name: 1, email: 1, isMentor: 1, likedCareerEdu: 1, likedMentor: 1, likedInfo: 1, verifiedEmail: 1, createdAt: 1 });
     const returnToken = access_token || token;
 
     if (registered) {

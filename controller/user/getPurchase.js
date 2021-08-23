@@ -21,8 +21,6 @@ module.exports = async (req, res) => {
         default: {
           const { _id: userId } = decode;
 
-          console.log(userId, req.query);
-
           // 몽고디비 aggregation 파이프라인
           const targetData = await purchaseHistoryModel.aggregate([
             // 구매내역에서 해당되는 유저들의 문서들만 골라서

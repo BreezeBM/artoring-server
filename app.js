@@ -1,16 +1,17 @@
-const express = require('express');
-const cors = require('cors');
-const router = require('./routes');
-const moment = require('moment');
-const helmet = require('helmet');
-const fs = require('fs');
-const https = require('https');
+const express = require("express");
+const cors = require("cors");
+const router = require("./routes");
+const moment = require("moment");
+const helmet = require("helmet");
+const fs = require("fs");
+const https = require("https");
+
 
 require('moment-timezone');
 require('dotenv').config();
 
-moment.tz.setDefault('Asia/Seoul');
-const db = require('./db');
+moment.tz.setDefault("Asia/Seoul");
+const db = require("./db");
 
 const port = process.env.PORT || 4000;
 
@@ -29,20 +30,26 @@ app.get('/', (req, res) => {
 });
 
 app.use(helmet());
+
 const whitelist = ['https://insideart-dev.artoring.com', 'https://artoring.com']; // undefined == EBS health check
 
 app.use(express.json({ extended: false }));
 app.use(cors({
-  origin: process.env.NODE_ENV !== 'production' ? '*' : function (origin, callback) {
-    console.log('Origin : ', origin);
-    if (whitelist.includes(origin)) callback(null, true);
-    else callback(new Error('Not allowed by CORS'));
-  },
-  methods: process.env.NODE_ENV !== 'production' ? '*' : 'GET,POST,PUT,DELETE,OPTIONS'
+  origin: process.env.NODE_ENV !== "production"
+    ? "*"
+    : function (origin, callback) {
+      console.log("Origin : ", origin);
+      if (whitelist.includes(origin)) callback(null, true);
+      else callback(new Error("Not allowed by CORS"));
+    },
+  methods: process.env.NODE_ENV !== "production"
+    ? "*"
+    : "GET,POST,PUT,DELETE,OPTIONS",
 }));
 
 // X-powered-by제외하는 간단한 보안 모듈
 app.use(helmet());
+
 
 app.use('/', router);
 

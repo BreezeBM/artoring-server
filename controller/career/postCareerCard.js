@@ -65,8 +65,8 @@ module.exports = async (req, res) => {
           maximumParticipants,
           price,
         };
-
         const careerCardData = await mentoringModel.findOne({ _id });
+
         if (!careerCardData) {
           await mentoringModel.create(postCardData);
           return res.send(201);

@@ -72,7 +72,7 @@ module.exports = async (req, res) => {
           return res.send(201);
         } else {
           await mentoringModel.findOneAndUpdate({ _id }, {
-            $set: careerCardData,
+            $set: postCardData,
           });
           return res.send(200);
         }

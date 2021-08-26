@@ -41,12 +41,14 @@ module.exports = async (req, res) => {
             // 어디서 좋아요를 눌렀는지에따라 유저 필드의 업데이트하는곳이 달라짐.
             const userData = targetModel === 'teach'
               ? await userModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(_id) }, { $push: { likedCareerEdu: targetId } }, { new: true })
-              : await userModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(_id) }, { $push: { likedInfo: targetId } }, { new: true });
+              : targetModel === 'mentor'
+                ? await userModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(_id) }, { $push: { likedMentor: targetId } }, { new: true })
+                : await userModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(_id) }, { $push: { likedInfo: targetId } }, { new: true });
 
             if (!userData) throw new UserException('user fail', 'matched user not found');
 
             // 좋아요한곳에서 좋아요 숫자를 하나 증가시킴
-            targetModel === 'teach'
+            targetModel === 'teach' || targetModel === 'mentor'
               ? await mentoringModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(targetId) }, { $inc: { likesCount: 1 } })
               : await careerInfoModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(targetId) }, { $inc: { likesCount: 1 } });
             res.status(201).send();

@@ -35,12 +35,10 @@ const whitelist = ['https://insideart-dev.artoring.com', 'https://artoring.com']
 
 app.use(express.json({ extended: false }));
 app.use(cors({
-  origin: process.env.NODE_ENV !== 'production'
-    ? '*'
-    : function (origin, callback) {
+  origin:
+    function (origin, callback) {
       console.log('Origin : ', origin);
-      if (whitelist.includes(origin)) callback(null, true);
-      else callback(new Error('Not allowed by CORS'));
+      callback(null, true);
     },
   methods: process.env.NODE_ENV !== 'production'
     ? '*'
@@ -53,10 +51,10 @@ app.use(helmet());
 
 app.use('/', router);
 
-module.exports = process.env.NODE_ENV === 'development'
-  ? https.createServer({ key: fs.readFileSync('./key.pem'), cert: fs.readFileSync('./cert.pem') }, app).listen(port, () => console.log(`🚀 https Server is starting on ${port}`))
-  : app.listen(port, () => {
-    console.log(`🚀 Server is starting on ${port}`);
-  });
+// module.exports = process.env.NODE_ENV === 'development'
+//   ? https.createServer({ key: fs.readFileSync('./key.pem'), cert: fs.readFileSync('./cert.pem') }, app).listen(port, () => console.log(`🚀 https Server is starting on ${port}`))
+//   : app.listen(port, () => {
+//     console.log(`🚀 Server is starting on ${port}`);
+//   });
 
-// module.exports = https.createServer({ key: fs.readFileSync('./key.pem'), cert: fs.readFileSync('./cert.pem') }, app).listen(port, () => console.log(`🚀 https Server is starting on ${port}`));
+module.exports = https.createServer({ key: fs.readFileSync('./key.pem'), cert: fs.readFileSync('./cert.pem') }, app).listen(port, () => console.log(`🚀 https Server is starting on ${port}`));

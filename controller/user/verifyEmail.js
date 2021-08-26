@@ -23,7 +23,7 @@ module.exports = async (req, res) => {
         const email = aesDecrypt(encryptEmail);
         // 멘터 혹은 커리어 교육 카드 좋아요에대해 공통으로 사용하기 위함.
         const userData = await userModel.findOneAndUpdate({ email }, { $set: { verifiedEmail: true } }, { new: true })
-          .select({ _id: 1, name: 1, thumb: 1, nickName: 1, email: 1, isMentor: 1, likedCareerEdu: 1, likedMentor: 1, verifiedEmail: 1, createdAt: 1 });
+          .select({ pwd: 0 });
 
         const token = await createJWT({ _id: userData._id, name: userData.name }, 3600);
 

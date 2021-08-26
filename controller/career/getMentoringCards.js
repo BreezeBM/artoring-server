@@ -32,6 +32,7 @@ module.exports = async (req, res) => {
             subCategory: '$subCategory',
             descriptionForMentor: '$mentor.descriptionForMentor',
             intro: '$mentor.intro',
+            isGroup: '$isGroup',
             _id: '$_id'
           }
         }

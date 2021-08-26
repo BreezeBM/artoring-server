@@ -9,6 +9,7 @@ const careerInfoSchema = new Schema({
   category: String,
   subCategory: String,
   detailInfo: String,
+  textDetailInfo: String,
   createdAt: { type: Date, required: true, default: new Date() },
   updatedAt: { type: Date, required: true, default: new Date() },
   likesCount: { type: Number, default: 0 }

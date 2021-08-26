@@ -29,7 +29,7 @@ module.exports = async (req, res) => {
         const adminData = await adminModel.find({ name, accessKey: accKey });
         if (!adminData) throw new AdminAccessException('no match found');
 
-        const mentorData = await userModel.aggregate([
+        let mentorData = await userModel.aggregate([
 
           {
             $search: {
@@ -49,7 +49,10 @@ module.exports = async (req, res) => {
               foreignField: 'userId'
             }
           }
-        ]).filter(ele => ele.mentor.length > 0);
+        ]);
+
+        console.log(mentorData);
+        mentorData = mentorData.filter(ele => ele.mentor.length > 0);
 
         res.status(200).json(mentorData);
       }

@@ -1,10 +1,10 @@
-const createDOMPurify = require("dompurify");
-const { JSDOM } = require("jsdom");
+const createDOMPurify = require('dompurify');
+const { JSDOM } = require('jsdom');
 
 const { verifyJWTToken, AdminAccessException, aesDecrypt } = require(
-  "../tools",
+  '../tools'
 );
-const { mentoringModel, adminModel } = require("../../model");
+const { mentoringModel, careerInfoModel, adminModel, mongoose } = require('../../model');
 
 const window = new JSDOM().window;
 const DOMPurify = createDOMPurify(window);
@@ -36,19 +36,21 @@ module.exports = async (req, res) => {
           availableTime,
           maximumParticipants,
           price,
+          issuedDate,
+          createrName
         } = req.body.cardData;
         const { name, accessKey, authLevel } = decode;
         if (authLevel === 0) return res.send(403);
 
-        if (!accessKey) throw new AdminAccessException("need authorize");
+        if (!accessKey) throw new AdminAccessException('need authorize');
 
         const accKey = await aesDecrypt(accessKey);
 
         const adminData = await adminModel.find({ name, accessKey: accKey });
-        if (!adminData) throw new AdminAccessException("no match found");
+        if (!adminData) throw new AdminAccessException('no match found');
 
         const purifiedDetailInfo = DOMPurify.sanitize(
-          decodeURIComponent(detailInfo),
+          decodeURIComponent(detailInfo)
         );
 
         const postCardData = {
@@ -64,17 +66,28 @@ module.exports = async (req, res) => {
           availableTime,
           maximumParticipants,
           price,
+          issuedDate,
+          createrName
         };
-        const careerCardData = await mentoringModel.findOne({ _id });
+        console.log(req.body);
+        const targetModel = isGroup !== undefined ? mentoringModel : careerInfoModel;
+        if (_id) {
+          const careerCardData = await targetModel.findOne({ _id: mongoose.Types.ObjectId(_id) });
 
-        if (!careerCardData) {
-          await mentoringModel.create(postCardData);
-          return res.send(201);
+          if (!careerCardData) {
+            await targetModel.create(postCardData);
+            return res.send(201);
+          } else {
+            const t = await targetModel.findOneAndUpdate({ _id }, {
+              $set: postCardData
+            }, { new: true });
+
+            console.log(t);
+            return res.send(200);
+          }
         } else {
-          await mentoringModel.findOneAndUpdate({ _id }, {
-            $set: postCardData,
-          });
-          return res.send(200);
+          await targetModel.create(postCardData);
+          return res.send(201);
         }
       }
     }

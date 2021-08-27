@@ -13,15 +13,14 @@ require('dotenv').config();
 moment.tz.setDefault('Asia/Seoul');
 const db = require('./db');
 
-const port = 4000;
+const port = process.env.PORT || 4000;
 
 const app = express();
 
 db();
 
-app.use(cookieParser());
 app.use(express.json({ extended: false }));
-
+app.use(cookieParser());
 app.get('/', (req, res) => {
   res.cookie('test', true, {
     secure: true
@@ -31,16 +30,20 @@ app.get('/', (req, res) => {
 });
 
 app.use(helmet());
+
 const whitelist = ['https://insideart-dev.artoring.com', 'https://artoring.com']; // undefined == EBS health check
 
 app.use(express.json({ extended: false }));
 app.use(cors({
-  origin: process.env.NODE_ENV !== 'production' ? '*' : function (origin, callback) {
-    console.log('Origin : ', origin);
-    if (whitelist.includes(origin)) callback(null, true);
-    else callback(new Error('Not allowed by CORS'));
-  },
-  methods: process.env.NODE_ENV !== 'production' ? '*' : 'GET,POST,PUT,DELETE,OPTIONS'
+  origin:
+    function (origin, callback) {
+      console.log('Origin : ', origin);
+      callback(null, true);
+    },
+  methods: process.env.NODE_ENV !== 'production'
+    ? '*'
+    : 'GET,POST,PUT,DELETE,OPTIONS',
+  credentials: true
 }));
 
 // X-powered-by제외하는 간단한 보안 모듈
@@ -48,8 +51,10 @@ app.use(helmet());
 
 app.use('/', router);
 
-module.exports = process.env.NODE_ENV === 'development'
-  ? https.createServer({ key: fs.readFileSync('./key.pem'), cert: fs.readFileSync('./cert.pem') }, app).listen(port, () => console.log(`🚀 https Server is starting on ${port}`))
-  : app.listen(port, () => {
-    console.log(`🚀 Server is starting on ${port}`);
-  });
+// module.exports = process.env.NODE_ENV === 'development'
+//   ? https.createServer({ key: fs.readFileSync('./key.pem'), cert: fs.readFileSync('./cert.pem') }, app).listen(port, () => console.log(`🚀 https Server is starting on ${port}`))
+//   : app.listen(port, () => {
+//     console.log(`🚀 Server is starting on ${port}`);
+//   });
+
+module.exports = https.createServer({ key: fs.readFileSync('./key.pem'), cert: fs.readFileSync('./cert.pem') }, app).listen(port, () => console.log(`🚀 https Server is starting on ${port}`));

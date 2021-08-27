@@ -18,7 +18,7 @@ module.exports = async (req, res) => {
           break;
         }
         default: {
-          const { _id, name } = decode;
+          const { _id } = decode;
           const session = await purchaseHistoryModel.startSession();
 
           const targetData = await mentoringModel.findOne({ _id: cardId }).select({ price: 1, startDate: 1, endDate: 1 });
@@ -29,11 +29,12 @@ module.exports = async (req, res) => {
           else {
             const transactionOptions = {
               readPreference: 'primary',
-              readConcern: { level: 'local' },
+              readConcern: { level: 'majority' },
               writeConcern: { w: 'majority' }
             };
+            // 사실 몽고디비는 하나의 도큐먼트에 대해 atomic 하다...
+            // 혹시몰라 우선은 transaction을 사용함.
             await session.withTransaction(async () => {
-              console.log(targetData);
               return await purchaseHistoryModel.create(
                 {
                   userId: _id,
@@ -60,11 +61,10 @@ module.exports = async (req, res) => {
 
         const transactionOptions = {
           readPreference: 'primary',
-          readConcern: { level: 'local' },
+          readConcern: { level: 'majority' },
           writeConcern: { w: 'majority' }
         };
         await session.withTransaction(async () => {
-          console.log(targetData);
           return await purchaseHistoryModel.create(
             {
               userId,

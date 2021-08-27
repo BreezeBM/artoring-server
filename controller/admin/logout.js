@@ -1,0 +1,44 @@
+require('dotenv').config();
+
+const { aesEncrypt, sha256Encrypt, createJWT, verifyJWTToken, AdminAccessException } = require('../tools');
+const { adminModel } = require('../../model');
+
+module.exports = async (req, res) => {
+  /*
+   * 어드민 계정들은 email, pwd, 접근 레벨, 고유한 accessKey를 가집니다.
+   */
+  try {
+    if (req.cookies.auth) {
+      const decode = await verifyJWTToken(req);
+
+      switch (decode) {
+        case 401: {
+          res.status(401).send();
+          break;
+        }
+        case 403: {
+          res.status(403).send();
+          break;
+        }
+        // verify  성공.
+        default: {
+        // 어드민 토큰은 항상 유니크한 엑세스 키를 가지고 있어야 하며
+        // 엑세스키는 AES256으로 암호화 처리되어 있음.
+
+          const { name, accessKey, authLevel } = decode;
+
+          if (!accessKey) throw new AdminAccessException('need authorize');
+          res.cookie('auth', { expires: Date.now() });
+
+          res.status(200).json({ userData: { name, accessKey, authLevel } });
+        }
+      }
+    } else {
+      res.status(401).send();
+    }
+  } catch (e) {
+    console.log(e);
+    res.status(500).send();
+  }
+}
+;

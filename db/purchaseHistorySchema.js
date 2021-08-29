@@ -9,6 +9,7 @@ const purchaseHistorySchema = new Schema({
   price: { type: Number, required: true },
   bookedStartTime: { type: Date },
   bookedEndTime: { type: Date },
+  isReviewed: { type: Boolean, default: false },
   inprogress: { type: String, default: 'inprogress' },
   zoomLink: String,
   createdAt: { type: Date, default: new Date() }

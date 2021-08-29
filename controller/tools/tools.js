@@ -59,11 +59,11 @@ const createJWT = (data, time = 60) => {
 };
 
 // 페이스북 키 증명 해쉬 및 여러 해싱에 사용됨.
-const sha256Encrypt = (slice, key, salt) => {
+const sha256Encrypt = (slice, key, salt, algo = 'hex') => {
   return crypto
     .createHmac('sha256', salt)
     .update(key)
-    .digest('hex')
+    .digest(algo)
     .slice(0, slice);
 };
 
@@ -155,7 +155,7 @@ const verifyAndCallback = async function (callback, type, accessToken, res, user
       }
     : null)
     .then(async response => {
-      if (type === 'facebook') { callback(response.data.data); } else { callback(); }
+      if (type === 'facebook') { callback(response.data.data, appSecret, proof); } else { callback(); }
 
       // 토큰 검증 에러 핸들러
     }).catch(err => {

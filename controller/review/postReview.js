@@ -1,5 +1,5 @@
 
-const { reviewModel, userModel } = require('../../model');
+const { reviewModel, purchaseHistoryModel, userModel, mongoose } = require('../../model');
 const { verifyJWTToken } = require('../tools');
 module.exports = async (req, res) => {
   const { type } = req.body;
@@ -19,14 +19,19 @@ module.exports = async (req, res) => {
           }
           default: {
             const { id: _id, name } = decode;
-            const { originType, targetId, text, rate } = req.body;
+            const { originType, targetId, text, rate, _id: purchaseId } = req.body;
 
-            const userData = await userModel.findOne({ _id, name });
-
-            await reviewModel.create({
-              userThumb: userData.thumb, userName: userData.name, originType, targetId, text, rate
-            });
-            res.send();
+            userModel.findOne({ _id: mongoose.Types.ObjectId(_id), name })
+              .then(userData => {
+                return reviewModel.create({
+                  userThumb: userData.thumb, userName: userData.name, originType, targetId, text, rate
+                });
+              })
+              .then(() => {
+                purchaseHistoryModel.findByIdAndUpdate(mongoose.Types.ObjectId(purchaseId), { $set: { isReviewd: true } });
+                res.send();
+              })
+            ;
           }
             break;
         }
@@ -37,12 +42,12 @@ module.exports = async (req, res) => {
     } else {
       const { originType, id, targetId, text, rate } = req.body;
 
-      const userData = await userModel.findOne({ _id: id });
-
-      await reviewModel.create({
-        userThumb: userData.thumb, userName: userData.name, originType, targetId, text, rate
-      });
-      res.send();
+      userModel.findOne({ _id: mongoose.Types.ObjectId(id) })
+        .then(userData => {
+          return reviewModel.create({
+            userThumb: userData.thumb, userName: userData.name, originType, targetId, text, rate
+          });
+        }).then(() => res.send());
     }
   }
 };

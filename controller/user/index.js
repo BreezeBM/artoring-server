@@ -8,9 +8,11 @@ const socialLogin = require('./socialLogin');
 const passwordMod = require('./passwordMod');
 const getLike = require('./getLike');
 const postPurchase = require('./postPerchase');
-const getPurchase = require('./getPurchase')
-;
+const getPurchase = require('./getPurchase');
 const logout = require('./logout');
+
+const dropUser = require('./dropUser');
+const dropSocial = require('./dropSocial');
 
 const careerCardController = {
   getProfile,
@@ -24,7 +26,9 @@ const careerCardController = {
   passwordMod,
   getLike,
   postPurchase,
-  getPurchase
+  getPurchase,
+  dropUser,
+  dropSocial
 };
 
 module.exports = careerCardController;

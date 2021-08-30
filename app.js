@@ -21,25 +21,24 @@ db();
 
 app.use(express.json({ extended: false }));
 app.use(cookieParser());
-app.get('/', (req, res) => {
-  res.cookie('test', true, {
-    secure: true
-  });
-  console.log(req.cookies);
-  res.send();
-});
 
 app.use(helmet());
 
-const whitelist = ['https://insideart-dev.artoring.com', 'https://artoring.com', 'https://www.gstatic.com']; // undefined == EBS health check
+const whitelist = ['https://insideart-dev.artoring.com', 'https://artoring.com', 'https://www.gstatic.com', undefined, process.env.ADMIN_URL]; // undefined == EBS health check or 다른서버
 
 app.use(express.json({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
 app.use(cors({
   origin:
-    function (origin, callback) {
-      console.log('Origin : ', origin);
-      if (whitelist.includes(origin)) { callback(null, true); } else callback(new Error('Not allowed by CORS'));
-    },
+    process.env.NODE_ENV === 'development'
+      ? function (origin, callback) {
+          console.log('Origin : ', origin);
+          callback(null, true);
+        }
+      : function (origin, callback) {
+        console.log('Origin : ', origin);
+        if (whitelist.includes(origin)) { callback(null, true); } else callback(new Error('Not allowed by CORS'));
+      },
   methods: process.env.NODE_ENV !== 'production'
     ? '*'
     : 'GET,POST,PUT,DELETE,OPTIONS',
@@ -48,6 +47,17 @@ app.use(cors({
 
 // X-powered-by제외하는 간단한 보안 모듈
 app.use(helmet());
+
+app.get('/', (req, res, next) => {
+  if (req.headers.host.includes(process.env.EC2_IP)) next();
+  else res.status(401).send();
+}, (req, res) => {
+  res.cookie('test', true, {
+    secure: true
+  });
+  console.log(req.cookies);
+  res.send();
+});
 
 app.use('/', router);
 

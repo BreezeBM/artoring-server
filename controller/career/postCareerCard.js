@@ -69,7 +69,6 @@ module.exports = async (req, res) => {
           issuedDate,
           createrName
         };
-        console.log(req.body);
         const targetModel = isGroup !== undefined ? mentoringModel : careerInfoModel;
         if (_id) {
           const careerCardData = await targetModel.findOne({ _id: mongoose.Types.ObjectId(_id) });

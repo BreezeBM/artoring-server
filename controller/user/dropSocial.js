@@ -22,53 +22,53 @@ module.exports = async (req, res) => {
       res.status(401).send();
       return;
     }
-    verifyAndCallback((data, appSecret, proof) => {
-      userModel.findOne({ _id: mongoose.Types.ObjectId(req.body._id) })
-        .then(userData => {
+
+    userModel.findOne({ _id: mongoose.Types.ObjectId(req.body._id) })
+      .then((userData) => {
+        verifyAndCallback((data, appSecret, proof) => {
           const url = userData.snsType === 'kakao'
             ? 'https://kapi.kakao.com/v1/user/unlink'
             : userData.snsType === 'naver'
               ? `https://nid.naver.com/oauth2.0/token?grant_type=delete&access_token=${req.headers.authorization}&client_id=${process.env.CLIENT_ID}&client_secret=${process.env.CLIENT_SECRET}`
               : `https://graph.facebook.com/v11.0/${userData.appId}/permissions?appsecret_proof=${proof}&access_token=${appSecret}`;
 
-          return model !== 'facebook'
-            ? axios.get(url)
+          const promise = userData.snsType !== 'facebook'
+            ? userData.snsType === 'kakao'
+                ? axios.get(url, {
+                    headers: {
+                      authorization: req.headers.authorization
+                    }
+                  })
+                : axios.get(url)
             : axios.delete(url);
-        })
-        .then(response => {
-          return mentoringModel.updateMany({ moderatorId: mongoose.Types.ObjectId(req.body._id) }, { $set: { isTerminated: true } });
-        })
-        .then((list) => { return mentorModel.findOneAndUpdate({ userId: mongoose.Types.ObjectId(req.body._id) }, { $set: { name: '탈퇴한 사용자입니다.', descriptionText: null, likesCount: 0, price: 0, tags: [], descriptionForMentor: encodeURIComponent('<p>탈퇴한 사용자입니다</p>') } }); })
-        .then((list) => { return reviewModel.updateMany({ userId: mongoose.Types.ObjectId(req.body._id) }, { userName: '탈퇴한 사용자', text: '탈퇴한 사용자 입니다.', rate: 0, userThumb: 'https://artoring.com/image/1626851218536.png' }); })
-        .then(list => {
-          console.log(3, list);
-          return Promise.all(list.map(ele => {
-            return mentoringModel.findOne({ _id: mongoose.Types.ObjectId(ele.targetId) });
-          }))
-          ;
-        })
-        .then(list => {
-          return Promise.all(list.map(ele => {
-            let count = ele.rateCount;
-            let rate = ele.rate * count;
+          promise
+            .then(response => {
+              return mentoringModel.updateMany({ moderatorId: mongoose.Types.ObjectId(req.body._id) }, { $set: { isTerminated: true } });
+            })
+            .then(() => mentorModel.findOneAndUpdate({ userId: mongoose.Types.ObjectId(req.body._id) }, { $set: { name: '탈퇴한 사용자입니다.', descriptionText: null, likesCount: 0, price: 0, tags: [], descriptionForMentor: encodeURIComponent('<p>탈퇴한 사용자입니다</p>') } }))
+            .then(() => reviewModel.updateMany({ userId: mongoose.Types.ObjectId(req.body._id) }, { userName: '탈퇴한 사용자', text: '탈퇴한 사용자 입니다.', rate: 0, userThumb: 'https://artoring.com/image/1626851218536.png' }))
+            .then(() => reviewModel.find({ userId: mongoose.Types.ObjectId(req.body._id) }))
+            .then(list => Promise.all(list.map(ele => mentoringModel.findOne({ _id: mongoose.Types.ObjectId(ele.targetId) }))))
+            .then(list => Promise.all(list.map(ele => {
+              let count = ele.rateCount;
+              let rate = ele.rate * count;
 
-            rate /= count--;
+              rate /= count--;
 
-            return mentorModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(ele._id) }, { $set: { count, rate } });
-          }));
-        })
-        .then(list => {
-          console.log(list);
-          return userModel.findOneAndDelete({ _id: mongoose.Types.ObjectId(req.body._id) });
-        })
-        .then(() => {
-          res.status(200).send();
-        })
-        .catch(e => {
-          console.log(e);
-          res.status(500).send();
-        });
-    }, model, req.headers.authorization, res);
+              return mentorModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(ele._id) }, { $set: { count, rate } });
+            })))
+            .then(list => userModel.findOneAndDelete({ _id: mongoose.Types.ObjectId(req.body._id) }))
+            .then(() => {
+              res.status(200).send();
+            }).catch(e => {
+              console.log(e);
+              res.status(500).send();
+            });
+        }, userData.snsType, req.headers.authorization, res);
+      }).catch(e => {
+        console.log(e);
+        res.status(500).send();
+      });
   } else {
     if (model === 'kakao') {
       const key = req.headers.authorization.split(' ')[1];
@@ -79,30 +79,19 @@ module.exports = async (req, res) => {
           .then(userData => {
             userId = userData._id;
             return mentoringModel.updateMany({ moderatorId: mongoose.Types.ObjectId(userId) }, { $set: { isTerminated: true } })
-              .then((list) => { console.log(1, list); return mentorModel.findOneAndUpdate({ userId: mongoose.Types.ObjectId(userId) }, { $set: { name: '탈퇴한 사용자입니다.', descriptionText: null, likesCount: 0, price: 0, tags: [], descriptionForMentor: encodeURIComponent('<p>탈퇴한 사용자입니다</p>') } }); })
-              .then((list) => { console.log(2, list); return reviewModel.updateMany({ userId: mongoose.Types.ObjectId(userId) }, { userName: '탈퇴한 사용자', text: '탈퇴한 사용자 입니다.', rate: 0, userThumb: 'https://artoring.com/image/1626851218536.png' }); })
-              .then(list => {
-                console.log(3, list);
-                return Promise.all(list.map(ele => {
-                  return mentoringModel.findOne({ _id: mongoose.Types.ObjectId(ele.targetId) });
-                }))
-                ;
-              })
-              .then(list => {
-                console.log(list);
-                return Promise.all(list.map(ele => {
-                  let count = ele.rateCount;
-                  let rate = ele.rate * count;
+              .then(() => mentorModel.findOneAndUpdate({ userId: mongoose.Types.ObjectId(userId) }, { $set: { name: '탈퇴한 사용자입니다.', descriptionText: null, likesCount: 0, price: 0, tags: [], descriptionForMentor: encodeURIComponent('<p>탈퇴한 사용자입니다</p>') } }))
+              .then(() => reviewModel.updateMany({ userId: mongoose.Types.ObjectId(userId) }, { userName: '탈퇴한 사용자', text: '탈퇴한 사용자 입니다.', rate: 0, userThumb: 'https://artoring.com/image/1626851218536.png' }))
+              .then(() => reviewModel.find({ userId: mongoose.Types.ObjectId(userId) }))
+              .then(list => Promise.all(list.map(ele => mentoringModel.findOne({ _id: mongoose.Types.ObjectId(ele.targetId) }))))
+              .then(list => Promise.all(list.map(ele => {
+                let count = ele.rateCount;
+                let rate = ele.rate * count;
 
-                  rate /= count--;
+                rate /= count--;
 
-                  return mentorModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(ele._id) }, { $set: { count, rate } });
-                }));
-              })
-              .then(list => {
-                console.log(list);
-                return userModel.findOneAndDelete({ _id: mongoose.Types.ObjectId(userId) });
-              })
+                return mentorModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(ele._id) }, { $set: { count, rate } });
+              })))
+              .then(list => userModel.findOneAndDelete({ _id: mongoose.Types.ObjectId(userId) }))
               .then(() => {
                 res.status(200).send();
               })
@@ -129,30 +118,18 @@ module.exports = async (req, res) => {
           userId = userData._id;
           return mentoringModel.updateMany({ moderatorId: mongoose.Types.ObjectId(userId) }, { $set: { isTerminated: true } });
         })
-        .then((list) => { console.log(1, list); return mentorModel.findOneAndUpdate({ userId: mongoose.Types.ObjectId(userId) }, { $set: { name: '탈퇴한 사용자입니다.', descriptionText: null, likesCount: 0, price: 0, tags: [], descriptionForMentor: encodeURIComponent('<p>탈퇴한 사용자입니다</p>') } }); })
-        .then((list) => { console.log(2, list); return reviewModel.updateMany({ userId: mongoose.Types.ObjectId(userId) }, { userName: '탈퇴한 사용자', text: '탈퇴한 사용자 입니다.', rate: 0, userThumb: 'https://artoring.com/image/1626851218536.png' }); })
-        .then(list => {
-          console.log(3, list);
-          return Promise.all(list.map(ele => {
-            return mentoringModel.findOne({ _id: mongoose.Types.ObjectId(ele.targetId) });
-          }))
-          ;
-        })
-        .then(list => {
-          console.log(list);
-          return Promise.all(list.map(ele => {
-            let count = ele.rateCount;
-            let rate = ele.rate * count;
+        .then(() => mentorModel.findOneAndUpdate({ userId: mongoose.Types.ObjectId(userId) }, { $set: { name: '탈퇴한 사용자입니다.', descriptionText: null, likesCount: 0, price: 0, tags: [], descriptionForMentor: encodeURIComponent('<p>탈퇴한 사용자입니다</p>') } }))
+        .then(() => reviewModel.updateMany({ userId: mongoose.Types.ObjectId(userId) }, { userName: '탈퇴한 사용자', text: '탈퇴한 사용자 입니다.', rate: 0, userThumb: 'https://artoring.com/image/1626851218536.png' }))
+        .then((list) => Promise.all(list.map(ele => mentoringModel.findOne({ _id: mongoose.Types.ObjectId(ele.targetId) }))))
+        .then(list => Promise.all(list.map(ele => {
+          let count = ele.rateCount;
+          let rate = ele.rate * count;
 
-            rate /= count--;
+          rate /= count--;
 
-            return mentorModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(ele._id) }, { $set: { count, rate } });
-          }));
-        })
-        .then(list => {
-          console.log(list);
-          return userModel.findOneAndDelete({ _id: mongoose.Types.ObjectId(userId) });
-        })
+          return mentorModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(ele._id) }, { $set: { count, rate } });
+        })))
+        .then(() => userModel.findOneAndDelete({ _id: mongoose.Types.ObjectId(userId) }))
         .then(() => {
           res.status(200).json({ url: `https://artoring.com/drop/facebook?id=${userId}`, confirmation_code: `${userId}Deleted!` });
         })

@@ -59,7 +59,8 @@ module.exports = async (req, res) => {
                 endDate: '$bookedEndTime',
                 tags: '$mentoring.tags',
                 inprogress: '$inprogress',
-                targetId: '$mentoring._id'
+                targetId: '$mentoring._id',
+                isReviewed: '$isReviewed'
 
               }
             },
@@ -114,7 +115,8 @@ module.exports = async (req, res) => {
               endDate: '$bookedEndTime',
               tags: '$mentoring.tags',
               inprogress: '$inprogress',
-              targetId: '$mentoring._id'
+              targetId: '$mentoring._id',
+              isReviewed: '$isReviewed'
             }
           },
           {

@@ -6,6 +6,7 @@ const verifyEmail = require('./verifyEmail');
 const retryVerify = require('./retryVerify');
 const socialLogin = require('./socialLogin');
 const passwordMod = require('./passwordMod');
+const passwordCheck = require('./passwordCheck');
 const getLike = require('./getLike');
 const postPurchase = require('./postPerchase');
 const getPurchase = require('./getPurchase');
@@ -24,6 +25,7 @@ const careerCardController = {
   socialLogin,
   logout,
   passwordMod,
+  passwordCheck,
   getLike,
   postPurchase,
   getPurchase,

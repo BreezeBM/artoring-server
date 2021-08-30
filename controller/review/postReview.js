@@ -1,10 +1,9 @@
-
-const { reviewModel, purchaseHistoryModel, userModel, mongoose } = require('../../model');
+const { reviewModel, purchaseHistoryModel, userModel, mongoose, mentoringModel } = require('../../model');
 const { verifyJWTToken } = require('../tools');
 module.exports = async (req, res) => {
-  const { type } = req.body;
-  if (type) {
-    if (type === 'email') {
+  const { loginType } = req.body;
+  if (loginType) {
+    if (loginType === 'email') {
       try {
         const decode = await verifyJWTToken(req);
 
@@ -18,18 +17,41 @@ module.exports = async (req, res) => {
             break;
           }
           default: {
-            const { id: _id, name } = decode;
-            const { originType, targetId, text, rate, _id: purchaseId } = req.body;
+            const { _id, name } = decode;
+            const { originType, rate, targetId, text, userName, userThumb } = req.body;
 
+            let reviewId;
             userModel.findOne({ _id: mongoose.Types.ObjectId(_id), name })
               .then(userData => {
                 return reviewModel.create({
-                  userThumb: userData.thumb, userName: userData.name, originType, targetId, text, rate
+                  userThumb, userName, userId: userData._id, originType, targetId, text, rate
+                });
+              })
+              .then((data) => {
+                reviewId = data._id;
+                return mentoringModel.findById(mongoose.Types.ObjectId(targetId));
+              })
+              .then(cardData => {
+                const { rateCount, rate: prevRate } = cardData;
+                const previous = rateCount === 0 ? 0 : rateCount * prevRate;
+
+                return mentoringModel.findByIdAndUpdate(targetId, {
+                  $set: {
+                    rateCount: rateCount + 1,
+                    rate: (previous + rate) / (rateCount + 1)
+                  },
+                  $push: {
+                    reviews: reviewId
+                  }
                 });
               })
               .then(() => {
-                purchaseHistoryModel.findByIdAndUpdate(mongoose.Types.ObjectId(purchaseId), { $set: { isReviewd: true } });
-                res.send();
+                return purchaseHistoryModel.findByIdAndUpdate(_id, { $set: { isReviewed: true } });
+              })
+              .then(() => res.status(201).send())
+              .catch(e => {
+                console.log(e);
+                res.status(500).send();
               })
             ;
           }
@@ -40,14 +62,39 @@ module.exports = async (req, res) => {
         res.json(e.message);
       }
     } else {
-      const { originType, id, targetId, text, rate } = req.body;
+      const { originType, rate, targetId, text, _id, userName, userThumb, userId } = req.body;
 
-      userModel.findOne({ _id: mongoose.Types.ObjectId(id) })
-        .then(userData => {
-          return reviewModel.create({
-            userThumb: userData.thumb, userName: userData.name, originType, targetId, text, rate
+      let reviewId;
+      reviewModel.create({
+        userThumb, userName, userId, originType, targetId, text, rate
+      })
+        .then((data) => {
+          reviewId = data._id;
+          return mentoringModel.findById(mongoose.Types.ObjectId(targetId));
+        })
+        .then(cardData => {
+          console.log(cardData);
+          const { rateCount, rate: prevRate } = cardData;
+          const previous = rateCount === 0 ? 0 : rateCount * prevRate;
+
+          return mentoringModel.findByIdAndUpdate(targetId, {
+            $set: {
+              rateCount: rateCount + 1,
+              rate: (previous + rate) / (rateCount + 1)
+            },
+            $push: {
+              reviews: reviewId
+            }
           });
-        }).then(() => res.send());
+        })
+        .then(() => {
+          return purchaseHistoryModel.findByIdAndUpdate(_id, { $set: { isReviewed: true } });
+        })
+        .then(() => res.status(201).send())
+        .catch(e => {
+          console.log(e);
+          res.status(500).send();
+        });
     }
   }
 };

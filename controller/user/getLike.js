@@ -22,7 +22,7 @@ module.exports = async (req, res) => {
           // const likeData = await userModel.findOne({ _id, name })
           //   .select({ queryType: 1, _id: 0 });
           // populate 메서드는 $lookup === SQL Left join 메서드
-          console.log(_id, name);
+
           // page와 로그인 타입만 명시된 요청  == 카드별 좋아요를 요청
           if (Object.keys(req.query).length === 2) {
             const result = {};

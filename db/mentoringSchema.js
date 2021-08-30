@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
@@ -23,16 +23,17 @@ const mentoringSchema = new Schema({
     thu: [String],
     fri: [String],
     sat: [String],
-    sun: [String],
+    sun: [String]
   },
   likesCount: { type: Number, default: 0 },
   maximumParticipants: Number,
   joinedParticipants: { type: Number, default: 0 },
   price: { type: Number, default: 0 },
   rate: { type: Number, default: 0 },
+  rateCount: { type: Number, default: 0 },
   reviews: [Schema.ObjectId], // _id가 아닌 자동증가 id정보들이 담깁니다.
   createdAt: { type: Date, default: new Date() },
-  updatedAt: { type: Date, default: new Date() },
+  updatedAt: { type: Date, default: new Date() }
 });
 
 module.exports = mentoringSchema;

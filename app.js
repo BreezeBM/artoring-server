@@ -24,7 +24,7 @@ app.use(cookieParser());
 
 app.use(helmet());
 
-const whitelist = ['https://insideart-dev.artoring.com', 'https://artoring.com', 'https://www.gstatic.com', undefined]; // undefined == EBS health check or 다른서버
+const whitelist = ['https://insideart-dev.artoring.com', 'https://artoring.com', 'https://www.gstatic.com', undefined, process.env.ADMIN_URL]; // undefined == EBS health check or 다른서버
 
 app.use(express.json({ extended: false }));
 app.use(express.urlencoded({ extended: true }));

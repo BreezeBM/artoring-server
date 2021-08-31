@@ -96,17 +96,16 @@ module.exports = async (req, res) => {
           try {
           // bcrypt 비밀번호 대조결과 일치
             if (result) {
-              if (!userData.accessKey) {
+              if (!userData.accessKey || userData.attempts <= 0) {
                 res.status(403).send();
                 return;
-              }
-              if (userData.attempts <= 0) {
-                res.status(404).send();
-                return;
-              }
-              userData.accessKey = aesEncrypt(userData.accessKey);
+              } else {
+                userData.accessKey = aesEncrypt(userData.accessKey);
 
-              return createAssessment();
+                return createAssessment();
+              }
+            } else {
+              res.status(404).send();
             }
           } catch (e) {
             console.log(e);
@@ -115,6 +114,7 @@ module.exports = async (req, res) => {
         })
         .then(async response => {
         // Check if the token is valid.
+          console.log(response);
           if (!response[0].tokenProperties.valid) {
             console.log('The CreateAssessment call failed because the token was: ' +
              response[0].tokenProperties.invalidReason);
@@ -144,6 +144,13 @@ module.exports = async (req, res) => {
                'does not match the action you are expecting to score');
             }
           }
+        })
+        .catch(e => {
+          console.log(e);
+          adminModel.findOneAndUpdate({ email: userEmail }, { $inc: { attempts: -1 } })
+            .then(() => {
+              res.status(500).json(e);
+            });
         });
     }
   } catch (e) {

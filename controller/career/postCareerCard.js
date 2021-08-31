@@ -60,7 +60,7 @@ module.exports = async (req, res) => {
           endDate,
           moderatorId,
           tags,
-          detailInfo: purifiedDetailInfo,
+          detailInfo: encodeURIComponent(purifiedDetailInfo),
           textDetailInfo,
           isGroup,
           availableTime,

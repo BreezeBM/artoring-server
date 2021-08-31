@@ -6,6 +6,7 @@ const bcrypt = require('bcrypt');
 
 const recaptchaAction = 'login';
 
+let userEmail;
 module.exports = async (req, res) => {
   /*
    * 어드민 계정들은 email, pwd, 접근 레벨, 고유한 accessKey를 가집니다.
@@ -43,110 +44,110 @@ module.exports = async (req, res) => {
           }
         }
       }
-    }
-    const { email, pwd, token: captcha } = req.body;
-    // for (let i = 0; i < hashingTime; i++) { pwd = sha256Encrypt(999, pwd, salt); }
+    } else {
+      const { email, pwd, token: captcha } = req.body;
+      userEmail = email;
 
-    const userData = await adminModel.findOne({ email }).select({ name: 1, pwd: 1, accessKey: 1, authorityLevel: 1, attempts: 1 });
-    bcrypt.compare(pwd, userData.pwd)
-      .then(async result => {
+      // for (let i = 0; i < hashingTime; i++) { pwd = sha256Encrypt(999, pwd, salt); }
+
+      const userData = await adminModel.findOne({ email }).select({ name: 1, pwd: 1, accessKey: 1, authorityLevel: 1, attempts: 1 });
+      bcrypt.compare(pwd, userData.pwd)
+        .then(async result => {
         // 캡챠 확인
-        function createAssessment () {
-          const projectID = process.env.CAPTCHA_ID;
-          const recaptchaSiteKey = process.env.CAPTCHA_KEY;
-          const token = captcha;
-          const assessmentName = 'your_assessment_name';
+          function createAssessment () {
+            const projectID = process.env.CAPTCHA_ID;
+            const recaptchaSiteKey = process.env.CAPTCHA_KEY;
+            const token = captcha;
+            const assessmentName = 'your_assessment_name';
 
-          const { RecaptchaEnterpriseServiceClient } =
+            const { RecaptchaEnterpriseServiceClient } =
          require('@google-cloud/recaptcha-enterprise');
 
-          // Create the reCAPTCHA client.
-          const client = new RecaptchaEnterpriseServiceClient();
+            // Create the reCAPTCHA client.
+            const client = new RecaptchaEnterpriseServiceClient();
 
-          // Set the properties of the event to be tracked.
-          const event = ({
-            token: token,
-            siteKey: recaptchaSiteKey
-          });
+            // Set the properties of the event to be tracked.
+            const event = ({
+              token: token,
+              siteKey: recaptchaSiteKey
+            });
 
-          const assessment = ({
-            event: event,
-            name: assessmentName
-          });
+            const assessment = ({
+              event: event,
+              name: assessmentName
+            });
 
-          // google 프로젝트 ID를 기반으로 프로젝트 및 권한 등 조회
-          const projectPath = client.projectPath(projectID);
+            // google 프로젝트 ID를 기반으로 프로젝트 및 권한 등 조회
+            const projectPath = client.projectPath(projectID);
 
-          // Build the assessment request.
-          const request = ({
-            assessment: assessment,
-            parent: projectPath
-          });
+            // Build the assessment request.
+            const request = ({
+              assessment: assessment,
+              parent: projectPath
+            });
 
-          // 캡챠 토큰 조회
-          return client.createAssessment(request);
-        }
-        try {
-          // bcrypt 비밀번호 대조결과 일치
-          if (result) {
-            if (!userData.accessKey) {
-              res.status(403).send();
-              return;
-            }
-            if (userData.attempts <= 0) {
-              res.status(404).send();
-              return;
-            }
-            userData.accessKey = aesEncrypt(userData.accessKey);
-
-            return createAssessment();
+            // 캡챠 토큰 조회
+            return client.createAssessment(request);
           }
-        } catch (e) {
-          console.log(e);
-          return e;
-        }
-      })
-      .then(async response => {
+          try {
+          // bcrypt 비밀번호 대조결과 일치
+            if (result) {
+              if (!userData.accessKey) {
+                res.status(403).send();
+                return;
+              }
+              if (userData.attempts <= 0) {
+                res.status(404).send();
+                return;
+              }
+              userData.accessKey = aesEncrypt(userData.accessKey);
+
+              return createAssessment();
+            }
+          } catch (e) {
+            console.log(e);
+            return e;
+          }
+        })
+        .then(async response => {
         // Check if the token is valid.
-        if (!response[0].tokenProperties.valid) {
-          console.log('The CreateAssessment call failed because the token was: ' +
+          if (!response[0].tokenProperties.valid) {
+            console.log('The CreateAssessment call failed because the token was: ' +
              response[0].tokenProperties.invalidReason);
-        } else {
+          } else {
           // Check if the expected action was executed.
-          if (response[0].tokenProperties.action === recaptchaAction) {
+            if (response[0].tokenProperties.action === recaptchaAction) {
             // Get the risk score and the reason(s).
             // For more information on interpreting the assessment,
             // see: https://cloud.google.com/recaptcha-enterprise/docs/interpret-assessment
-            if (response[0].riskAnalysis.score <= 0.86) {
-              throw new Error('suspected as bot');
-            } else {
-              const token = await createJWT({ name: userData.name, accessKey: userData.accessKey, authLevel: userData.authorityLevel }, 3600);
+              if (response[0].riskAnalysis.score <= 0.86) {
+                throw new Error('suspected as bot');
+              } else {
+                const token = await createJWT({ name: userData.name, accessKey: userData.accessKey, authLevel: userData.authorityLevel }, 3600);
 
-              delete userData.pwd;
-              res.cookie('auth', token, {
-                secure: true,
-                httpOnly: true,
-                // domain: process.env.NODE_ENV === 'development' ? 'localhost' : 'back.artoring.com',
-                maxAge: 3600 * 1000,
-                sameSite: 'none',
-                path: '/'
-              });
-              res.status(200).json({ userData });
-            }
-          } else {
-            console.log('The action attribute in your reCAPTCHA tag ' +
+                delete userData.pwd;
+                res.cookie('auth', token, {
+                  secure: true,
+                  httpOnly: true,
+                  // domain: process.env.NODE_ENV === 'development' ? 'localhost' : 'back.artoring.com',
+                  maxAge: 3600 * 1000,
+                  sameSite: 'none',
+                  path: '/'
+                }).status(200).json({ userData });
+              }
+            } else {
+              console.log('The action attribute in your reCAPTCHA tag ' +
                'does not match the action you are expecting to score');
+            }
           }
-        }
-      })
-      .catch(async e => {
-        await adminModel.findOneAndUpdate({ email }, { $inc: { attempts: -1 } });
-        console.log(e);
-        res.status(401).json(e.message);
-      });
+        });
+    }
   } catch (e) {
     console.log(e);
-    res.status(500).json(e);
+    adminModel.findOneAndUpdate({ email: userEmail }, { $inc: { attempts: -1 } })
+      .then(() => {
+        res.status(500).json(e);
+      });
   }
 }
 ;

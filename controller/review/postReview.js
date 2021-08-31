@@ -73,7 +73,6 @@ module.exports = async (req, res) => {
           return mentoringModel.findById(mongoose.Types.ObjectId(targetId));
         })
         .then(cardData => {
-          console.log(cardData);
           const { rateCount, rate: prevRate } = cardData;
           const previous = rateCount === 0 ? 0 : rateCount * prevRate;
 

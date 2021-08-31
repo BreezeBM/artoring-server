@@ -17,10 +17,12 @@ module.exports = async (req, res) => {
       if (decode) {
         switch (decode) {
           case 401: {
+            res.cookie('auth', '', { expires: new Date(Date.now()) });
             res.status(401).send();
             break;
           }
           case 403: {
+            res.cookie('auth', '', { expires: new Date(Date.now()) });
             res.status(403).send();
             break;
           }
@@ -110,7 +112,6 @@ module.exports = async (req, res) => {
         })
         .then(async response => {
         // Check if the token is valid.
-          console.log(response);
           if (!response[0].tokenProperties.valid) {
             console.log('The CreateAssessment call failed because the token was: ' +
              response[0].tokenProperties.invalidReason);

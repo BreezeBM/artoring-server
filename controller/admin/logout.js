@@ -28,7 +28,7 @@ module.exports = async (req, res) => {
           const { name, accessKey, authLevel } = decode;
 
           if (!accessKey) throw new AdminAccessException('need authorize');
-          res.cookie('auth', { expires: Date.now() });
+          res.cookie('auth', '', { expires: new Date(Date.now()) });
 
           res.status(200).json({ userData: { name, accessKey, authLevel } });
         }

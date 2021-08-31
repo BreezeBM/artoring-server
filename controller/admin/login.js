@@ -60,6 +60,10 @@ module.exports = async (req, res) => {
             const token = captcha;
             const assessmentName = 'your_assessment_name';
 
+            console.log('p', projectID);
+            console.log('k', recaptchaSiteKey);
+            console.log('t', token);
+            
             const { RecaptchaEnterpriseServiceClient } =
          require('@google-cloud/recaptcha-enterprise');
 

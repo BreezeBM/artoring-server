@@ -51,7 +51,6 @@ module.exports = async (req, res) => {
           }
         ]);
 
-        console.log(mentorData);
         mentorData = mentorData.filter(ele => ele.mentor.length > 0);
 
         res.status(200).json(mentorData);

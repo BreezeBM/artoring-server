@@ -1,4 +1,4 @@
-const { mentoringCardModel, adminModel, mongoose } = require('../../model');
+const { careerInfoModel, adminModel, mongoose } = require('../../model');
 const { verifyJWTToken, aesDecrypt, AdminAccessException } = require('../tools');
 
 module.exports = async (req, res) => {
@@ -32,7 +32,7 @@ module.exports = async (req, res) => {
         if (!adminData) throw new AdminAccessException('no match found');
 
         // 해당 카드 제거.
-        mentoringCardModel.findOneAndDelete({ _id: mongoose.Types.ObjectId(_id) })
+        careerInfoModel.findOneAndDelete({ _id: mongoose.Types.ObjectId(_id) })
           .then(() => {
             res.status(204).send();
           });

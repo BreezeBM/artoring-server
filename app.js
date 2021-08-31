@@ -39,9 +39,7 @@ app.use(cors({
         console.log('Origin : ', origin);
         if (whitelist.includes(origin)) { callback(null, true); } else callback(new Error('Not allowed by CORS'));
       },
-  methods: process.env.NODE_ENV !== 'production'
-    ? '*'
-    : 'GET,POST,PUT,DELETE,OPTIONS',
+  methods: 'GET,POST,PUT,DELETE,OPTIONS',
   credentials: true
 }));
 

@@ -65,7 +65,7 @@ module.exports = async (req, res) => {
             console.log('p', projectID);
             console.log('k', recaptchaSiteKey);
             console.log('t', token);
-            
+
             const { RecaptchaEnterpriseServiceClient } =
          require('@google-cloud/recaptcha-enterprise');
 

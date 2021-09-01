@@ -7,7 +7,14 @@ module.exports = async (req, res) => {
 
     if (req.params.id) {
       const data = await mentorModel.aggregate([
-        { $match: { userId: mongoose.Types.ObjectId(req.params.id) } },
+        {
+          $match: {
+            $or: [
+              { userId: mongoose.Types.ObjectId(req.params.id) },
+              { _id: mongoose.Types.ObjectId(req.params.id) }
+            ]
+          }
+        },
         { $lookup: { from: 'usermodels', as: 'user', localField: 'userId', foreignField: '_id' } },
         { $unwind: '$user' },
         {
@@ -15,6 +22,7 @@ module.exports = async (req, res) => {
             avaliableTime: '$avaliableTime',
             descriptionForMentor: '$descriptionForMentor',
             userName: '$user.name',
+            thumb: '$thumb',
             id: '$_id'
           }
         }

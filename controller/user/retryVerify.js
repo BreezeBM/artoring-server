@@ -1,4 +1,4 @@
-const { userModel } = require('../../model');
+const { userModel, mongoose } = require('../../model');
 const { verifyJWTToken, sendEmail } = require('../tools');
 
 module.exports = async (req, res) => {
@@ -20,8 +20,10 @@ module.exports = async (req, res) => {
       default: {
         const { _id } = decode;
 
-        const userData = await userModel.findOne({ _id });
-        sendEmail(userData, res);
+        userModel.findOne({ _id: mongoose.Types.ObjectId(_id) })
+          .then(async userData => {
+            await sendEmail({ userData, accessToken: req.headers.accessToken }, userData.email, res);
+          });
 
         break;
       }

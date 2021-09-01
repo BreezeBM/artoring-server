@@ -9,6 +9,8 @@ router.use('/apply', applyRouter);
 router.use('/calculate', calculatorRouter);
 router.get('/', mentorController.getMentor);
 router.get('/:id', mentorController.getMentor);
+router.post('/', mentorController.modifiMentor);
+router.put('/', mentorController.modifiMentor);
 
 router.use('/*', (req, res) => res.status(404).send());
 

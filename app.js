@@ -32,11 +32,9 @@ app.use(cors({
   origin:
     process.env.NODE_ENV === 'development'
       ? function (origin, callback) {
-          console.log('Origin : ', origin);
           callback(null, true);
         }
       : function (origin, callback) {
-        console.log('Origin : ', origin);
         if (whitelist.includes(origin)) { callback(null, true); } else callback(new Error('Not allowed by CORS'));
       },
   methods: 'GET,POST,PUT,DELETE,OPTIONS',

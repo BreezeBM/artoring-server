@@ -81,7 +81,6 @@ module.exports = async (req, res) => {
               $set: postCardData
             }, { new: true });
 
-            console.log(t);
             return res.send(200);
           }
         } else {

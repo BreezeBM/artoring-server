@@ -93,7 +93,7 @@ module.exports = async (req, res) => {
               createdAt: 1
             }
           }, {
-            $skip: (req.query.page - 1) * 8 || 1
+            $skip: (req.query.page - 1) * 8 || 0
           }, {
             $limit: 8
           }

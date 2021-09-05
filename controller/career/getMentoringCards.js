@@ -59,6 +59,7 @@ module.exports = async (req, res) => {
             }
           ];
           const gt = pipeline[0].$match.$expr.$and;
+          // $lookup 파이프라인 업데이트
           switch (Number(req.query.category)) {
             case 1: {
               gt.push({ $gte: ['$category.employee', Number(req.query.workedFor)] });
@@ -96,16 +97,18 @@ module.exports = async (req, res) => {
           }
           gt.push({ $eq: ['$userId', '$$moderatorId'] });
 
+          // aggregate 파이프라인 생성
           const aggregate = [
             { $match: query },
             {
               $lookup: {
                 from: 'mentormodels',
                 as: 'mentor',
+                // $lookup 파이프라인 변수 선언
                 let: { moderatorId: '$moderatorId' },
                 pipeline
               }
-            }, {
+            }, { // 결과 프로퍼티중 mentor가 비어있는걸 제외
               $match: {
                 $expr: {
                   $ne: [
@@ -140,6 +143,7 @@ module.exports = async (req, res) => {
 
               }
             }, {
+              // 페이지네이션 카드 정보 및  카드 수 리턴
               $facet: {
                 cardList: [{ $skip: (req.query.page - 1) }, { $limit: 16 }],
                 totalCount: [

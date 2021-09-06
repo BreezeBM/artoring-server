@@ -9,6 +9,15 @@ const { mentoringModel, careerInfoModel, adminModel, mongoose } = require('../..
 const window = new JSDOM().window;
 const DOMPurify = createDOMPurify(window);
 
+DOMPurify.addHook('uponSanitizeElement', (node, data) => {
+  if (data.tagName === 'iframe') {
+    const src = node.getAttribute('src') || '';
+    if (!src.startsWith('https://www.youtube.com/embed/')) {
+      return node.parentNode.removeChild(node);
+    }
+  }
+});
+
 module.exports = async (req, res) => {
   try {
     const decode = await verifyJWTToken(req);
@@ -50,8 +59,11 @@ module.exports = async (req, res) => {
         if (!adminData) throw new AdminAccessException('no match found');
 
         const purifiedDetailInfo = DOMPurify.sanitize(
-          decodeURIComponent(detailInfo)
-        );
+          decodeURIComponent(detailInfo), {
+            ADD_TAGS: ['iframe'], // or ALLOWED_TAGS
+            ADD_ATTR: ['allow', 'allowfullscreen', 'frameborder', 'scrolling'] // or //or ALLOWED_ATR
+          });
+
 
         const postCardData = {
           thumb,

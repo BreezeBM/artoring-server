@@ -94,126 +94,183 @@ const searchEngine = async (callback, keyword, model, page) => {
     // 이 리스트들의 요소중 _source를 들여다 보면 그제서야 진짜 문서들이 보임.
     });
   } else {
-    try {
-      // 키워드 검색 페이지에서 사용하게 됨. 개인/집단 멘토링에따라 해당되는 돜먼드들을 2개의 배열로 리턴.
-      const teachData = await client.search(keyword[0] !== ''
-        ? {
-            index: 'mentoring',
-            from: 0,
-            size: 8,
-            body: {
-              sort: [
-                { startDate: { order: 'desc', format: 'strict_date_optional_time_nanos' } },
-                '_score'
-              ],
-              query: {
-                bool: {
-                  should: [{
-                    terms: {
-                      detailInfo: keyword
-                    }
-                  }, {
-                    terms: {
-                      title: keyword
-                    }
-                  }, {
-                    terms: {
-                      tags: keyword
-                    }
-                  }],
-                  must: {
-                    term: {
-                      isGroup: true
-                    }
+    // 키워드 검색 페이지에서 사용하게 됨. 개인/집단 멘토링에따라 해당되는 돜먼드들을 2개의 배열로 리턴.
+    let teachQueryResult, mentorQueryResult, newsQueryResult;
+    client.search(keyword[0] !== ''
+      ? {
+          index: 'mentoring',
+          from: 0,
+          size: 8,
+          body: {
+            sort: [
+              { startDate: { order: 'desc', format: 'strict_date_optional_time_nanos' } },
+              '_score'
+            ],
+            query: {
+              bool: {
+                should: [{
+                  terms: {
+                    detailInfo: keyword
+                  }
+                }, {
+                  terms: {
+                    title: keyword
+                  }
+                }, {
+                  terms: {
+                    tags: keyword
+                  }
+                }],
+                must: {
+                  term: {
+                    isGroup: true
                   }
                 }
               }
             }
           }
-        : {
-            index: 'mentoring',
-            from: 0,
-            size: 8,
-            body: {
-              sort: [
-                { startDate: { order: 'desc', format: 'strict_date_optional_time_nanos' } },
-                '_score'
-              ],
-              query: {
-                bool: {
-                  must: {
-                    term: {
-                      isGroup: true
-                    }
-                  }
-                }
-              }
-            }
-          });
-
-      const { hits: teachQueryResult } = teachData.body;
-
-      const mentorData = await client.search(keyword[0] !== ''
-        ? {
-            index: 'mentoring',
-            size: 8,
-            body: {
-              sort: [
-                { startDate: { order: 'desc', format: 'strict_date_optional_time_nanos' } },
-                '_score'
-              ],
-              query: {
-                bool: {
-                  should: [{
-                    terms: {
-                      name: keyword
-                    }
-                  }, {
-                    terms: {
-                      descriptionText: keyword
-                    }
-                  }, {
-                    terms: {
-                      tags: keyword
-                    }
-                  }],
-                  must: {
-                    term: {
-                      isGroup: false
-                    }
+        }
+      : {
+          index: 'mentoring',
+          from: 0,
+          size: 8,
+          body: {
+            sort: [
+              { startDate: { order: 'desc', format: 'strict_date_optional_time_nanos' } },
+              '_score'
+            ],
+            query: {
+              bool: {
+                must: {
+                  term: {
+                    isGroup: true
                   }
                 }
               }
             }
           }
-        : {
-            index: 'mentoring',
-            from: 0,
-            size: 8,
-            body: {
-              sort: [
-                { startDate: { order: 'desc', format: 'strict_date_optional_time_nanos' } },
-                '_score'
-              ],
-              query: {
-                bool: {
-                  must: {
-                    term: {
-                      isGroup: false
+        })
+      .then(data => {
+        teachQueryResult = data.body.hits;
+
+        return client.search(keyword[0] !== ''
+          ? {
+              index: 'mentoring',
+              size: 8,
+              body: {
+                sort: [
+                  { startDate: { order: 'desc', format: 'strict_date_optional_time_nanos' } },
+                  '_score'
+                ],
+                query: {
+                  bool: {
+                    should: [{
+                      terms: {
+                        name: keyword
+                      }
+                    }, {
+                      terms: {
+                        descriptionText: keyword
+                      }
+                    }, {
+                      terms: {
+                        tags: keyword
+                      }
+                    }],
+                    must: {
+                      term: {
+                        isGroup: false
+                      }
                     }
                   }
                 }
               }
             }
-          });
-      const { hits: mentorQueryResult } = mentorData.body;
-
-      const result = { teachQueryResult, mentorQueryResult };
-
-      callback(null, result);
-    } catch (e) {
-      callback(e, null);
-    }
+          : {
+              index: 'mentoring',
+              from: 0,
+              size: 8,
+              body: {
+                sort: [
+                  { startDate: { order: 'desc', format: 'strict_date_optional_time_nanos' } },
+                  '_score'
+                ],
+                query: {
+                  bool: {
+                    must: {
+                      term: {
+                        isGroup: false
+                      }
+                    }
+                  }
+                }
+              }
+            });
+      })
+      .then(data => {
+        mentorQueryResult = data.body.hits;
+        return client.search(keyword[0] !== ''
+          ? {
+              index: 'news',
+              size: 8,
+              body: {
+                sort: [
+                  { issuedDate: { order: 'desc', format: 'strict_date_optional_time_nanos' } },
+                  '_score'
+                ],
+                query: {
+                  bool: {
+                    should: [{
+                      terms: {
+                        createrName: keyword
+                      }
+                    }, {
+                      terms: {
+                        textDetailInfo: keyword
+                      }
+                    }, {
+                      terms: {
+                        title: keyword
+                      }
+                    }]
+                  }
+                }
+              }
+            }
+          : {
+              index: 'news',
+              from: 0,
+              size: 8,
+              body: {
+                sort: [
+                  { issuedDate: { order: 'desc', format: 'strict_date_optional_time_nanos' } },
+                  '_score'
+                ],
+                query: {
+                  bool: {
+                    should: [{
+                      terms: {
+                        createrName: keyword
+                      }
+                    }, {
+                      terms: {
+                        textDetailInfo: keyword
+                      }
+                    }, {
+                      terms: {
+                        title: keyword
+                      }
+                    }]
+                  }
+                }
+              }
+            });
+      })
+      .then(data => {
+        newsQueryResult = data.body.hits;
+        callback(null, { teachQueryResult, mentorQueryResult, newsQueryResult });
+      })
+      .catch(e => callback(e, null));
   }
 }
 ;

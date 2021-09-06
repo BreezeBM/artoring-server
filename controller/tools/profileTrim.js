@@ -18,7 +18,7 @@ const trimKakao = (account) => {
   const result = {};
   result.appId = account.id; // 연결끊기에서 카카오 id가 이메일 대신 전달됨. 이때 사용됨
   result.snsType = 'kakao';
-  if (!account.profile_nickname_needs_agreement && account.profile && account.profile.nickname) result.nickName = account.profile.nickname;
+  if (!account.profile_nickname_needs_agreement && account.profile && account.profile.nickname) result.name = account.profile.name || account.profile.nickname;
   if (!account.profile_image_needs_agreement && account.profile && account.profile.thumbnail_image_url) result.thumb = account.profile.thumbnail_image_url;
   if (!account.email_needs_agreement && account.has_email && account.is_email_valid && account.is_email_verified) result.email = account.email;
   if (!account.gender_needs_agreement && account.has_gender) result.gender = account.gender;

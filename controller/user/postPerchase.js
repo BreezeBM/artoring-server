@@ -1,4 +1,4 @@
-const { userModel, purchaseHistoryModel, careerInfoModel, mentoringModel } = require('../../model');
+const { userModel, purchaseHistoryModel, careerInfoModel, mentoringModel, mongoose } = require('../../model');
 const { verifyJWTToken, verifyAndCallback } = require('../tools');
 
 module.exports = async (req, res) => {
@@ -34,8 +34,8 @@ module.exports = async (req, res) => {
             };
             // 사실 몽고디비는 하나의 도큐먼트에 대해 atomic 하다...
             // 혹시몰라 우선은 transaction을 사용함.
-            await session.withTransaction(async () => {
-              return await purchaseHistoryModel.create(
+            await session.withTransaction(() => {
+              return purchaseHistoryModel.create(
                 {
                   userId: _id,
                   targetId: cardId,
@@ -46,6 +46,15 @@ module.exports = async (req, res) => {
                   loginType: type,
                   startDate,
                   endDate
+                })
+                .then(() => {
+                  return mentoringModel.findById({ _id: mongoose.Types.ObjectId(cardId) });
+                })
+                .then(data => {
+                  if (data.joinedParticipants >= data.maximumParticipants) res.status(400).send();
+                  else {
+                    return mentoringModel.findByIdAndUpdate({ _id: mongoose.Types.ObjectId(cardId) }, { $inc: { joinedParticipants: 1 } });
+                  }
                 });
             }, transactionOptions);
             session.endSession();
@@ -64,8 +73,8 @@ module.exports = async (req, res) => {
           readConcern: { level: 'majority' },
           writeConcern: { w: 'majority' }
         };
-        await session.withTransaction(async () => {
-          return await purchaseHistoryModel.create(
+        await session.withTransaction(() => {
+          return purchaseHistoryModel.create(
             {
               userId,
               targetId: cardId,
@@ -76,6 +85,15 @@ module.exports = async (req, res) => {
               loginType: type,
               startDate,
               endDate
+            })
+            .then(() => {
+              return mentoringModel.findById({ _id: mongoose.Types.ObjectId(cardId) });
+            })
+            .then(data => {
+              if (data.joinedParticipants >= data.maximumParticipants) res.status(400).send();
+              else {
+                return mentoringModel.findByIdAndUpdate({ _id: mongoose.Types.ObjectId(cardId) }, { $inc: { joinedParticipants: 1 } });
+              }
             });
         }, transactionOptions);
         session.endSession();

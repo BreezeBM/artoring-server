@@ -26,6 +26,7 @@ module.exports = async (req, res) => {
             startDate: '$startDate',
             endDate: '$endDate',
             detailInfo: '$detailInfo',
+            textDetailInfo: '$textDetailInfo',
             maximumParticipants: '$maximumParticipants',
             category: '$category',
             subCategory: '$subCategory',
@@ -145,7 +146,7 @@ module.exports = async (req, res) => {
             }, {
               // 페이지네이션 카드 정보 및  카드 수 리턴
               $facet: {
-                cardList: [{ $skip: (req.query.page - 1) }, { $limit: 16 }],
+                cardList: [{ $skip: (req.query.page - 1) }, { $limit: Number(req.query.size) || 16 }],
                 totalCount: [
                   {
                     $count: 'count'

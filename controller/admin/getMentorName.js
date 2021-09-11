@@ -19,7 +19,7 @@ module.exports = async (req, res) => {
         // 어드민 토큰은 항상 유니크한 엑세스 키를 가지고 있어야 하며
         // 엑세스키는 AES256으로 암호화 처리되어 있음.
 
-        const { name, accessKey, authLevel } = decode;
+        const { name, accessKey, authLevel, page } = decode;
 
         if (!accessKey || authLevel === 0) throw new AdminAccessException('need authorize');
 
@@ -29,29 +29,62 @@ module.exports = async (req, res) => {
         const adminData = await adminModel.find({ name, accessKey: accKey });
         if (!adminData) throw new AdminAccessException('no match found');
 
-        const mentorData = await userModel.aggregate([
-
-          {
-            $search: {
-              index: 'searchName',
-              text: {
-                query: `{ name: '${req.body.name}' }`,
-                path: {
-                  wildcard: '*'
+        let mentorData = await userModel.aggregate(req.body.name !== ''
+          ? [
+              {
+                $search: {
+                  index: 'searchName',
+                  text: {
+                    query: `{ name: '${req.body.name}' }`,
+                    path: {
+                      wildcard: '*'
+                    }
+                  }
+                }
+              }, {
+                $lookup: {
+                  from: 'mentormodels',
+                  as: 'mentor',
+                  localField: '_id',
+                  foreignField: 'userId'
+                }
+              }, {
+                $project: {
+                  _id: '$_id',
+                  current: '$current',
+                  userName: '$name'
                 }
               }
-            }
-          }, {
-            $lookup: {
-              from: 'mentormodels',
-              as: 'mentor',
-              localField: '_id',
-              foreignField: 'userId'
-            }
-          }
-        ]).filter(ele => ele.mentor.length > 0);
+            ]
+          : [
+              { $match: { isMentor: true } },
+              {
+                $lookup: {
+                  from: 'mentormodels',
+                  as: 'Mentor',
+                  localField: '_id',
+                  foreignField: 'userId'
+                }
+              },
+              { $unwind: '$Mentor' },
+              {
+                $project: {
+                  _id: '$Mentor._id',
+                  descriptionForMentor: '$Mentor.descriptionForMentor',
+                  descriptionText: '$Mentor.descriptionText',
+                  name: '$Mentor.name',
+                  current: '$current'
+                }
+              }
+            ]);
 
-        res.status(200).json(mentorData);
+        mentorData = mentorData.filter(ele => ele._id !== undefined);
+        const total = mentorData.length;
+        if (page) {
+          mentorData = mentorData.splice((page - 1) * 8, 8);
+        }
+
+        res.status(200).json({ mentorData, total });
       }
         break;
     }

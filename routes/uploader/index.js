@@ -18,11 +18,16 @@ const upload = multer({
   multers3({
     s3: s3,
     bucket: 'artoring-container',
+    contentType: multers3.AUTO_CONTENT_TYPE,
+    metadata: function (req, file, cb) {
+      cb(null, { fieldName: file.fieldname });
+    },
     key: function (req, file, cb) {
-      cb(null, 'image/' + Date.now() + '.' + file.originalname.split('.').pop()); // 이름 설정
+      console.log(file);
+      cb(null, 'image/' + Date.now() + '_' + file.originalname); // 이름 설정
     }
   })
-}, 'NONE');
+});
 
 router.post('/img', upload.single('file'), uploaderController.handler);
 

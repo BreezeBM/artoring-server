@@ -2,7 +2,7 @@ const { purchaseHistoryModel, mentoringModel, mongoose } = require('../../model'
 const { verifyJWTToken, verifyAndCallback } = require('../tools');
 
 module.exports = async (req, res) => {
-  const { loginType: type, id, page, purchasedType = true } = req.query;
+  const { loginType: type, id, page } = req.query;
   const accessToken = req.headers.authorization;
 
   try {
@@ -37,12 +37,7 @@ module.exports = async (req, res) => {
                   {
                     $match: {
                       $expr: {
-                        $and: [
-                          { $eq: ['$isGroup', purchasedType] },
-                          {
-                            $eq: ['$_id', '$$targetId']
-                          }
-                        ]
+                        $eq: ['$_id', '$$targetId']
                       }
                     }
                   }
@@ -58,7 +53,9 @@ module.exports = async (req, res) => {
                 startDate: '$bookedStartTime',
                 endDate: '$bookedEndTime',
                 tags: '$mentoring.tags',
-                inprogress: '$inprogress'
+                inprogress: '$inprogress',
+                targetId: '$mentoring._id',
+                isReviewed: '$isReviewed'
 
               }
             },
@@ -81,7 +78,7 @@ module.exports = async (req, res) => {
     } else {
       verifyAndCallback(async () => {
         // const targetData = await purchaseHistoryModel.findOne(query, null, queryOption).select({ zoomLink: 0, cratedAt: 0 });
-        const targetData = await purchaseHistoryModel.aggregate([
+        purchaseHistoryModel.aggregate([
           { $match: { userId: mongoose.Types.ObjectId(id) } },
           {
             $lookup: {
@@ -92,18 +89,14 @@ module.exports = async (req, res) => {
                 {
                   $match: {
                     $expr: {
-                      $and: [
-                        { $eq: ['$isGroup', purchasedType] },
-                        {
-                          $eq: ['$_id', '$$targetId']
-                        }
-                      ]
+                      $eq: ['$_id', '$$targetId']
                     }
                   }
                 }
               ]
             }
           },
+          { $unwind: '$mentoring' },
           {
             $project: {
               title: '$mentoring.title',
@@ -112,24 +105,28 @@ module.exports = async (req, res) => {
               startDate: '$bookedStartTime',
               endDate: '$bookedEndTime',
               tags: '$mentoring.tags',
-              inprogress: '$inprogress'
+              inprogress: '$inprogress',
+              targetId: '$mentoring._id',
+              isReviewed: '$isReviewed'
             }
           },
+
           {
-            $sort: {
-              startDate: -1
+            // 페이지네이션 카드 정보 및  카드 수 리턴
+            $facet: {
+              cardList: [{ $skip: (req.query.page - 1) }, { $limit: Number(req.query.size) || 16 }]
+
             }
-          }, {
-            $skip: page ? (page - 1) * 8 : 0
-          }, {
-            $limit: 8
           }
-        ]);
-        targetData.map(index => {
-          index.tags = index.tags.flat();
-          return index;
-        });
-        res.status(200).json(targetData);
+        ])
+          .then(targetData => {
+            // targetData.map(index => {
+            //   index = index.flat();
+            //   return index;
+            // });
+
+            res.status(200).json(targetData[0]);
+          });
       }, type, accessToken, res);
     }
   } catch (e) {

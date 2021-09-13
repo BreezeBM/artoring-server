@@ -66,13 +66,18 @@ module.exports = async (req, res) => {
               }
               // 필요한 양 만큼의 데이터만 추출
             }, {
-              $skip: page ? (page - 1) * 8 : 0
-            }, {
-              $limit: 8
+              $facet: {
+                cardList: [{ $skip: (req.query.page - 1) }, { $limit: Number(req.query.size) || 16 }],
+                count: [
+                  {
+                    $count: 'count'
+                  }
+                ]
+              }
             }
           ]);
 
-          res.status(200).json(targetData);
+          res.status(200).json(targetData[0]);
         }
       }
     } else {
@@ -114,7 +119,12 @@ module.exports = async (req, res) => {
           {
             // 페이지네이션 카드 정보 및  카드 수 리턴
             $facet: {
-              cardList: [{ $skip: (req.query.page - 1) }, { $limit: Number(req.query.size) || 16 }]
+              cardList: [{ $skip: (req.query.page - 1) * (req.query.size || 16) }, { $limit: Number(req.query.size) || 16 }],
+              count: [
+                {
+                  $count: 'count'
+                }
+              ]
 
             }
           }

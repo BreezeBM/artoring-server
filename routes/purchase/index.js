@@ -12,6 +12,9 @@ router.post('/refund', userController.payment.revoke);
 // 결제 실패시 디비 내역 삭제
 router.delete('/payment/:merchantUid', userController.payment.remove);
 
+// 멘토링 등록 핸들러
+router.post('/questions', userController.postQuestions);
+
 router.post('/', userController.postPurchase);
 router.get('/', userController.getPurchase);
 

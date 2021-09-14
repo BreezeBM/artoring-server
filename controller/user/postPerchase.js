@@ -48,7 +48,8 @@ module.exports = async (req, res) => {
                   originType: reservationType,
                   loginType: type,
                   startDate,
-                  endDate
+                  endDate,
+                  questions: ['', '', '']
                 })
                 .then((data) => {
                   createdDoc = data;
@@ -97,7 +98,8 @@ module.exports = async (req, res) => {
               originType: reservationType,
               loginType: type,
               startDate,
-              endDate
+              endDate,
+              questions: ['', '', '']
             })
             .then((data) => {
               for (const n of Object.keys(data._doc)) { createdDoc[n] = data._doc[n]; }

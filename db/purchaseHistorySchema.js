@@ -15,6 +15,7 @@ const purchaseHistorySchema = new Schema({
   isRefund: { type: Boolean, default: false },
   inprogress: { type: String, default: 'inprogress' },
   zoomLink: String,
+  questions: [{ type: String }],
   createdAt: { type: Date, default: new Date() },
   // 아임포트 결제 상태 저장
   paymentData: { type: Object }

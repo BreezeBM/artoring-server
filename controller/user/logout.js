@@ -4,9 +4,9 @@ const axios = require('axios');
 const { verifyJWTToken, createJWT, verifyAndCallback, sha256Encrypt } = require('../tools');
 
 module.exports = async (req, res) => {
-  const { type } = req.query;
-
-  const accessToken = req.headers.authorization;
+  const split = req.cookies.authorization.split(' ');
+  const accessToken = split[0].concat(' ', split[1]);
+  const type = split[2];
 
   if (type) {
     if (type === 'email') {
@@ -25,7 +25,14 @@ module.exports = async (req, res) => {
           default: {
             // 즉시만료 JWT 토큰을 생성하여 리턴. 유출되어도 염려 없다.
             const fakeToken = await createJWT({ email: 'expired' }, 0);
-            res.status(201).json({ accessToken: fakeToken });
+            res.cookie('authorization', fakeToken, {
+              secure: true,
+              httpOnly: true,
+              // domain: process.env.NODE_ENV === 'development' ? 'localhost' : 'back.artoring.com',
+              maxAge: 0,
+              sameSite: 'none',
+              path: '/'
+            }).status(201).json();
 
             break;
           }
@@ -37,6 +44,7 @@ module.exports = async (req, res) => {
     } else {
       verifyAndCallback(async (userinfo) => {
         let proof;
+
         if (type === 'facebook') {
           // 시크릿코드, 엑세스 토큰을 활용하여 증명데이터를 생성하고 이를 제거하고자하는 엑세스토큰과 함께 전송.
 

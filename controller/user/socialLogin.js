@@ -44,6 +44,7 @@ module.exports = async (req, res) => {
         ? 'https://kapi.kakao.com//v2/user/me' // 카카오
         : `https://graph.facebook.com/v11.0/${id}?fields=id,name,picture,birthday,email,gender&appsecret_proof=${proof}&access_token=${token}`; // 페이스북
 
+    let response;
     type !== 'facebook'
       ? response = await axios.get(api_url, { headers: { Authorization: access_token.includes('Bearer') ? access_token : `Bearer ${access_token}` } })
       : response = await axios.get(api_url);
@@ -57,10 +58,16 @@ module.exports = async (req, res) => {
     const registered = await userModel
       .findOne({ email: userData.email })
       .select({ _id: 1, thumb: 1, name: 1, email: 1, isMentor: 1, likedCareerEdu: 1, likedMentor: 1, likedInfo: 1, verifiedEmail: 1, createdAt: 1 });
-    const returnToken = access_token || token;
 
     if (registered) {
-      res.status(200).json({ accessToken: returnToken || token, trimedData: registered });
+      res.cookie('authorization', `Bearer ${access_token || token} ${type}`, {
+        secure: true,
+        httpOnly: true,
+        // domain: process.env.NODE_ENV === 'development' ? 'localhost' : 'back.artoring.com',
+        maxAge: 3600 * 1000,
+        sameSite: 'none',
+        path: '/'
+      }).status(200).json({ trimedData: registered });
     } else {
       trimUserData(userData);
 
@@ -69,7 +76,14 @@ module.exports = async (req, res) => {
       const createdDoc = await userModel.create(userData);
       userData._id = createdDoc._id;
 
-      res.status(200).json({ accessToken: returnToken || token, trimedData: userData, signup: true });
+      res.cookie('authorization', `Bearer ${access_token || token} ${type}`, {
+        secure: true,
+        httpOnly: true,
+        // domain: process.env.NODE_ENV === 'development' ? 'localhost' : 'back.artoring.com',
+        maxAge: 3600 * 1000,
+        sameSite: 'none',
+        path: '/'
+      }).status(200).json({ trimedData: userData, signup: true });
     }
   } catch (e) {
     console.log('\n', e, e.response ? e.response.data : '');

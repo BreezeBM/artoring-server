@@ -6,6 +6,7 @@ const { verifyAndCallback } = require('../tools');
 // 좋아요는 유저가 등록하고, 삭제해야함.
 module.exports = async (req, res) => {
   const { targetModel, targetId } = req.params;
+  const { id: _id } = req.query;
 
   const split = req.cookies.authorization.split(' ');
   const accessToken = split[0].concat(' ', split[1]);

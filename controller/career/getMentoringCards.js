@@ -63,7 +63,7 @@ module.exports = async (req, res) => {
           // $lookup 파이프라인 업데이트
           switch (Number(req.query.category)) {
             case 1: {
-              gt.push({ $gte: ['$category.employee', Number(req.query.workedFor)] });
+              gt.push({ $gte: ['$category.employment', Number(req.query.workedFor)] });
               break;
             }
             case 2: {
@@ -146,7 +146,7 @@ module.exports = async (req, res) => {
             }, {
               // 페이지네이션 카드 정보 및  카드 수 리턴
               $facet: {
-                cardList: [{ $skip: (req.query.page - 1) }, { $limit: Number(req.query.size) || 16 }],
+                cardList: [{ $skip: (req.query.page - 1) * (req.query.size || 16) }, { $limit: Number(req.query.size) || 16 }],
                 totalCount: [
                   {
                     $count: 'count'

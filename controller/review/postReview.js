@@ -1,9 +1,12 @@
 const { reviewModel, purchaseHistoryModel, userModel, mongoose, mentoringModel } = require('../../model');
 const { verifyJWTToken, verifyAndCallback } = require('../tools');
 module.exports = async (req, res) => {
-  const { loginType } = req.body;
-  if (loginType) {
-    if (loginType === 'email') {
+  const split = req.cookies.authorization.split(' ');
+  const accessToken = split[0].concat(' ', split[1]);
+  const type = split[2];
+
+  if (type) {
+    if (type === 'email') {
       try {
         const decode = await verifyJWTToken(req);
 
@@ -95,7 +98,7 @@ module.exports = async (req, res) => {
             console.log(e);
             res.status(500).send();
           });
-      }, loginType, req.headers.authorization, res);
+      }, type, accessToken, res);
     }
   }
 };

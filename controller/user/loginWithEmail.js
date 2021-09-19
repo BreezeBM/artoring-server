@@ -35,7 +35,14 @@ module.exports = async (req, res) => {
               if (result) {
                 delete data.pwd;
                 const token = await createJWT({ _id: data._id, name: data.name }, 3600);
-                res.status(201).json({ accessToken: token, userData: data });
+                res.cookie('authorization', `Bearer ${token} email`, {
+                  secure: true,
+                  httpOnly: true,
+                  // domain: process.env.NODE_ENV === 'development' ? 'localhost' : 'back.artoring.com',
+                  maxAge: 3600 * 1000,
+                  sameSite: 'none',
+                  path: '/'
+                }).status(201).json({ userData: data });
               } else {
                 res.status(401).send({ message: '잘못된 비밀번호' });
               }

@@ -3,7 +3,12 @@ const { userModel } = require('../../model');
 const { verifyJWTToken, verifyAndCallback } = require('../tools');
 
 module.exports = async (req, res) => {
-  const { type, profile } = req.body;
+  const { profile } = req.body;
+
+  const split = req.cookies.authorization.split(' ');
+  const accessToken = split[0].concat(' ', split[1]);
+  const type = split[2];
+
   if (type === 'email') {
     const decode = await verifyJWTToken(req);
 
@@ -24,7 +29,6 @@ module.exports = async (req, res) => {
       }
     }
   } else {
-    const accessToken = req.headers.authorization;
     verifyAndCallback(async () => {
       // 몽고디비 aggregate를 moogoose에서는 이런 메서드로도 지원해준다. 적용후 데이터를 볼수있도록 new: true설정이되어있다.
       await userModel.findOneAndUpdate({ _id: profile._id }, { $set: profile }, { new: true });

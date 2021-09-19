@@ -1,9 +1,12 @@
-const { userModel, purchaseHistoryModel, careerInfoModel, mentoringModel, mongoose } = require('../../model');
+const { userModel, purchaseHistoryModel, mentoringModel, mongoose } = require('../../model');
 const { verifyJWTToken, verifyAndCallback, sha256Encrypt } = require('../tools');
 
 module.exports = async (req, res) => {
-  const { loginType: type, cardId, userId, reservationType, startDate, endDate } = req.body;
-  const accessToken = req.headers.authorization;
+  const { cardId, userId, reservationType, startDate, endDate } = req.body;
+  const split = req.cookies.authorization.split(' ');
+  const accessToken = split[0].concat(' ', split[1]);
+  const type = split[2];
+
   try {
     if (type === 'email') {
       const decode = await verifyJWTToken(req);

@@ -12,10 +12,12 @@ function UserException (type, message) {
 
 // 좋아요는 유저가 등록하고, 삭제해야함.
 module.exports = async (req, res) => {
-  const { type, targetId, _id } = req.body;
+  const { targetId, _id } = req.body;
   const { targetModel } = req.params || req.body;
 
-  const accessToken = req.headers.authorization;
+  const split = req.cookies.authorization.split(' ');
+  const accessToken = split[0].concat(' ', split[1]);
+  const type = split[2];
 
   // 각 타입에 대해 유저프로필을 각 오어스 서버에 요청하고, 이를 바탕으로 서버에 등록애함.
   // 템플릿 사용해야한다.

@@ -2,8 +2,10 @@ const { purchaseHistoryModel, mentoringModel, mongoose } = require('../../model'
 const { verifyJWTToken, verifyAndCallback } = require('../tools');
 
 module.exports = async (req, res) => {
-  const { loginType: type, id, page } = req.query;
-  const accessToken = req.headers.authorization;
+  const { id, page, size } = req.query;
+  const split = req.cookies.authorization.split(' ');
+  const accessToken = split[0].concat(' ', split[1]);
+  const type = split[2];
 
   try {
     if (type === 'email') {
@@ -68,7 +70,7 @@ module.exports = async (req, res) => {
               // 필요한 양 만큼의 데이터만 추출
             }, {
               $facet: {
-                cardList: [{ $skip: (req.query.page - 1) }, { $limit: Number(req.query.size) || 16 }],
+                cardList: [{ $skip: (page - 1) }, { $limit: Number(size) || 16 }],
                 count: [
                   {
                     $count: 'count'

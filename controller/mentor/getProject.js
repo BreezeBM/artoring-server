@@ -3,9 +3,13 @@ const { verifyJWTToken, verifyAndCallback } = require('../tools');
 
 // 멘토 개인페이지, 프로젝트 리스트 및 그 참여명단 처리 핸들러
 module.exports = async (req, res) => {
-  const { loginType: type, userId, programId, size } = req.query;
+  const { userId, programId, size } = req.query;
   const page = Number(req.query.page);
-  const accessToken = req.headers.authorization;
+
+  const split = req.cookies.authorization.split(' ');
+  const accessToken = split[0].concat(' ', split[1]);
+  const type = split[2];
+
   try {
     if (type === 'email') {
       const decode = await verifyJWTToken(req);
@@ -77,7 +81,6 @@ module.exports = async (req, res) => {
                 }
               ])
                 .then(list => {
-                  console.log(list[0]);
                   res.status(200).json(list[0]);
                 });
             }

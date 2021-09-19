@@ -3,7 +3,11 @@ const { purchaseHistoryModel, mentoringModel, mongoose } = require('../../model'
 const { verifyJWTToken, verifyAndCallback } = require('../tools');
 // 아임포트 결제이후 결제 내역 검증 및 저장
 const post = (req, res) => {
-  const { imp_uid, merchant_uid, loginType } = req.body;
+  const { imp_uid, merchant_uid } = req.body;
+
+  const split = req.cookies.authorization.split(' ');
+  const accessToken = split[0].concat(' ', split[1]);
+  const loginType = split[2];
 
   const tokenUrl = 'https://api.iamport.kr/users/getToken';
   const paymentUrl = 'https://api.iamport.kr/payments';
@@ -95,14 +99,17 @@ const post = (req, res) => {
 
           res.status(500).send(e);
         });
-    }, loginType, req.headers.authorization, res);
+    }, loginType, accessToken, res);
   }
 };
 
 // 아임포트 결제 실패 프로세스 핸들러
 const remove = async (req, res) => {
   const { merchantUid } = req.params;
-  const { loginType } = req.query;
+
+  const split = req.cookies.authorization.split(' ');
+  const accessToken = split[0].concat(' ', split[1]);
+  const loginType = split[2];
 
   if (!merchantUid) res.status(404).send();
   else if (loginType === 'email') {
@@ -162,13 +169,17 @@ const remove = async (req, res) => {
           });
       }, transactionOptions);
       res.status(200).send();
-    }, loginType, req.headers.authorization, res);
+    }, loginType, accessToken, res);
   }
 }
 ;
 // 결제 취소 담당 핸들러, 계좌정보등을 받아야 하기 때문에 post 메서드
 const revoke = async (req, res) => {
-  const { id, loginType, reason } = req.body;
+  const { id, reason } = req.body;
+
+  const split = req.cookies.authorization.split(' ');
+  const accessToken = split[0].concat(' ', split[1]);
+  const loginType = split[2];
 
   if (loginType === 'email') {
     const decode = await verifyJWTToken(req);
@@ -309,7 +320,7 @@ const revoke = async (req, res) => {
           console.log(e);
           res.status(500).send();
         });
-    }, loginType, req.headers.authorization, res);
+    }, loginType, accessToken, res);
   }
 };
 module.exports = { post, remove, revoke }

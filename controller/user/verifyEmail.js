@@ -2,9 +2,6 @@ const { userModel } = require('../../model');
 const { verifyJWTToken, createJWT, aesDecrypt } = require('../tools');
 
 module.exports = async (req, res) => {
-  const { token } = req.body;
-  req.headers.authorization = `Bearer ${token}`;
-
   try {
     const decode = await verifyJWTToken(req);
 

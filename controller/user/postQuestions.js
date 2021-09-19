@@ -1,7 +1,9 @@
 const { purchaseHistoryModel, mongoose } = require('../../model');
 const { verifyJWTToken, verifyAndCallback } = require('../tools');
 module.exports = async (req, res) => {
-  const { loginType } = req.body;
+  const split = req.cookies.authorization.split(' ');
+  const accessToken = split[0].concat(' ', split[1]);
+  const loginType = split[2];
 
   if (loginType) {
     if (loginType === 'email') {
@@ -59,7 +61,7 @@ module.exports = async (req, res) => {
             res.status(500).send();
           })
         ;
-      }, loginType, req.headers.authorization, res);
+      }, loginType, accessToken, res);
     }
   }
 };

@@ -18,7 +18,7 @@ require('dotenv').config();
  * decode: JWT 해독 결과 데이터
  */
 const verifyJWTToken = async (req) => {
-  if (!req.headers.authorization && !req.cookies.auth) return 401;
+  if (!req.cookies.authorization && !req.cookies.auth) return 401;
   else {
     try {
       if (req.cookies.auth) {
@@ -27,9 +27,7 @@ const verifyJWTToken = async (req) => {
         if (!decode) return 403;
         else return decode;
       } else {
-        if (req.headers.authorization.indexOf('Bearer') < 0) return 401;
-        const token = req.headers.authorization.split(' ')[1];
-
+        const token = req.cookies.authorization.split(' ')[1];
         const decode = jwt.verify(token, process.env.NODE_ENV === 'development' ? process.env.JWT_SEC_KEY_DEVELOP : process.env.JWT_SEC_KEY_PRODUCTION);
 
         if (!decode) return 403;

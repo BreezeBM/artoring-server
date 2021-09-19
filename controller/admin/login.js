@@ -33,14 +33,14 @@ module.exports = async (req, res) => {
 
             const { name, accessKey, authLevel } = decode;
 
-            if (!accessKey || authLevel === 0) throw new Error('need authorize');
+            if (!accessKey || authLevel === 0) throw new Error(1); // ('need authorize. request increase auth level');
 
             // AES 암호화된 데이터를 복호하 하여 권한을 검증.
             const accKey = await aesDecrypt(accessKey);
 
             const adminData = await adminModel.findOne({ name, accessKey: accKey }).select({ name: 1, accessKey: 1 });
 
-            if (!adminData) throw new AdminAccessException('no match found');
+            if (!adminData) throw new AdminAccessException(2);
 
             res.status(200).json({ userData: adminData });
           }
@@ -91,23 +91,17 @@ module.exports = async (req, res) => {
             // 캡챠 토큰 조회
             return client.createAssessment(request);
           }
-          try {
           // bcrypt 비밀번호 대조결과 일치
-            if (result) {
-              if (!userData.accessKey || userData.attempts <= 0) {
-                res.status(403).send();
-                return;
-              } else {
-                userData.accessKey = aesEncrypt(userData.accessKey);
-
-                return createAssessment();
-              }
+          if (result) {
+            if (!userData.accessKey || userData.attempts <= 0) {
+              throw new Error(3);
             } else {
-              res.status(404).send();
+              userData.accessKey = aesEncrypt(userData.accessKey);
+
+              return createAssessment();
             }
-          } catch (e) {
-            console.log(e);
-            return e;
+          } else {
+            throw new Error(4);
           }
         })
         .then(async response => {
@@ -143,18 +137,25 @@ module.exports = async (req, res) => {
           }
         })
         .catch(e => {
-          console.log(e);
           adminModel.findOneAndUpdate({ email: userEmail }, { $inc: { attempts: -1 } })
             .then(() => {
-              res.status(500).json(e);
+              console.log(e.message, e.message === 4, typeof e.message);
+              if (e.message === '1') res.status(200).json({ message: 'need authorize. request increase auth level', code: 401 });
+              else if (e.message === '2')res.status(200).json({ message: 'invalied access', code: 401 });
+              else if (e.message === '3')res.status(200).json({ message: 'need authorize', code: 403 });
+              else if (e.message === '4')res.status(200).json({ message: 'no match found check email or password', code: 400 });
+              else res.status(500).send();
             });
         });
     }
   } catch (e) {
-    console.log(e);
     adminModel.findOneAndUpdate({ email: userEmail }, { $inc: { attempts: -1 } })
       .then(() => {
-        res.status(500).json(e);
+        if (e.message === '1') res.status(200).json({ message: 'need authorize. request increase auth level', code: 401 });
+        else if (e.message === '2')res.status(200).json({ message: 'invalied access', code: 401 });
+        else if (e.message === '3')res.status(200).json({ message: 'need authorize', code: 403 });
+        else if (e.message === '4')res.status(200).json({ message: 'no match found check email or password', code: 400 });
+        else res.status(500).send();
       });
   }
 }

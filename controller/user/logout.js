@@ -51,7 +51,14 @@ module.exports = async (req, res) => {
           proof = sha256Encrypt(999, accessToken.split(' ')[1], process.env.FACEBOOK_SEC);
           const response = await axios.get(`https://graph.facebook.com/${Number(userinfo.user_id)}/permissions?appsecret_proof=${proof}&access_token=${accessToken.split(' ')[1]}`);
 
-          res.status(200).send();
+          res.cookie('authorization', '', {
+            secure: true,
+            httpOnly: true,
+            // domain: process.env.NODE_ENV === 'development' ? 'localhost' : 'back.artoring.com',
+            maxAge: 0,
+            sameSite: 'none',
+            path: '/'
+          }).status(201).json();
         } else {
           // 네이버, 카카오 서버에 토큰 만료 신청. 자동으로 ref토큰까지 만료된다.
           const url = type === 'naver'
@@ -64,7 +71,14 @@ module.exports = async (req, res) => {
             }
           });
 
-          res.status(200).send();
+          res.cookie('authorization', '', {
+            secure: true,
+            httpOnly: true,
+            // domain: process.env.NODE_ENV === 'development' ? 'localhost' : 'back.artoring.com',
+            maxAge: 0,
+            sameSite: 'none',
+            path: '/'
+          }).status(201).json();
         }
 
         res.send();

@@ -9,32 +9,41 @@ dotenv.config();
 module.exports = async (req, res) => {
   try {
     const { type } = req.params;
-    const { code, state, token, id } = req.body; // 여기의 id는 페이스북만의 특수한 숫자 아이디.
+    const { code, state, id } = req.body; // 여기의 id는 페이스북만의 특수한 숫자 아이디.
+
+    let { token } = req.body;
     let access_token, refresh_token;
 
-    const redirect_uri = process.env.NODE_ENV === 'development' ? `https://localhost:3000/callback/${type}` : `https://artoring.com/callback/${type}`;
-    let url, clientSecret, clientId, contentType;
+    console.log(!req.cookies.authorization, req.cookies.authorization === '');
+    if (!req.cookies.authorization || req.cookies.authorization === '') {
+      const redirect_uri = process.env.NODE_ENV === 'development' ? `https://localhost:3000/callback/${type}` : `https://artoring.com/callback/${type}`;
+      let url, clientSecret, clientId, contentType;
 
-    if (type === 'kakao' || type === 'naver') {
-      if (type === 'kakao') {
-        url = 'https://kauth.kakao.com/oauth/token?';
-        contentType = 'application/x-www-form-urlencoded;charset=utf-8';
-        clientId = process.env.KAKAO_ID;
-        clientSecret = process.env.KAKAO_SEC;
-      } else if (type === 'naver') {
-        url = 'https://nid.naver.com/oauth2.0/token?';
-        contentType = 'application/x-www-form-urlencoded;charset=utf-8';
-        clientId = process.env.NAVER_ID;
-        clientSecret = process.env.NAVER_SEC;
+      if (type === 'kakao' || type === 'naver') {
+        if (type === 'kakao') {
+          url = 'https://kauth.kakao.com/oauth/token?';
+          contentType = 'application/x-www-form-urlencoded;charset=utf-8';
+          clientId = process.env.KAKAO_ID;
+          clientSecret = process.env.KAKAO_SEC;
+        } else if (type === 'naver') {
+          url = 'https://nid.naver.com/oauth2.0/token?';
+          contentType = 'application/x-www-form-urlencoded;charset=utf-8';
+          clientId = process.env.NAVER_ID;
+          clientSecret = process.env.NAVER_SEC;
+        }
+
+        const response = await axios.get(url.concat(`client_id=${clientId}&client_secret=${clientSecret}&grant_type=authorization_code&redirect_uri=${redirect_uri}&code=${code}&state=${state}`), {
+          'Content-Type': contentType
+        });
+
+        // 선언없이 구조분해 할당을 사용/
+        ({ access_token, refresh_token } = response.data);
       }
-
-      const response = await axios.get(url.concat(`client_id=${clientId}&client_secret=${clientSecret}&grant_type=authorization_code&redirect_uri=${redirect_uri}&code=${code}&state=${state}`), {
-        'Content-Type': contentType
-      });
-
-      // 선언없이 구조분해 할당을 사용/
-      ({ access_token, refresh_token } = response.data);
+    } else {
+      token = token || req.cookies.authorization.split(' ')[1];
+      access_token = access_token || req.cookies.authorization.split(' ')[1];
     }
+
     let proof;
     if (type === 'facebook') proof = sha256Encrypt(999, token, process.env.FACEBOOK_SEC);
 
@@ -59,7 +68,9 @@ module.exports = async (req, res) => {
       .findOne({ email: userData.email })
       .select({ _id: 1, thumb: 1, name: 1, email: 1, isMentor: 1, likedCareerEdu: 1, likedMentor: 1, likedInfo: 1, verifiedEmail: 1, createdAt: 1 });
 
-    if (registered) {
+    if (req.cookies.authorization && req.cookies.authorization !== '') {
+      res.status(200).json(registered);
+    } else if (registered) {
       res.cookie('authorization', `Bearer ${access_token || token} ${type}`, {
         secure: true,
         httpOnly: true,

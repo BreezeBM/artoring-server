@@ -42,7 +42,7 @@ module.exports = async (data, email = data.email, res) => {
 <div style="font-family: NanumSquareRoundOTFEB; font-size: 24px; font-weight: normal; font-stretch: normal; font-style: normal; line-height: 1.25; letter-spacing: normal; color: #ff4a70; padding-bottom: 30px;">이메일 주소를 인증해 주세요</div>
 <div><strong><span style="font-size: 14pt; font-family: NanumSquareRound;">안녕하세요 아토링입니다!</span></strong></div>
 <div style="margin-bottom: 50px;"><span style="font-size: 14pt; font-family: NanumSquareRoundOTFEB;">아래 버튼을 클릭하여 인증을 완료해 주세요!</span></div>
-<a href="${process.env.NODE_ENV !== 'development' ? `https://insideart-dev.artoring.com/verify?token=${verifyToken}` : `https://localhost:3000/verify?token=${verifyToken}`}" target="_blank" rel="noopener"><button style="width: 336px; height: 50px; border-radius: 10px; background-color: #000000; font-family: NanumSquareRoundOTFEB; font-size: 16px; font-weight: normal; font-stretch: noraml; line-heigth: 1.69; letter-spacing: normal; color: #ffffff;">이메일 주소 인증</button></a></div>
+<a href="${process.env.NODE_ENV !== 'development' ? `https://artoring.com/verify?token=${verifyToken}` : `https://localhost:3000/verify?token=${verifyToken}`}" target="_blank" rel="noopener"><button style="width: 336px; height: 50px; border-radius: 10px; background-color: #000000; font-family: NanumSquareRoundOTFEB; font-size: 16px; font-weight: normal; font-stretch: noraml; line-heigth: 1.69; letter-spacing: normal; color: #ffffff;">이메일 주소 인증</button></a></div>
 </td>
 </tr>
 <tr style="height: 82px;">

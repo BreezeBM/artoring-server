@@ -15,7 +15,7 @@ module.exports = async (req, res) => {
     let access_token, refresh_token;
 
     if (!req.cookies.authorization || req.cookies.authorization === '') {
-      const redirect_uri = process.env.NODE_ENV === 'development' ? `https://localhost:3000/callback/${type}` : `https://insideart-dev.artoring.com/callback/${type}`;
+      const redirect_uri = process.env.NODE_ENV === 'development' ? `https://localhost:3000/callback/${type}` : `https://artoring.com/callback/${type}`;
       let url, clientSecret, clientId, contentType;
 
       if (type === 'kakao' || type === 'naver') {

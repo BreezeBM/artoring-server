@@ -45,7 +45,7 @@ const post = (req, res) => {
             return purchaseHistoryModel.findOne({ merchantUid: merchant_uid })
               .then((document) => {
                 if (document.price === paymentData.amount) {
-                  return purchaseHistoryModel.findOneAndUpdate({ merchantUid: merchant_uid }, { $set: { paymentData } }, { new: true });
+                  return purchaseHistoryModel.findOneAndUpdate({ merchantUid: merchant_uid }, { $set: { paymentData, progress: 'paid' } }, { new: true });
                 } else { throw new Error({ status: 'forgery', message: '위조된 결제시도' }); }
               });
           })
@@ -83,7 +83,7 @@ const post = (req, res) => {
           return purchaseHistoryModel.findOne({ merchantUid: merchant_uid })
             .then((document) => {
               if (document.price === paymentData.amount) {
-                return purchaseHistoryModel.findOneAndUpdate({ merchantUid: merchant_uid }, { $set: { paymentData } }, { new: true });
+                return purchaseHistoryModel.findOneAndUpdate({ merchantUid: merchant_uid }, { $set: { paymentData, progress: 'paid' } }, { new: true });
               } else { throw new Error({ status: 'forgery', message: '위조된 결제시도' }); }
             });
         })
@@ -107,6 +107,10 @@ const post = (req, res) => {
 const remove = async (req, res) => {
   const { merchantUid } = req.params;
 
+  if (!req.cookies.authorization) {
+    res.status(401).send();
+    return;
+  }
   const split = req.cookies.authorization.split(' ');
   const accessToken = split[0].concat(' ', split[1]);
   const loginType = split[2];
@@ -136,7 +140,10 @@ const remove = async (req, res) => {
         await session.withTransaction(() => {
           return purchaseHistoryModel.findOneAndDelete({ merchantUid })
             .then((data) => {
-              return mentoringModel.findByIdAndUpdate({ _id: mongoose.Types.ObjectId(data.targetId) }, { $inc: { joinedParticipants: -1 } });
+              console.log(data);
+              return mentoringModel.findByIdAndUpdate({ _id: mongoose.Types.ObjectId(data.targetId) }, { $inc: { joinedParticipants: -1 } })
+                .then((data) => {
+                });
             })
             .catch(e => {
               console.log(e);
@@ -160,8 +167,11 @@ const remove = async (req, res) => {
       await session.withTransaction(() => {
         return purchaseHistoryModel.findOneAndDelete({ merchantUid })
           .then((data) => {
-            return mentoringModel.findByIdAndUpdate({ _id: mongoose.Types.ObjectId(data.targetId) }, { $inc: { joinedParticipants: -1 } });
+            return mentoringModel.findByIdAndUpdate({ _id: mongoose.Types.ObjectId(data.targetId) }, { $inc: { joinedParticipants: -1 } })
+              .then((data) => {
+              });
           })
+
           .catch(e => {
             console.log(e);
 

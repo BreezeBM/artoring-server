@@ -63,9 +63,10 @@ module.exports = async (req, res) => {
         : response.data.kakao_account
           ? trimKakao(response.data.kakao_account)
           : trimFacebook(response.data);
+
     const registered = await userModel
       .findOne({ email: userData.email })
-      .select({ _id: 1, thumb: 1, name: 1, email: 1, isMentor: 1, likedCareerEdu: 1, likedMentor: 1, likedInfo: 1, verifiedEmail: 1, createdAt: 1 });
+      .select({ _id: 1, thumb: 1, name: 1, email: 1, phone: 1, verifiedPhone: 1, isMentor: 1, likedCareerEdu: 1, likedMentor: 1, likedInfo: 1, verifiedEmail: 1, createdAt: 1 });
 
     if (req.cookies.authorization && req.cookies.authorization !== '') {
       res.status(200).json(registered);

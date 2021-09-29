@@ -7,7 +7,10 @@ const trimNaver = (profile) => {
   if (profile.nickname) result.nickName = profile.nickname;
   if (profile.email) result.email = profile.email;
   if (profile.name) result.name = profile.name;
-  if (profile.mobile) result.phone = profile.mobile;
+  if (profile.mobile) {
+    result.phone = profile.mobile;
+    result.verifiedPhone = true;
+  }
   if (profile.birthday && profile.birthyear) { result.birth = profile.birthyear.concat(' ', profile.birthday); }
 
   return result;

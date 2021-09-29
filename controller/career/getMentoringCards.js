@@ -86,7 +86,7 @@ module.exports = async (req, res) => {
             default: {
               const or = [];
               or.push(
-                { $gte: ['$category.employee', Number(req.query.workedFor)] },
+                { $gte: ['$category.employment', Number(req.query.workedFor)] },
                 { $gte: ['$category.founded', Number(req.query.workedFor)] },
                 { $gte: ['$category.professional', Number(req.query.workedFor)] },
                 { $gte: ['$category.free', Number(req.query.workedFor)] },

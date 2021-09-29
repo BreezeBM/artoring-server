@@ -16,6 +16,7 @@ router.delete('/payment/:merchantUid', userController.payment.remove);
 router.post('/questions', userController.postQuestions);
 
 router.post('/', userController.postPurchase);
+router.get('/:id', userController.getPurchase);
 router.get('/', userController.getPurchase);
 
 router.use('/*', (req, res) => {

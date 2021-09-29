@@ -3,6 +3,10 @@ const { verifyJWTToken, verifyAndCallback, sha256Encrypt } = require('../tools')
 
 module.exports = async (req, res) => {
   const { cardId, userId, reservationType, startDate, endDate } = req.body;
+  if (!req.cookies.authorization) {
+    res.status(401).send();
+    return;
+  }
   const split = req.cookies.authorization.split(' ');
   const accessToken = split[0].concat(' ', split[1]);
   const type = split[2];
@@ -59,17 +63,28 @@ module.exports = async (req, res) => {
                   return mentoringModel.findById({ _id: mongoose.Types.ObjectId(cardId) });
                 })
                 .then((data) => {
-                  createdDoc.programTitle = data.title;
-                  return userModel.findById({ _id: mongoose.Types.ObjectId(_id) });
-                })
-                .then(data => {
                   // 예약이 완료되지 않았더라도 예약자 추가시켜 추가 예약을 방지
                   if (data.joinedParticipants >= data.maximumParticipants) res.status(400).send();
                   else {
-                    createdDoc.userName = data.name;
-                    createdDoc.userPhone = data.phone;
-                    return mentoringModel.findByIdAndUpdate({ _id: mongoose.Types.ObjectId(cardId) }, { $inc: { joinedParticipants: 1 } });
+                    createdDoc.programTitle = data.title;
+                    return userModel.findById({ _id: mongoose.Types.ObjectId(_id) });
                   }
+                })
+                .then(data => {
+                  // 20분 이후에도 결제하지 않았다면 결제 취소시킴
+                  setTimeout((merchantUid) => {
+                    purchaseHistoryModel.findOne({ merchant_uid: merchantUid })
+                      .then(data => {
+                        if (data && data.progress === 'inprogress') {
+                          purchaseHistoryModel.findByIdAndDelete({ _id: mongoose.Types.ObjectId(data._id) })
+                            .then(() => {
+                              return mentoringModel.findByIdAndUpdate({ _id: mongoose.Types.ObjectId(data.targetId) }, { $inc: { joinedParticipants: -1 } });
+                            });
+                        }
+                      });
+                  }, 1000 * 60 * 20, createdDoc.merchantUid);
+
+                  return mentoringModel.findByIdAndUpdate({ _id: mongoose.Types.ObjectId(cardId) }, { $inc: { joinedParticipants: 1 } });
                 });
             }, transactionOptions);
             session.endSession();
@@ -109,17 +124,26 @@ module.exports = async (req, res) => {
               return mentoringModel.findById({ _id: mongoose.Types.ObjectId(cardId) });
             })
             .then((data) => {
-              createdDoc.programTitle = data._doc.title;
-              return userModel.findById({ _id: mongoose.Types.ObjectId(userId) });
-            })
-            .then(data => {
               // 예약이 완료되지 않았더라도 예약자 추가시켜 추가 예약을 방지
               if (data.joinedParticipants >= data.maximumParticipants) res.status(400).send();
               else {
-                createdDoc.userName = data._doc.name;
-                createdDoc.userPhone = data._doc.phone;
-                return mentoringModel.findByIdAndUpdate({ _id: mongoose.Types.ObjectId(cardId) }, { $inc: { joinedParticipants: 1 } });
+                createdDoc.programTitle = data._doc.title;
+                return userModel.findById({ _id: mongoose.Types.ObjectId(userId) });
               }
+            })
+            .then(data => {
+              setTimeout((merchantUid) => {
+                purchaseHistoryModel.findOne({ merchantUid })
+                  .then(data => {
+                    if (data && data.progress === 'inprogress') {
+                      purchaseHistoryModel.findByIdAndDelete({ _id: mongoose.Types.ObjectId(data._id) })
+                        .then((data) => {
+                          return mentoringModel.findByIdAndUpdate({ _id: mongoose.Types.ObjectId(data.targetId) }, { $inc: { joinedParticipants: -1 } });
+                        });
+                    }
+                  });
+              }, 1000 * 60 * 20, createdDoc.merchantUid);
+              return mentoringModel.findByIdAndUpdate({ _id: mongoose.Types.ObjectId(cardId) }, { $inc: { joinedParticipants: 1 } });
             });
         }, transactionOptions);
         session.endSession();

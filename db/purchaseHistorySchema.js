@@ -13,7 +13,7 @@ const purchaseHistorySchema = new Schema({
   merchantUid: { type: String, required: true },
   isReviewed: { type: Boolean, default: false },
   isRefund: { type: Boolean, default: false },
-  inprogress: { type: String, default: 'inprogress' },
+  progress: { type: String, default: 'inprogress' },
   zoomLink: String,
   questions: [{ type: String }],
   createdAt: { type: Date, default: new Date() },

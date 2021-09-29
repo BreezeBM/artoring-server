@@ -19,6 +19,7 @@ module.exports = async (req, res) => {
         pwd: 1,
         name: 1,
         thumb: 1,
+        pone: 1,
         nickName: 1,
         email: 1,
         isMentor: 1,
@@ -26,6 +27,7 @@ module.exports = async (req, res) => {
         likedMentor: 1,
         likedInfo: 1,
         verifiedEmail: 1,
+        verifiedPhone: 1,
         createdAt: 1
       })
       .then((data) => {

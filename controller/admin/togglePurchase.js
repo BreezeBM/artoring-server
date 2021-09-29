@@ -29,9 +29,9 @@ module.exports = async (req, res) => {
         const adminData = await adminModel.find({ name, accessKey: accKey });
         if (!adminData) throw new AdminAccessException('no match found');
 
-        const { id: _id, inProgress: inprogress } = req.body;
+        const { id: _id, inProgress: progress } = req.body;
 
-        await purchaseHistoryModel.findByIdAndUpdate({ _id: mongoose.Types.ObjectId(_id) }, { inprogress });
+        await purchaseHistoryModel.findByIdAndUpdate({ _id: mongoose.Types.ObjectId(_id) }, { progress });
 
         res.status(200).json();
       }

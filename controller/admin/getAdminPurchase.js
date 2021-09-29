@@ -75,7 +75,7 @@ module.exports = async (req, res) => {
             });
         } else {
           purchaseHistoryModel.aggregate([
-            { $match: { inprogress: 'inprogress' } },
+            { $match: { progress: 'paid' } },
             {
               $lookup: {
                 from: 'mentoringmodels',

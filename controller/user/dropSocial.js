@@ -16,9 +16,12 @@ function base64decode (data) {
 module.exports = async (req, res) => {
   const { model } = req.params;
 
+  const split = req.cookies.authorization.split(' ');
+  const accessToken = split[0].concat(' ', split[1]);
+
   // 클라이언트에서 회원탈퇴 요청이 들어온 경우
   if (req.body._id) {
-    if (!req.headers.authorization) {
+    if (!req.cookies.authorization) {
       res.status(401).send();
       return;
     }
@@ -29,14 +32,14 @@ module.exports = async (req, res) => {
           const url = userData.snsType === 'kakao'
             ? 'https://kapi.kakao.com/v1/user/unlink'
             : userData.snsType === 'naver'
-              ? `https://nid.naver.com/oauth2.0/token?grant_type=delete&access_token=${req.headers.authorization}&client_id=${process.env.CLIENT_ID}&client_secret=${process.env.CLIENT_SECRET}`
+              ? `https://nid.naver.com/oauth2.0/token?grant_type=delete&access_token=${accessToken}&client_id=${process.env.CLIENT_ID}&client_secret=${process.env.CLIENT_SECRET}`
               : `https://graph.facebook.com/v11.0/${userData.appId}/permissions?appsecret_proof=${proof}&access_token=${appSecret}`;
 
           const promise = userData.snsType !== 'facebook'
             ? userData.snsType === 'kakao'
                 ? axios.get(url, {
                     headers: {
-                      authorization: req.headers.authorization
+                      authorization: accessToken
                     }
                   })
                 : axios.get(url)
@@ -64,14 +67,14 @@ module.exports = async (req, res) => {
               console.log(e);
               res.status(500).send();
             });
-        }, userData.snsType, req.headers.authorization, res);
+        }, userData.snsType, accessToken, res);
       }).catch(e => {
         console.log(e);
         res.status(500).send();
       });
   } else {
     if (model === 'kakao') {
-      const key = req.headers.authorization.split(' ')[1];
+      const key = accessToken;
       if (key !== process.env.K_ADMIN || req.body.app_id !== process.env.K_ID) res.status(401).send();
       else {
         let userId;

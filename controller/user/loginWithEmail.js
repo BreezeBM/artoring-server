@@ -20,6 +20,7 @@ module.exports = async (req, res) => {
         pwd: 1,
         name: 1,
         thumb: 1,
+        pone: 1,
         nickName: 1,
         email: 1,
         isMentor: 1,
@@ -27,6 +28,7 @@ module.exports = async (req, res) => {
         likedMentor: 1,
         likedInfo: 1,
         verifiedEmail: 1,
+        verifiedPhone: 1,
         createdAt: 1,
       })
       .then((data) => {
@@ -39,7 +41,14 @@ module.exports = async (req, res) => {
                   _id: data._id,
                   name: data.name,
                 }, 3600);
-                res.status(201).json({ accessToken: token, userData: data });
+                res.cookie("authorization", `Bearer ${token} email`, {
+                  secure: true,
+                  httpOnly: true,
+                  // domain: process.env.NODE_ENV === 'development' ? 'localhost' : 'back.artoring.com',
+                  maxAge: 3600 * 1000,
+                  sameSite: "none",
+                  path: "/",
+                }).status(201).json({ userData: data });
               } else {
                 res.status(401).send({ message: "잘못된 비밀번호" });
               }

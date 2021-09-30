@@ -13,6 +13,7 @@ const userSchema = new Schema({
   nickName: { type: String },
   email: { type: String, required: true, unique: true },
   verifiedEmail: { type: Boolean, default: false },
+  verifiedPhone: { type: Boolean, default: false },
   gender: { type: String },
   birth: { type: String },
   phone: { type: String },

@@ -1,9 +1,12 @@
 const { reviewModel, purchaseHistoryModel, userModel, mongoose, mentoringModel } = require('../../model');
-const { verifyJWTToken } = require('../tools');
+const { verifyJWTToken, verifyAndCallback } = require('../tools');
 module.exports = async (req, res) => {
-  const { loginType } = req.body;
-  if (loginType) {
-    if (loginType === 'email') {
+  const split = req.cookies.authorization.split(' ');
+  const accessToken = split[0].concat(' ', split[1]);
+  const type = split[2];
+
+  if (type) {
+    if (type === 'email') {
       try {
         const decode = await verifyJWTToken(req);
 
@@ -64,36 +67,38 @@ module.exports = async (req, res) => {
     } else {
       const { originType, rate, targetId, text, _id, userName, userThumb, userId } = req.body;
 
-      let reviewId;
-      reviewModel.create({
-        userThumb, userName, userId, originType, targetId, text, rate
-      })
-        .then((data) => {
-          reviewId = data._id;
-          return mentoringModel.findById(mongoose.Types.ObjectId(targetId));
+      verifyAndCallback(() => {
+        let reviewId;
+        reviewModel.create({
+          userThumb, userName, userId, originType, targetId, text, rate
         })
-        .then(cardData => {
-          const { rateCount, rate: prevRate } = cardData;
-          const previous = rateCount === 0 ? 0 : rateCount * prevRate;
+          .then((data) => {
+            reviewId = data._id;
+            return mentoringModel.findById(mongoose.Types.ObjectId(targetId));
+          })
+          .then(cardData => {
+            const { rateCount, rate: prevRate } = cardData;
+            const previous = rateCount === 0 ? 0 : rateCount * prevRate;
 
-          return mentoringModel.findByIdAndUpdate(targetId, {
-            $set: {
-              rateCount: rateCount + 1,
-              rate: (previous + rate) / (rateCount + 1)
-            },
-            $push: {
-              reviews: reviewId
-            }
+            return mentoringModel.findByIdAndUpdate(targetId, {
+              $set: {
+                rateCount: rateCount + 1,
+                rate: (previous + rate) / (rateCount + 1)
+              },
+              $push: {
+                reviews: reviewId
+              }
+            });
+          })
+          .then(() => {
+            return purchaseHistoryModel.findByIdAndUpdate(_id, { $set: { isReviewed: true } });
+          })
+          .then(() => res.status(201).send())
+          .catch(e => {
+            console.log(e);
+            res.status(500).send();
           });
-        })
-        .then(() => {
-          return purchaseHistoryModel.findByIdAndUpdate(_id, { $set: { isReviewed: true } });
-        })
-        .then(() => res.status(201).send())
-        .catch(e => {
-          console.log(e);
-          res.status(500).send();
-        });
+      }, type, accessToken, res);
     }
   }
 };

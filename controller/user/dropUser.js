@@ -6,6 +6,10 @@ const { verifyJWTToken } = require('../tools');
 module.exports = async (req, res) => {
   const { _id } = req.body;
 
+  const isSocial = !req.cookies.authorization.includes('email');
+
+  if (isSocial) res.redirect(307, '/drop/social');
+
   try {
     const decode = await verifyJWTToken(req);
 

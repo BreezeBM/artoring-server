@@ -2,9 +2,8 @@ const { userModel, mongoose } = require('../../model');
 const { verifyJWTToken, sendEmail } = require('../tools');
 
 module.exports = async (req, res) => {
-  const { accessToken: token } = req.body;
-
-  req.headers.authorization = `Bearer ${token}`;
+  const split = req.cookies.authorization.split(' ');
+  const accessToken = split[0].concat(' ', split[1]);
   try {
     const decode = await verifyJWTToken(req);
 
@@ -22,7 +21,7 @@ module.exports = async (req, res) => {
 
         userModel.findOne({ _id: mongoose.Types.ObjectId(_id) })
           .then(async userData => {
-            await sendEmail({ userData, accessToken: req.headers.accessToken }, userData.email, res);
+            await sendEmail({ userData, accessToken }, userData.email, res);
           });
 
         break;

@@ -23,7 +23,6 @@ const upload = multer({
       cb(null, { fieldName: file.fieldname });
     },
     key: function (req, file, cb) {
-      console.log(file);
       cb(null, 'image/' + Date.now() + '_' + file.originalname); // 이름 설정
     }
   })

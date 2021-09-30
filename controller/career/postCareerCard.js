@@ -64,7 +64,6 @@ module.exports = async (req, res) => {
             ADD_ATTR: ['allow', 'allowfullscreen', 'frameborder', 'scrolling'] // or //or ALLOWED_ATR
           });
 
-
         const postCardData = {
           thumb,
           title,
@@ -93,7 +92,7 @@ module.exports = async (req, res) => {
               $set: postCardData
             }, { new: true });
 
-            return res.send(200);
+            return res.sendStatus(200);
           }
         } else {
           await targetModel.create(postCardData);

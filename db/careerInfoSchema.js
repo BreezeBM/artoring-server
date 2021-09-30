@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const careerInfoSchema = new Schema({
@@ -12,8 +12,7 @@ const careerInfoSchema = new Schema({
   textDetailInfo: String,
   createdAt: { type: Date, required: true, default: new Date() },
   updatedAt: { type: Date, required: true, default: new Date() },
-  likesCount: { type: Number, default: 0 }
+  likesCount: { type: Number, default: 0 },
 });
 
-module.exports = careerInfoSchema
-;
+module.exports = careerInfoSchema;

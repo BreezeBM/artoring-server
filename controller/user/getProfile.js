@@ -3,9 +3,11 @@ const { userModel } = require('../../model');
 const { verifyJWTToken, verifyAndCallback } = require('../tools');
 
 module.exports = async (req, res) => {
-  const accessToken = req.headers.authorization;
+  const split = req.cookies.authorization.split(' ');
+  const accessToken = split[0].concat(' ', split[1]);
+  const type = split[2];
 
-  const { type, id } = req.query;
+  const { id } = req.query;
   try {
     if (type === 'email') {
       const decode = await verifyJWTToken(req);

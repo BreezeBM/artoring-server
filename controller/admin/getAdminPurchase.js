@@ -1,5 +1,5 @@
 require('dotenv').config();
-const { purchaseHistoryModel, adminModel } = require('../../model');
+const { purchaseHistoryModel, adminModel, mongoose } = require('../../model');
 const { verifyJWTToken, aesDecrypt, AdminAccessException } = require('../tools');
 
 module.exports = async (req, res) => {
@@ -29,77 +29,93 @@ module.exports = async (req, res) => {
         const adminData = await adminModel.find({ name, accessKey: accKey });
         if (!adminData) throw new AdminAccessException('no match found');
 
-        const total = await purchaseHistoryModel.countDocuments({ inprogress: 'inprogress' });
-        // const cardList = await purchaseHistoryModel.find({
-        //   inprogress: 'inprogress'
-        // }, null, {
-        //   sort: { createdAt: 1 },
-        //   skip: (req.query.page || 1 - 1) * 8,
-        //   limit: 8
-        // });
-        const cardList = await purchaseHistoryModel.aggregate([
-          { $match: { inprogress: 'inprogress' } },
-          {
-            $lookup: {
-              from: 'mentoringmodels',
-              as: 'mentoring',
-              foreignField: '_id',
-              localField: 'targetId'
+        // 멘토링 카드의 _id정보
+        if (req.params.id) {
+          purchaseHistoryModel.aggregate([
+            { $match: { targetId: mongoose.Types.ObjectId(req.params.id) } },
+            {
+              $lookup: {
+                from: 'usermodels',
+                as: 'users',
+                let: { userId: '$userId' },
+                pipeline: [
+                  { $match: { $expr: { $eq: ['$_id', '$$userId'] } } },
+                  {
+                    $project: {
+                      thumb: '$thumb',
+                      name: '$name',
+                      nickName: '$nickName',
+                      email: '$email',
+                      gender: '$gender',
+                      birth: '$birth',
+                      phone: '$phone'
+                    }
+                  }
+                ]
+              }
+            },
+            { $unwind: '$users' },
+            {
+              $facet: {
+                cardList: [{ $skip: (req.query.page - 1) * (req.query.size || 10) }, { $limit: Number(req.query.size) || 10 }],
+                total: [
+                  { $project: { users: '$users' } },
+                  { $unwind: '$users' },
+                  {
+                    $group: {
+                      _id: null,
+                      count: { $sum: 1 }
+                    }
+                  }]
+              }
             }
-          }, {
-            $unwind: '$mentoring'
-          },
-          {
-            $lookup: {
-              from: 'usermodels',
-              as: 'user',
-              foreignField: '_id',
-              localField: 'userId'
+          ])
+            .then(data => {
+              res.status(200).json(data[0]);
+            });
+        } else {
+          purchaseHistoryModel.aggregate([
+            { $match: { progress: 'paid' } },
+            {
+              $lookup: {
+                from: 'mentoringmodels',
+                as: 'mentoring',
+                foreignField: '_id',
+                localField: 'targetId'
+              }
+            }, {
+              $unwind: '$mentoring'
+            },
+            {
+              $group: {
+                _id: '$mentoring._id',
+                originType: { $first: '$originType' }, // 구매한 대상의 타입. 멘토 || 커리어 || ...
+                price: { $first: '$price' },
+                createdAt: { $first: '$createdAt' },
+                tags: { $first: '$mentoring.tags' },
+                programThumb: { $first: '$mentoring.thumb' },
+                programTitle: { $first: '$mentoring.title' },
+                programStartDate: { $first: '$mentoring.startDate' },
+                programEndDate: { $first: '$mentoring.endDate' },
+                isGroup: { $first: '$mentoring.isGroup' },
+                moderatorName: { $first: '$mentor.name' }
+              }
+            },
+            {
+              $facet: {
+                cardList: [{ $skip: (req.query.page - 1) * (req.query.size || 8) }, { $limit: Number(req.query.size) || 8 }],
+                total: [
+                  {
+                    $count: 'count'
+                  }
+                ]
+              }
             }
-          }, {
-            $unwind: '$user'
-          }, {
-            $lookup: {
-              from: 'usermodels',
-              as: 'mentor',
-              foreignField: '_id',
-              localField: 'mentoring.moderatorId'
-            }
-
-          }, {
-            $unwind: '$mentor'
-          }, {
-            $project: {
-              originType: '$originType', // 구매한 대상의 타입. 멘토 || 커리어 || ...
-              price: '$price',
-              bookedStartTime: '$bokkedStartTime',
-              bookedEndTime: '$bookedEntTime',
-              inprogress: '$inprogress',
-              createdAt: '$createdAt',
-              userName: '$user.name',
-              email: '$user.email',
-              phone: '$user.phone',
-              tags: '$mentoring.tags',
-              programThumb: '$mentoring.thumb',
-              programTitle: '$mentoring.title',
-              programStartDate: '$mentoring.startDate',
-              programEndDate: '$mentoring.endDate',
-              isGroup: '$mentoring.isGroup',
-              moderatorName: '$mentor.name',
-              _id: '$mentoring._id'
-            }
-          }, {
-            $sort: {
-              createdAt: 1
-            }
-          }, {
-            $skip: (req.query.page - 1) * 8 || 0
-          }, {
-            $limit: 8
-          }
-        ]);
-
-        res.status(200).json({ total, cardList });
+          ])
+            .then(cardList => {
+              res.status(200).json(cardList[0]);
+            });
+        }
       }
         break;
     }

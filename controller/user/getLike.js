@@ -4,8 +4,12 @@ const { verifyJWTToken, verifyAndCallback } = require('../tools');
 module.exports = async (req, res) => {
   const decode = await verifyJWTToken(req);
 
-  const { queryType, loginType, id, page } = req.query;
-  if (loginType === 'email') {
+  const split = req.cookies.authorization.split(' ');
+  const accessToken = split[0].concat(' ', split[1]);
+  const type = split[2];
+
+  const { queryType, id, page } = req.query;
+  if (type === 'email') {
     switch (decode) {
       case 401: {
         res.status(401).send();
@@ -95,7 +99,6 @@ module.exports = async (req, res) => {
       }
     }
   } else {
-    const accessToken = req.headers.authorization;
     verifyAndCallback(async () => {
       try {
         if (Object.keys(req.query).length === 2) {
@@ -169,6 +172,6 @@ module.exports = async (req, res) => {
         console.error(err);
         res.status(401).send({ message: 'AccessToken doesnt exist!' });
       }
-    }, loginType, accessToken, res);
+    }, type, accessToken, res);
   }
 };

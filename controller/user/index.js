@@ -9,7 +9,9 @@ const passwordMod = require('./passwordMod');
 const passwordCheck = require('./passwordCheck');
 const getLike = require('./getLike');
 const postPurchase = require('./postPerchase');
+const postQuestions = require('./postQuestions');
 const getPurchase = require('./getPurchase');
+const payment = require('./iamport');
 const logout = require('./logout');
 
 const dropUser = require('./dropUser');
@@ -30,7 +32,9 @@ const careerCardController = {
   postPurchase,
   getPurchase,
   dropUser,
-  dropSocial
+  dropSocial,
+  payment,
+  postQuestions
 };
 
 module.exports = careerCardController;

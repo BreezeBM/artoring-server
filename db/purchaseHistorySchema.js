@@ -9,10 +9,16 @@ const purchaseHistorySchema = new Schema({
   price: { type: Number, required: true },
   bookedStartTime: { type: Date },
   bookedEndTime: { type: Date },
+  // PG 결제 검증용 데이터
+  merchantUid: { type: String, required: true },
   isReviewed: { type: Boolean, default: false },
-  inprogress: { type: String, default: 'inprogress' },
+  isRefund: { type: Boolean, default: false },
+  progress: { type: String, default: 'inprogress' },
   zoomLink: String,
-  createdAt: { type: Date, default: new Date() }
+  questions: [{ type: String }],
+  createdAt: { type: Date, default: new Date() },
+  // 아임포트 결제 상태 저장
+  paymentData: { type: Object }
 });
 
 module.exports = purchaseHistorySchema

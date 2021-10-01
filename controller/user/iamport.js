@@ -45,7 +45,7 @@ const post = (req, res) => {
             return purchaseHistoryModel.findOne({ merchantUid: merchant_uid })
               .then((document) => {
                 if (document.price === paymentData.amount) {
-                  return purchaseHistoryModel.findOneAndUpdate({ merchantUid: merchant_uid }, { $set: { paymentData, progress: 'paid' } }, { new: true });
+                  return purchaseHistoryModel.findOneAndUpdate({ merchantUid: merchant_uid }, { $set: { paymentData, progress: 'paid', questions: req.body.questions } }, { new: true });
                 } else { throw new Error({ status: 'forgery', message: '위조된 결제시도' }); }
               });
           })
@@ -82,12 +82,14 @@ const post = (req, res) => {
 
           return purchaseHistoryModel.findOne({ merchantUid: merchant_uid })
             .then((document) => {
+              console.log(document);
               if (document.price === paymentData.amount) {
-                return purchaseHistoryModel.findOneAndUpdate({ merchantUid: merchant_uid }, { $set: { paymentData, progress: 'paid' } }, { new: true });
+                return purchaseHistoryModel.findOneAndUpdate({ merchantUid: merchant_uid }, { $set: { paymentData, progress: 'paid', questions: req.body.questions } }, { new: true });
               } else { throw new Error({ status: 'forgery', message: '위조된 결제시도' }); }
             });
         })
         .then((document) => {
+          console.log(document);
           switch (document.paymentData.status) {
             case 'paid':
               res.send({ status: 'success', message: '일반 결제 성공' });
@@ -105,6 +107,7 @@ const post = (req, res) => {
 
 // 아임포트 결제 실패 프로세스 핸들러
 const remove = async (req, res) => {
+  console.log('remove');
   const { merchantUid } = req.params;
 
   if (!req.cookies.authorization) {
@@ -185,6 +188,7 @@ const remove = async (req, res) => {
 ;
 // 결제 취소 담당 핸들러, 계좌정보등을 받아야 하기 때문에 post 메서드
 const revoke = async (req, res) => {
+  console.log('revoke');
   const { id, reason } = req.body;
 
   const split = req.cookies.authorization.split(' ');
@@ -205,10 +209,13 @@ const revoke = async (req, res) => {
       }
       default: {
         // 결제 정보 확인
+        let purchaseData;
+
         purchaseHistoryModel.findOne({ _id: mongoose.Types.ObjectId(id) })
           .then((data) => {
             // 해당 데이터가 없거나 혹은 이미 환불이 된 경우
             //
+            purchaseData = data;
 
             if (!data || data.isRefund) res.status(404).send();
             else {
@@ -260,8 +267,9 @@ const revoke = async (req, res) => {
             } else { return purchaseHistoryModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(id) }, { $set: { isRefund: true } }); }
           })
           .then(() => {
-            res.status(200).send();
+            return mentoringModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(purchaseData.targetId) }, { $inc: { joinedParticipants: -1 } });
           })
+          .then(() => res.status(200).send())
           .catch(e => {
             console.log(e);
             res.status(500).send();
@@ -272,10 +280,12 @@ const revoke = async (req, res) => {
     verifyAndCallback(() => {
       // 결제 정보 확인
       //
-
+      let purchaseData;
       purchaseHistoryModel.findOne({ _id: mongoose.Types.ObjectId(id) })
         .then((data) => {
           // 해당 데이터가 없거나 혹은 이미 환불이 된 경우
+          //
+          purchaseData = data;
           if (!data || data.isRefund) res.status(404).send();
           else {
             let amount;
@@ -324,8 +334,9 @@ const revoke = async (req, res) => {
           } return purchaseHistoryModel.findOneAndDelete({ _id: mongoose.Types.ObjectId(id) });
         })
         .then(() => {
-          res.status(200).send();
+          return mentoringModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(purchaseData.targetId) }, { $inc: { joinedParticipants: -1 } });
         })
+        .then(() => res.status(200).send())
         .catch(e => {
           console.log(e);
           res.status(500).send();

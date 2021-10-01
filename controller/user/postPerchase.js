@@ -73,13 +73,15 @@ module.exports = async (req, res) => {
                 .then(data => {
                   // 20분 이후에도 결제하지 않았다면 결제 취소시킴
                   setTimeout((merchantUid) => {
+                    console.log('here?');
                     purchaseHistoryModel.findOne({ merchant_uid: merchantUid })
                       .then(data => {
                         if (data && data.progress === 'inprogress') {
                           purchaseHistoryModel.findByIdAndDelete({ _id: mongoose.Types.ObjectId(data._id) })
                             .then(() => {
                               return mentoringModel.findByIdAndUpdate({ _id: mongoose.Types.ObjectId(data.targetId) }, { $inc: { joinedParticipants: -1 } });
-                            });
+                            })
+                            .then(() => {});
                         }
                       });
                   }, 1000 * 60 * 20, createdDoc.merchantUid);
@@ -133,13 +135,15 @@ module.exports = async (req, res) => {
             })
             .then(data => {
               setTimeout((merchantUid) => {
+                console.log('here?');
                 purchaseHistoryModel.findOne({ merchantUid })
                   .then(data => {
                     if (data && data.progress === 'inprogress') {
                       purchaseHistoryModel.findByIdAndDelete({ _id: mongoose.Types.ObjectId(data._id) })
                         .then((data) => {
                           return mentoringModel.findByIdAndUpdate({ _id: mongoose.Types.ObjectId(data.targetId) }, { $inc: { joinedParticipants: -1 } });
-                        });
+                        })
+                        .then(() => {});
                     }
                   });
               }, 1000 * 60 * 20, createdDoc.merchantUid);

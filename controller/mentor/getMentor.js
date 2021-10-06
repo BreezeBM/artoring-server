@@ -1,4 +1,4 @@
-const { mentorModel, mongoose } = require('../../model');
+const { userModel, mongoose } = require('../../model');
 
 module.exports = async (req, res) => {
   // params에 id가 담겨있으면 id에 해당하는 상세정보 리턴. 아니면 최신의 데이터 8개를 리턴
@@ -6,24 +6,25 @@ module.exports = async (req, res) => {
     // 특정 멘토의 상세 데이터 요청시
 
     if (req.params.id) {
-      const data = await mentorModel.aggregate([
+      const data = await userModel.aggregate([
         {
           $match: {
-            $or: [
-              { userId: mongoose.Types.ObjectId(req.params.id) },
-              { _id: mongoose.Types.ObjectId(req.params.id) }
-            ]
+            $and: [{
+              $or: [
+                { userId: mongoose.Types.ObjectId(req.params.id) },
+                { _id: mongoose.Types.ObjectId(req.params.id) }
+              ]
+            },
+            { isMentor: true }]
           }
         },
-        { $lookup: { from: 'usermodels', as: 'user', localField: 'userId', foreignField: '_id' } },
-        { $unwind: '$user' },
         {
           $project: {
-            avaliableTime: '$avaliableTime',
-            descriptionForMentor: '$descriptionForMentor',
-            category: '$category',
-            userName: '$user.name',
-            thumb: '$thumb',
+            avaliableTime: '$mentor.avaliableTime',
+            descriptionForMentor: '$mentor.descriptionForMentor',
+            category: '$mentor.category',
+            userName: '$name',
+            thumb: '$mentor.thumb',
             id: '$_id'
           }
         }
@@ -74,22 +75,21 @@ module.exports = async (req, res) => {
       //   const total = { basic, edu, lecture, gether };
 
       //   res.status(200).json({ total });
-      mentorModel.aggregate([
-        { $lookup: { from: 'usermodels', as: 'user', localField: 'userId', foreignField: '_id' } },
-        { $unwind: '$user' },
+      userModel.aggregate([
+        { $match: { isMentor: true } },
         {
           $project: {
-            avaliableTime: '$avaliableTime',
-            current: '$user.current',
-            descriptionForMentor: '$descriptionForMentor',
-            category: '$category',
-            userName: '$user.name',
-            thumb: '$thumb',
+            availableTime: '$mentor.availableTime',
+            current: '$current',
+            descriptionForMentor: '$mentor.descriptionForMentor',
+            category: '$mentor.category',
+            userName: '$name',
+            thumb: '$mentor.thumb',
             id: '$_id'
           }
         }, {
           $facet: {
-            cardList: [{ $skip: (req.query.page - 1) * (req.query.size || 8) }, { $limit: Number(req.query.size) || 8 }],
+            cardList: [{ $skip: (Number(req.query.page) - 1) * (Number(req.query.size) || 8) }, { $limit: Number(req.query.size) || 8 }],
             totalCount: [
               {
                 $count: 'count'

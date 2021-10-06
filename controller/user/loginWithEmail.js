@@ -1,6 +1,6 @@
 require('dotenv').config();
-const { userModel } = require('../../model');
-const { createJWT, sha256Encrypt } = require('../tools');
+const { userModel, mongoose } = require('../../model');
+const { createJWT, verifyJWTToken, sha256Encrypt } = require('../tools');
 const bcrypt = require('bcrypt');
 
 module.exports = async (req, res) => {
@@ -12,14 +12,48 @@ module.exports = async (req, res) => {
     ? process.env.SALT_DEV
     : process.env.SALT_PRO;
 
-  if (email) {
+  if (req.cookies.authorization) {
+    const decode = await verifyJWTToken(req);
+
+    switch (decode) {
+      case 401 : {
+        res.status(401).send();
+        break;
+      }
+      case 403: {
+        res.status(403).send();
+        break;
+      }
+      default: {
+        userModel.findOne({ _id: mongoose.Types.ObjectId(decode._id), name: decode.name })
+          .select({
+            _id: 1,
+            name: 1,
+            thumb: 1,
+            phone: 1,
+            nickName: 1,
+            email: 1,
+            isMentor: 1,
+            likedCareerEdu: 1,
+            likedMentor: 1,
+            likedInfo: 1,
+            verifiedEmail: 1,
+            verifiedPhone: 1,
+            createdAt: 1
+          })
+          .then((data) => {
+            res.status(200).json(data);
+          });
+      }
+    }
+  } else if (email) {
     userModel.findOne({ email })
       .select({
         _id: 1,
         pwd: 1,
         name: 1,
         thumb: 1,
-        pone: 1,
+        phone: 1,
         nickName: 1,
         email: 1,
         isMentor: 1,

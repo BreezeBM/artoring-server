@@ -12,7 +12,7 @@ const mentoringSchema = new Schema({
   moderatorId: { type: Schema.ObjectId, required: true },
   category: [String],
   subCategory: [String],
-  tags: [String],
+  tags: Schema.Types.Mixed,
   detailInfo: String,
   textDetailInfo: String,
   isGroup: Boolean,

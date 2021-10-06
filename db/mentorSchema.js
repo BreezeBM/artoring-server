@@ -3,8 +3,6 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const mentorSchema = new Schema({
-  userId: { type: Schema.ObjectId, required: true, unique: true },
-  name: { type: String, required: true }, // 엘라스틱서치 검색용
   thumb: { type: String, required: true }, // 어드민 관리용
   settledAmount: Number,
   tags: [String],

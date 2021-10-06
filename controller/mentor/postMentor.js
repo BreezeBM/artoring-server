@@ -1,4 +1,4 @@
-const { mentorModel, adminModel, mongoose } = require('../../model');
+const { userModel, adminModel, mongoose } = require('../../model');
 const { verifyJWTToken, aesDecrypt, AdminAccessException } = require('../tools');
 
 module.exports = async (req, res) => {
@@ -28,12 +28,14 @@ module.exports = async (req, res) => {
 
         const { _id, descriptionForMentor, descriptionText, thumb, category } =
         req.body;
-        mentorModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(_id) }, {
+        userModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(_id) }, {
           $set: {
-            descriptionForMentor,
-            descriptionText,
-            category,
-            thumb
+            mentor: {
+              descriptionForMentor,
+              descriptionText,
+              category,
+              thumb
+            }
           }
         })
           .then(() => {

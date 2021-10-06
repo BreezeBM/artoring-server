@@ -21,7 +21,7 @@ const verifyJWTToken = async (req) => {
   if (!req.cookies.authorization && !req.cookies.auth) return 401;
   else {
     try {
-      if (req.cookies.auth) {
+      if (req.cookies.auth && req.cookies.from) {
         const decode = jwt.verify(req.cookies.auth, process.env.NODE_ENV === 'development' ? process.env.JWT_SEC_KEY_DEVELOP : process.env.JWT_SEC_KEY_PRODUCTION);
 
         if (!decode) return 403;

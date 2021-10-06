@@ -73,7 +73,6 @@ module.exports = async (req, res) => {
                 .then(data => {
                   // 20분 이후에도 결제하지 않았다면 결제 취소시킴
                   setTimeout((merchantUid) => {
-                    console.log('here?');
                     purchaseHistoryModel.findOne({ merchant_uid: merchantUid })
                       .then(data => {
                         if (data && data.progress === 'inprogress') {
@@ -135,7 +134,6 @@ module.exports = async (req, res) => {
             })
             .then(data => {
               setTimeout((merchantUid) => {
-                console.log('here?');
                 purchaseHistoryModel.findOne({ merchantUid })
                   .then(data => {
                     if (data && data.progress === 'inprogress') {

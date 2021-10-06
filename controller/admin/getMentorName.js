@@ -43,7 +43,7 @@ module.exports = async (req, res) => {
                 }
               }, {
                 $lookup: {
-                  from: 'mentormodels',
+                  from: 'usermodels',
                   as: 'mentor',
                   localField: '_id',
                   foreignField: 'userId'
@@ -60,7 +60,7 @@ module.exports = async (req, res) => {
               { $match: { isMentor: true } },
               {
                 $lookup: {
-                  from: 'mentormodels',
+                  from: 'usermodels',
                   as: 'Mentor',
                   localField: '_id',
                   foreignField: 'userId'

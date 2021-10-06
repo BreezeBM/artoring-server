@@ -1,5 +1,6 @@
 
 const mongoose = require('mongoose');
+const mentorSchema = require('./mentorSchema');
 
 const Schema = mongoose.Schema;
 
@@ -19,6 +20,7 @@ const userSchema = new Schema({
   address: { type: String },
   pwd: { type: String, required: true },
   isMentor: { type: Boolean, default: false },
+  mentor: mentorSchema,
   major: { type: String },
   current: {
     jobTitle: { type: String },

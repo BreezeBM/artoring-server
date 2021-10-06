@@ -11,7 +11,6 @@ module.exports = async (req, res) => {
   const accessToken = split[0].concat(' ', split[1]);
   const type = split[2];
 
-  console.log(req.query, req.params);
   try {
     if (type === 'email') {
       const decode = await verifyJWTToken(req);

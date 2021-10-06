@@ -82,14 +82,12 @@ const post = (req, res) => {
 
           return purchaseHistoryModel.findOne({ merchantUid: merchant_uid })
             .then((document) => {
-              console.log(document);
               if (document.price === paymentData.amount) {
                 return purchaseHistoryModel.findOneAndUpdate({ merchantUid: merchant_uid }, { $set: { paymentData, progress: 'paid', questions: req.body.questions } }, { new: true });
               } else { throw new Error({ status: 'forgery', message: '위조된 결제시도' }); }
             });
         })
         .then((document) => {
-          console.log(document);
           switch (document.paymentData.status) {
             case 'paid':
               res.send({ status: 'success', message: '일반 결제 성공' });
@@ -107,7 +105,6 @@ const post = (req, res) => {
 
 // 아임포트 결제 실패 프로세스 핸들러
 const remove = async (req, res) => {
-  console.log('remove');
   const { merchantUid } = req.params;
 
   if (!req.cookies.authorization) {
@@ -143,7 +140,6 @@ const remove = async (req, res) => {
         await session.withTransaction(() => {
           return purchaseHistoryModel.findOneAndDelete({ merchantUid })
             .then((data) => {
-              console.log(data);
               return mentoringModel.findByIdAndUpdate({ _id: mongoose.Types.ObjectId(data.targetId) }, { $inc: { joinedParticipants: -1 } })
                 .then((data) => {
                 });
@@ -188,7 +184,6 @@ const remove = async (req, res) => {
 ;
 // 결제 취소 담당 핸들러, 계좌정보등을 받아야 하기 때문에 post 메서드
 const revoke = async (req, res) => {
-  console.log('revoke');
   const { id, reason } = req.body;
 
   const split = req.cookies.authorization.split(' ');

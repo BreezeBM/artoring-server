@@ -18,11 +18,13 @@ module.exports = async (req, res) => {
         switch (decode) {
           case 401: {
             res.cookie('auth', '', { expires: new Date(Date.now()) });
+            res.cookie('from', '', { expires: new Date(Date.now()) });
             res.status(401).send();
             break;
           }
           case 403: {
             res.cookie('auth', '', { expires: new Date(Date.now()) });
+            res.cookie('from', '', { expires: new Date(Date.now()) });
             res.status(403).send();
             break;
           }
@@ -128,7 +130,16 @@ module.exports = async (req, res) => {
                   maxAge: 3600 * 1000,
                   sameSite: 'none',
                   path: '/'
-                }).status(200).json({ userData });
+                });
+                res.cookie('from', true, {
+                  secure: true,
+                  httpOnly: true,
+                  // domain: process.env.NODE_ENV === 'development' ? 'localhost' : 'back.artoring.com',
+                  maxAge: 3600 * 1000,
+                  sameSite: 'none',
+                  path: '/'
+                });
+                res.status(200).json({ userData });
               }
             } else {
               console.log('The action attribute in your reCAPTCHA tag ' +

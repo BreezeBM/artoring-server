@@ -71,6 +71,14 @@ module.exports = async (data, email = data.email, res) => {
     } else {
       /* 클라이언트에게 인증 번호를 보내서 사용자가 맞게 입력하는지 확인! */
       smtpTransport.close();
+      res.cookie('authorization', `Bearer ${accessToken} email`, {
+        secure: true,
+        httpOnly: true,
+        // domain: process.env.NODE_ENV === 'development' ? 'localhost' : 'back.artoring.com',
+        maxAge: 3600 * 1000,
+        sameSite: 'none',
+        path: '/'
+      });
       return res.status(200).json({ responses, accessToken });
     }
   });

@@ -1,10 +1,14 @@
 require('dotenv').config();
 
 const { userModel, reviewModel, careerInfoModel, mentoringModel, mongoose } = require('../../model');
-const { verifyJWTToken } = require('../tools');
+const { verifyJWTToken, sha256Encrypt } = require('../tools');
+
+const randWords = require('random-words');
 
 module.exports = async (req, res) => {
   const { _id } = req.body;
+
+  const randomWords = randWords({ min: 3, exactly: 24, join: ' ' });
 
   const isSocial = !req.cookies.authorization.includes('email');
 
@@ -34,7 +38,7 @@ module.exports = async (req, res) => {
               name: '탈퇴한 사용자입니다.',
               appId: '',
               nickName: '',
-              email: '',
+              email: sha256Encrypt(999, randomWords, Date.toString()),
               gender: '',
               birth: '',
               phone: '',
@@ -88,6 +92,7 @@ module.exports = async (req, res) => {
               .then(list => Promise.all(likedInfo.map(ele => careerInfoModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(ele) }, { $inc: { likesCount: -1 } }))));
           })
           .then(() => {
+            res.cookie('authorization', '', { expires: new Date(Date.now()) });
             res.status(200).send();
           })
           .catch(e => {

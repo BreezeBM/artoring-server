@@ -32,8 +32,8 @@ const searchEngine = async (callback, keyword, model, page) => {
             // 키워드 검색 상세 결과를 리턴
             // 소팅 방법 명시. 1순위 최신순, 2순위 유사도 순
             sort: [
-              { startDate: { order: 'desc', format: 'strict_date_optional_time_nanos' } },
-              '_score'
+              { startDate: { order: 'desc', format: 'strict_date_optional_time_nanos' } }
+
             ],
             // 엘라스틱서치 문서 쿼리 방법 명시
             query: {
@@ -54,6 +54,7 @@ const searchEngine = async (callback, keyword, model, page) => {
                     tags: keyword
                   }
                 }],
+                minimum_should_match: 1,
                 // 반드시 있어야 함.
                 must: {
                   term: {
@@ -66,8 +67,8 @@ const searchEngine = async (callback, keyword, model, page) => {
           }
         : {
             sort: [
-              { startDate: { order: 'desc', format: 'strict_date_optional_time_nanos' } },
-              '_score'
+              { startDate: { order: 'desc', format: 'strict_date_optional_time_nanos' } }
+
             ],
             // 모델 명시 안함 === 전체문서검색 상세 페이지 개인 멘토링 여부만 체크.
             query: {
@@ -102,6 +103,7 @@ const searchEngine = async (callback, keyword, model, page) => {
           from: 0,
           size: 8,
           body: {
+            track_scores: true,
             sort: [
               { startDate: { order: 'desc', format: 'strict_date_optional_time_nanos' } },
               '_score'
@@ -110,7 +112,7 @@ const searchEngine = async (callback, keyword, model, page) => {
               bool: {
                 should: [{
                   terms: {
-                    detailInfo: keyword
+                    textDetailInfo: keyword
                   }
                 }, {
                   terms: {
@@ -121,6 +123,7 @@ const searchEngine = async (callback, keyword, model, page) => {
                     tags: keyword
                   }
                 }],
+                minimum_should_match: 1,
                 must: {
                   term: {
                     isGroup: true
@@ -135,9 +138,11 @@ const searchEngine = async (callback, keyword, model, page) => {
           from: 0,
           size: 8,
           body: {
+            track_scores: true,
             sort: [
               { startDate: { order: 'desc', format: 'strict_date_optional_time_nanos' } },
               '_score'
+
             ],
             query: {
               bool: {
@@ -158,25 +163,28 @@ const searchEngine = async (callback, keyword, model, page) => {
               index: 'mentoring',
               size: 8,
               body: {
+                track_scores: true,
                 sort: [
                   { startDate: { order: 'desc', format: 'strict_date_optional_time_nanos' } },
                   '_score'
+
                 ],
                 query: {
                   bool: {
                     should: [{
                       terms: {
-                        name: keyword
+                        title: keyword
                       }
                     }, {
                       terms: {
-                        descriptionText: keyword
+                        textDetailInfo: keyword
                       }
                     }, {
                       terms: {
                         tags: keyword
                       }
                     }],
+                    minimum_should_match: 1,
                     must: {
                       term: {
                         isGroup: false
@@ -191,9 +199,11 @@ const searchEngine = async (callback, keyword, model, page) => {
               from: 0,
               size: 8,
               body: {
+                track_scores: true,
                 sort: [
                   { startDate: { order: 'desc', format: 'strict_date_optional_time_nanos' } },
                   '_score'
+
                 ],
                 query: {
                   bool: {
@@ -209,11 +219,13 @@ const searchEngine = async (callback, keyword, model, page) => {
       })
       .then(data => {
         mentorQueryResult = data.body.hits;
+        console.log(keyword);
         return client.search(keyword[0] !== ''
           ? {
               index: 'news',
               size: 8,
               body: {
+                track_scores: true,
                 sort: [
                   { issuedDate: { order: 'desc', format: 'strict_date_optional_time_nanos' } },
                   '_score'
@@ -222,15 +234,15 @@ const searchEngine = async (callback, keyword, model, page) => {
                   bool: {
                     should: [{
                       terms: {
-                        createrName: keyword
-                      }
-                    }, {
-                      terms: {
                         textDetailInfo: keyword
                       }
                     }, {
                       terms: {
                         title: keyword
+                      }
+                    }, {
+                      terms: {
+                        createrName: keyword
                       }
                     }]
                   }
@@ -242,31 +254,16 @@ const searchEngine = async (callback, keyword, model, page) => {
               from: 0,
               size: 8,
               body: {
+                track_scores: true,
                 sort: [
                   { issuedDate: { order: 'desc', format: 'strict_date_optional_time_nanos' } },
                   '_score'
-                ],
-                query: {
-                  bool: {
-                    should: [{
-                      terms: {
-                        createrName: keyword
-                      }
-                    }, {
-                      terms: {
-                        textDetailInfo: keyword
-                      }
-                    }, {
-                      terms: {
-                        title: keyword
-                      }
-                    }]
-                  }
-                }
+                ]
               }
             });
       })
       .then(data => {
+        console.log('news', data);
         newsQueryResult = data.body.hits;
         callback(null, { teachQueryResult, mentorQueryResult, newsQueryResult });
       })

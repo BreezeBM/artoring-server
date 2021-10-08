@@ -3,7 +3,9 @@ const { verifyJWTToken, createJWT, aesDecrypt } = require('../tools');
 
 module.exports = async (req, res) => {
   try {
-    const decode = await verifyJWTToken(req);
+    const { token } = req.body;
+
+    const decode = await verifyJWTToken(null, token);
 
     switch (decode) {
       case 401: {

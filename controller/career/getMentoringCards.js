@@ -64,34 +64,34 @@ module.exports = async (req, res) => {
           // $lookup 파이프라인 업데이트
           switch (Number(req.query.category)) {
             case 1: {
-              gt.push({ $gte: ['$category.employment', Number(req.query.workedFor)] });
+              gt.push({ $gte: ['$mentor.category.employment', Number(req.query.workedFor)] });
               break;
             }
             case 2: {
-              gt.push({ $gte: ['$category.founded', Number(req.query.workedFor)] });
+              gt.push({ $gte: ['$mentor.category.founded', Number(req.query.workedFor)] });
               break;
             }
             case 3: {
-              gt.push({ $gte: ['$category.professional', Number(req.query.workedFor)] });
+              gt.push({ $gte: ['$mentor.category.professional', Number(req.query.workedFor)] });
               break;
             }
             case 4: {
-              gt.push({ $gte: ['$category.free', Number(req.query.workedFor)] });
+              gt.push({ $gte: ['$mentor.category.free', Number(req.query.workedFor)] });
               break;
             }
             case 5: {
-              gt.push({ $gte: ['$category.edu', Number(req.query.workedFor)] });
+              gt.push({ $gte: ['$mentor.category.edu', Number(req.query.workedFor)] });
               break;
             }
             // 카테고리 0 === 필터링 없음
             default: {
               const or = [];
               or.push(
-                { $gte: ['$category.employment', Number(req.query.workedFor)] },
-                { $gte: ['$category.founded', Number(req.query.workedFor)] },
-                { $gte: ['$category.professional', Number(req.query.workedFor)] },
-                { $gte: ['$category.free', Number(req.query.workedFor)] },
-                { $gte: ['$category.edu', Number(req.query.workedFor)] }
+                { $gte: ['$mentor.category.employment', Number(req.query.workedFor)] },
+                { $gte: ['$mentor.category.founded', Number(req.query.workedFor)] },
+                { $gte: ['$mentor.category.professional', Number(req.query.workedFor)] },
+                { $gte: ['$mentor.category.free', Number(req.query.workedFor)] },
+                { $gte: ['$mentor.category.edu', Number(req.query.workedFor)] }
               );
               gt.push({ $or: or });
 
@@ -111,6 +111,9 @@ module.exports = async (req, res) => {
                 let: { moderatorId: '$moderatorId' },
                 pipeline
               }
+            },
+            {
+              $unwind: '$mentor'
             }, {
               $project: {
                 availableTime: '$availableTime',
@@ -129,7 +132,7 @@ module.exports = async (req, res) => {
                 maximumParticipants: '$maximumParticipants',
                 category: '$category',
                 subCategory: '$subCategory',
-                descriptionForMentor: '$mentor.descriptionForMentor',
+                descriptionForMentor: '$mentor.mentor.descriptionForMentor',
                 intro: '$mentor.intro',
                 isGroup: '$isGroup',
                 _id: '$_id'

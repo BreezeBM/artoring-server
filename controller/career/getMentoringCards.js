@@ -10,6 +10,7 @@ module.exports = async (req, res) => {
         { $match: { _id: mongoose.Types.ObjectId(req.params.id) } },
         // 관계형 DB의 Join과 같이 다른 콜렉션(mentor 콜렉션)에서 특정 조건에 해당되는 도큐먼트들을 임포트. === inner join
         { $lookup: { from: 'usermodels', localField: 'moderatorId', foreignField: '_id', as: 'mentor' } },
+        { $unwind: '$mentor' },
         {
           // match와 lookup으로 가져온 데이터중 어떤것들을 결과물에 나타나게 할것인가
           $project: {
@@ -30,7 +31,7 @@ module.exports = async (req, res) => {
             maximumParticipants: '$maximumParticipants',
             category: '$category',
             subCategory: '$subCategory',
-            descriptionForMentor: '$mentor.descriptionForMentor',
+            descriptionForMentor: '$mentor.mentor.descriptionForMentor',
             intro: '$mentor.intro',
             isGroup: '$isGroup',
             _id: '$_id'

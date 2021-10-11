@@ -18,13 +18,13 @@ function base64decode (data) {
 module.exports = async (req, res) => {
   const { model } = req.params;
 
-  const split = req.cookies.authorization.split(' ');
-  const accessToken = split[0].concat(' ', split[1]);
-
   const randomWords = randWords({ min: 3, exactly: 24, join: ' ' });
 
   // 클라이언트에서 회원탈퇴 요청이 들어온 경우
   if (req.body._id) {
+    const split = req.cookies.authorization.split(' ');
+    const accessToken = split[0].concat(' ', split[1]);
+
     if (!req.cookies.authorization) {
       res.status(401).send();
       return;
@@ -217,7 +217,10 @@ module.exports = async (req, res) => {
       let likedMentor;
       let likedInfo;
 
-      sha256Encrypt(999, signedPayload, process.env.FACEBOOK_SEC, 'base64').replace(/\+/g, '-').replace(/\//g, '_').replace('=', '')
+      const promise = Promise.resolve(
+        sha256Encrypt(999, signedPayload, process.env.FACEBOOK_SEC, 'base64').replace(/\+/g, '-').replace(/\//g, '_').replace('=', ''));
+
+      promise
         .then(expectedToken => {
           if (expectedToken !== signedHeader) throw new Error('token mismatch');
 
@@ -267,6 +270,14 @@ module.exports = async (req, res) => {
             }
           }
         }))
+        .then((userData) => {
+          userId = userData._id;
+          likedCareerEdu = userData.likedCareerEdu;
+          likedMentor = userData.likedMentor;
+          likedInfo = userData.likedInfo;
+          return reviewModel.updateMany({ userId: mongoose.Types.ObjectId(userId) }, { userName: '탈퇴한 사용자', text: '탈퇴한 사용자 입니다.', rate: 0, userThumb: 'https://artoring.com/image/1626851218536.png' })
+          ;
+        })
         .then(list => Promise.all(list.map(ele => mentoringModel.findOne({ _id: mongoose.Types.ObjectId(ele.targetId) }))))
         .then(list => Promise.all(list.map(ele => {
           let count = ele.rateCount;

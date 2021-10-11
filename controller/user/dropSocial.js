@@ -18,13 +18,13 @@ function base64decode (data) {
 module.exports = async (req, res) => {
   const { model } = req.params;
 
-  const split = req.cookies.authorization.split(' ');
-  const accessToken = split[0].concat(' ', split[1]);
-
   const randomWords = randWords({ min: 3, exactly: 24, join: ' ' });
 
   // 클라이언트에서 회원탈퇴 요청이 들어온 경우
   if (req.body._id) {
+    const split = req.cookies.authorization.split(' ');
+    const accessToken = split[0].concat(' ', split[1]);
+
     if (!req.cookies.authorization) {
       res.status(401).send();
       return;
@@ -128,7 +128,7 @@ module.exports = async (req, res) => {
       });
   } else {
     if (model === 'kakao') {
-      const key = accessToken;
+      const key = req.headers.authorization.split(' ')[1];
       if (key !== process.env.K_ADMIN || req.body.app_id !== process.env.K_ID) res.status(401).send();
       else {
         let userId;
@@ -145,10 +145,10 @@ module.exports = async (req, res) => {
             likedInfo = userData.likedInfo;
 
             return mentoringModel.updateMany({ moderatorId: mongoose.Types.ObjectId(userId) }, { $set: { isTerminated: true } })
-              // 리뷰 내역 치환
+            // 리뷰 내역 치환
               .then(() => reviewModel.updateMany({ userId: mongoose.Types.ObjectId(userId) }, { userName: '탈퇴한 사용자', text: '탈퇴한 사용자 입니다.', rate: 0, userThumb: 'https://artoring.com/image/1626851218536.png' }))
               .then(() => reviewModel.find({ userId: mongoose.Types.ObjectId(userId) }))
-              // 평점 되돌리기
+            // 평점 되돌리기
               .then(list => Promise.all(list.map(ele => mentoringModel.findOne({ _id: mongoose.Types.ObjectId(ele.targetId) }))))
               .then(list => Promise.all(list.map(ele => {
                 let count = ele.rateCount;
@@ -158,7 +158,7 @@ module.exports = async (req, res) => {
 
                 return mentoringModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(ele._id) }, { $set: { count, rate } });
               })))
-              // 멘토였던 사람의 경우 좋아요를 해둔 다른 사람들 정보까지 제거.
+            // 멘토였던 사람의 경우 좋아요를 해둔 다른 사람들 정보까지 제거.
               .then(list => Promise.all(list.map(ele => userModel.findOneAndUpdate({ $or: [{ likedCareerEdu: { $in: [ele._id] } }, { likedMentor: { $in: [userId] } }] }, { $pull: { likedCareerEdu: ele._id, likedMentor: userId } }))))
               .then(() => {
                 return Promise.all(likedCareerEdu.map(ele => mentoringModel.findByIdAndUpdate({ _id: mongoose.Types.ObjectId(ele) }, { $inc: { likesCount: -1 } })))
@@ -217,7 +217,10 @@ module.exports = async (req, res) => {
       let likedMentor;
       let likedInfo;
 
-      sha256Encrypt(999, signedPayload, process.env.FACEBOOK_SEC, 'base64').replace(/\+/g, '-').replace(/\//g, '_').replace('=', '')
+      const promise = Promise.resolve(
+        sha256Encrypt(999, signedPayload, process.env.FACEBOOK_SEC, 'base64').replace(/\+/g, '-').replace(/\//g, '_').replace('=', ''));
+
+      promise
         .then(expectedToken => {
           if (expectedToken !== signedHeader) throw new Error('token mismatch');
 
@@ -267,6 +270,11 @@ module.exports = async (req, res) => {
             }
           }
         }))
+        .then((userData) => {
+          return reviewModel.updateMany({ userId: mongoose.Types.ObjectId(userId) }, { userName: '탈퇴한 사용자', text: '탈퇴한 사용자 입니다.', rate: 0, userThumb: 'https://artoring.com/image/1626851218536.png' }, { new: true })
+          ;
+        })
+        .then(() => reviewModel.find({ userId: mongoose.Types.ObjectId(userId) }))
         .then(list => Promise.all(list.map(ele => mentoringModel.findOne({ _id: mongoose.Types.ObjectId(ele.targetId) }))))
         .then(list => Promise.all(list.map(ele => {
           let count = ele.rateCount;
@@ -276,7 +284,7 @@ module.exports = async (req, res) => {
 
           return mentoringModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(ele._id) }, { $set: { count, rate } });
         })))
-        // 멘토였던 사람의 경우 좋아요를 해둔 다른 사람들 정보까지 제거.
+      // 멘토였던 사람의 경우 좋아요를 해둔 다른 사람들 정보까지 제거.
         .then(list => Promise.all(list.map(ele => userModel.findOneAndUpdate({ $or: [{ likedCareerEdu: { $in: [ele._id] } }, { likedMentor: { $in: [userId] } }] }, { $pull: { likedCareerEdu: ele._id, likedMentor: userId } }))))
         .then(() => {
           return Promise.all(likedCareerEdu.map(ele => mentoringModel.findByIdAndUpdate({ _id: mongoose.Types.ObjectId(ele) }, { $inc: { likesCount: -1 } })))

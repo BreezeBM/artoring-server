@@ -127,11 +127,12 @@ module.exports = async (req, res) => {
                   bookedStartTime: '$bookedStartTime',
                   bookedEndTime: '$bookedEndTime',
                   createdAt: '$createdAt',
-                  userThumb: '$user.thumb',
-                  userName: '$user.name',
-                  major: '$user.major',
-                  current: '$user.current',
-                  interestedIn: '$user.interestedIn',
+                  userThumb: '$users.thumb',
+                  userName: '$users.name',
+                  gender: '$users.gender',
+                  major: '$users.major',
+                  current: '$users.current',
+                  interestedIn: '$users.interestedIn',
                   questions: '$questions'
                 }
               },

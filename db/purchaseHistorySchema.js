@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-
+const { date } = require('../controller/tools');
 const Schema = mongoose.Schema;
 
 const purchaseHistorySchema = new Schema({
@@ -16,7 +16,7 @@ const purchaseHistorySchema = new Schema({
   progress: { type: String, default: 'inprogress' },
   zoomLink: String,
   questions: [{ type: String }],
-  createdAt: { type: Date, default: new Date() },
+  createdAt: { type: Date, default: new Date(date().add(9, 'hours').format()) },
   // 아임포트 결제 상태 저장
   paymentData: { type: Object }
 });

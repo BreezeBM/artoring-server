@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const router = require('./routes');
-const moment = require('moment');
+
 const helmet = require('helmet');
 const fs = require('fs');
 const https = require('https');
@@ -9,8 +9,7 @@ const cookieParser = require('cookie-parser');
 
 require('moment-timezone');
 require('dotenv').config();
-
-moment.tz.setDefault('Asia/Seoul');
+const { date } = require('./controller/tools');
 const db = require('./db');
 
 const port = process.env.PORT || 4000;
@@ -41,17 +40,15 @@ app.use(cors({
   credentials: true
 }));
 
-// X-powered-by제외하는 간단한 보안 모듈
-app.use(helmet());
-
 app.get('/', (req, res, next) => {
-  if (req.headers.host.includes(process.env.EC2_IP)) next();
-  else res.status(401).send();
+  process.env.NODE_ENV === 'development'
+    ? next(null, true)
+    : (() => {
+        if (req.headers.host.includes(process.env.EC2_IP)) next();
+        else res.status(401).send();
+      })();
 }, (req, res) => {
-  res.cookie('test', true, {
-    secure: true
-  });
-  console.log(req.cookies);
+  // console.log(date().add('hours', 9).format());
   res.send();
 });
 

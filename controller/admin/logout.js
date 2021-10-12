@@ -1,7 +1,6 @@
 require('dotenv').config();
 
-const { aesEncrypt, sha256Encrypt, createJWT, verifyJWTToken, AdminAccessException } = require('../tools');
-const { adminModel } = require('../../model');
+const { verifyJWTToken, AdminAccessException, date } = require('../tools');
 
 module.exports = async (req, res) => {
   /*
@@ -28,7 +27,7 @@ module.exports = async (req, res) => {
           const { name, accessKey, authLevel } = decode;
 
           if (!accessKey) throw new AdminAccessException('need authorize');
-          res.cookie('auth', '', { expires: new Date(Date.now()) });
+          res.cookie('auth', '', { expires: new Date(date().add(9, 'hours').format()) });
 
           res.status(200).json({ userData: { name, accessKey, authLevel } });
         }

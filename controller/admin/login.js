@@ -3,7 +3,7 @@ require('dotenv').config();
 const { aesEncrypt, aesDecrypt, createJWT, verifyJWTToken, AdminAccessException } = require('../tools');
 const { adminModel } = require('../../model');
 const bcrypt = require('bcrypt');
-const date = require('../controller/tools');
+const { date } = require('../tools');
 
 const recaptchaAction = 'login';
 

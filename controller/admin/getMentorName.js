@@ -31,6 +31,7 @@ module.exports = async (req, res) => {
 
         let mentorData = await userModel.aggregate(req.body.name !== ''
           ? [
+              { $match: { isMentor: true } },
               {
                 $search: {
                   index: 'searchName',
@@ -57,7 +58,7 @@ module.exports = async (req, res) => {
               }
             ]
           : [
-              { $match: { isMentor: true } },
+              { $match: { isMentor: req.body.isRegistered } },
               {
                 $lookup: {
                   from: 'usermodels',
@@ -70,8 +71,8 @@ module.exports = async (req, res) => {
               {
                 $project: {
                   _id: '$Mentor._id',
-                  descriptionForMentor: '$Mentor.descriptionForMentor',
-                  descriptionText: '$Mentor.descriptionText',
+                  descriptionForMentor: req.body.isRegistered ? '$Mentor.descriptionForMentor' : '',
+                  descriptionText: req.body.isRegistered ? '$Mentor.descriptionText' : '',
                   name: '$Mentor.name',
                   current: '$current'
                 }

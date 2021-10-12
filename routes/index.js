@@ -12,6 +12,8 @@ const purchaseRouter = require('./purchase');
 const adminRouter = require('./admin');
 const mentorRouter = require('./mentor');
 
+const { userController } = require('../controller');
+
 router.use('/career', careerRouter);
 router.use('/mentor', mentorRouter);
 router.use('/upload', uploader);
@@ -21,6 +23,7 @@ router.use('/verify', verifyRouter);
 router.use('/search', searchRouter);
 router.use('/reserve', purchaseRouter);
 router.use('/admin', adminRouter);
+router.post('/iamport', userController.payment.webhook);
 
 router.use('/', userRouter);
 

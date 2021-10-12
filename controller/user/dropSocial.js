@@ -2,7 +2,7 @@ require('dotenv').config();
 
 const { default: axios } = require('axios');
 const { userModel, reviewModel, mentoringModel, mongoose, careerInfoModel } = require('../../model');
-const { sha256Encrypt, verifyAndCallback } = require('../tools');
+const { sha256Encrypt, verifyAndCallback, date } = require('../tools');
 
 const randWords = require('random-words');
 
@@ -115,7 +115,7 @@ module.exports = async (req, res) => {
                 .then(list => Promise.all(likedInfo.map(ele => careerInfoModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(ele) }, { $inc: { likesCount: -1 } }))));
             })
             .then(() => {
-              res.cookie('authorization', '', { expires: new Date(Date.now()) });
+              res.cookie('authorization', '', { expires: new Date(date().add(9, 'hours').format()) });
               res.status(200).send();
             }).catch(e => {
               console.log(e);
@@ -200,7 +200,7 @@ module.exports = async (req, res) => {
                 }
               }))
               .then(() => {
-                res.cookie('authorization', '', { expires: new Date(Date.now()) });
+                res.cookie('authorization', '', { expires: new Date(date().add(9, 'hours').format()) });
                 res.status(200).send();
               })
               .catch(e => {
@@ -292,7 +292,7 @@ module.exports = async (req, res) => {
             .then(list => Promise.all(likedInfo.map(ele => careerInfoModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(ele) }, { $inc: { likesCount: -1 } }))));
         })
         .then(() => {
-          res.cookie('authorization', '', { expires: new Date(Date.now()) });
+          res.cookie('authorization', '', { expires: new Date(date().add(9, 'hours').format()) });
           res.status(200).json({ url: `https://artoring.com/drop/facebook?id=${userId}`, confirmation_code: `${userId}Deleted!` });
         })
         .catch(e => {

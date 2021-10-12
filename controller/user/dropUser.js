@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 const { userModel, reviewModel, careerInfoModel, mentoringModel, mongoose } = require('../../model');
-const { verifyJWTToken, sha256Encrypt } = require('../tools');
+const { verifyJWTToken, sha256Encrypt, date } = require('../tools');
 
 const randWords = require('random-words');
 
@@ -74,6 +74,7 @@ module.exports = async (req, res) => {
             return reviewModel.updateMany({ userId: mongoose.Types.ObjectId(_id) }, { userName: '탈퇴한 사용자', text: '탈퇴한 사용자 입니다.', rate: 0, userThumb: 'https://artoring.com/image/1626851218536.png' })
             ;
           })
+          .then(() => reviewModel.find({ userId: mongoose.Types.ObjectId(userId) }))
           .then(list => Promise.all(list.map(ele => mentoringModel.findOne({ _id: mongoose.Types.ObjectId(ele.targetId) }))))
           .then(list => Promise.all(list.map(ele => {
             let count = ele.rateCount;
@@ -91,7 +92,7 @@ module.exports = async (req, res) => {
               .then(list => Promise.all(likedInfo.map(ele => careerInfoModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(ele) }, { $inc: { likesCount: -1 } }))));
           })
           .then(() => {
-            res.cookie('authorization', '', { expires: new Date(Date.now()) });
+            res.cookie('authorization', '', { expires: new Date(date().add(9, 'hours').format()) });
             res.status(200).send();
           })
           .catch(e => {

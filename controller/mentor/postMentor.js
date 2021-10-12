@@ -30,6 +30,7 @@ module.exports = async (req, res) => {
         req.body;
         userModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(_id) }, {
           $set: {
+            isMentor: true,
             mentor: {
               descriptionForMentor,
               descriptionText,

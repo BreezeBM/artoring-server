@@ -3,6 +3,7 @@ require('dotenv').config();
 const { aesEncrypt, aesDecrypt, createJWT, verifyJWTToken, AdminAccessException } = require('../tools');
 const { adminModel } = require('../../model');
 const bcrypt = require('bcrypt');
+const date = require('../controller/tools');
 
 const recaptchaAction = 'login';
 
@@ -17,14 +18,14 @@ module.exports = async (req, res) => {
       if (decode) {
         switch (decode) {
           case 401: {
-            res.cookie('auth', '', { expires: new Date(Date.now()) });
-            res.cookie('from', '', { expires: new Date(Date.now()) });
+            res.cookie('auth', '', { expires: date.add(9, 'hours').format() });
+            res.cookie('from', '', { expires: date.add(9, 'hours').format() });
             res.status(401).send();
             break;
           }
           case 403: {
-            res.cookie('auth', '', { expires: new Date(Date.now()) });
-            res.cookie('from', '', { expires: new Date(Date.now()) });
+            res.cookie('auth', '', { expires: date.add(9, 'hours').format() });
+            res.cookie('from', '', { expires: date.add(9, 'hours').format() });
             res.status(403).send();
             break;
           }

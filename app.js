@@ -9,7 +9,6 @@ const cookieParser = require('cookie-parser');
 
 require('moment-timezone');
 require('dotenv').config();
-const { date } = require('./controller/tools');
 const db = require('./db');
 
 const port = process.env.PORT || 4000;
@@ -48,7 +47,6 @@ app.get('/', (req, res, next) => {
         else res.status(401).send();
       })();
 }, (req, res) => {
-  // console.log(date().add('hours', 9).format());
   res.send();
 });
 

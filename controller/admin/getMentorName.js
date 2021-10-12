@@ -46,7 +46,7 @@ module.exports = async (req, res) => {
               {
                 $project: {
                   _id: '$_id',
-                  current: '$mentor.current',
+                  current: '$current',
                   userName: '$name',
                   thumb: '$mentor.thumb'
                 }

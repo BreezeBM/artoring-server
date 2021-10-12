@@ -1,6 +1,6 @@
 const axios = require('axios');
 const { purchaseHistoryModel, mentoringModel, mongoose } = require('../../model');
-const { verifyJWTToken, verifyAndCallback } = require('../tools');
+const { verifyJWTToken, verifyAndCallback, date } = require('../tools');
 // 아임포트 결제이후 결제 내역 검증 및 저장
 const post = (req, res) => {
   const { imp_uid, merchant_uid } = req.body;
@@ -288,11 +288,11 @@ const revoke = async (req, res) => {
             bookedTime.setHours(0, 0, 0, 0);
 
             // 환불 가능 금액 설정
-            if (bookedTime.getTime() - 1000 * 3600 * 24 * 2 <= new Date()) {
+            if (bookedTime.getTime() - 1000 * 3600 * 24 * 2 <= new Date(date().add(9, 'hours').format())) {
               res.status(400).send();
               return;
-            } else if (bookedTime.getTime() - 1000 * 3600 * 24 * 2 > new Date() && bookedTime.getTime() - 1000 * 3600 * 24 * 5 < new Date()) amount = data.price / 2;
-            else if (bookedTime.getTime() - 1000 * 3600 * 24 * 5 >= new Date()) amount = data.price;
+            } else if (bookedTime.getTime() - 1000 * 3600 * 24 * 2 > new Date(date().add(9, 'hours').format()) && bookedTime.getTime() - 1000 * 3600 * 24 * 5 < new Date(date().add(9, 'hours').format())) amount = data.price / 2;
+            else if (bookedTime.getTime() - 1000 * 3600 * 24 * 5 >= new Date(date().add(9, 'hours').format())) amount = data.price;
             else {
               res.status(501).send();
               return;
@@ -339,5 +339,70 @@ const revoke = async (req, res) => {
     }, loginType, accessToken, res);
   }
 };
-module.exports = { post, remove, revoke }
+
+const webhook = (req, res) => {
+  const { imp_uid: impUid, merchant_uid: merchantUid } = req.body;
+
+  if (!impUid || !merchantUid) {
+    res.status(400).send();
+    return;
+  }
+
+  const tokenUrl = 'https://api.iamport.kr/users/getToken';
+  const paymentUrl = 'https://api.iamport.kr/payments';
+
+  axios.post(tokenUrl, { imp_key: process.env.IAMPORT_KEY, imp_secret: process.env.IAMPORT_SEC })
+    .then(({ data }) => {
+      const { access_token: accessToken } = data.response;
+
+      // 아임포트 서버 결제 정보 조희
+      return axios.get(paymentUrl.concat('/', impUid), {
+        headers: {
+          Authorization: accessToken
+        }
+      });
+    })
+    .then(({ data }) => {
+      const paymentData = data.response;
+
+      const { imp_uid: impUid, merchant_uid: merchantUid } = paymentData;
+
+      return purchaseHistoryModel.findOne({ merchantUid, impUid })
+        .then((document) => {
+          if (document.price === paymentData.amount) {
+            switch (paymentData.status) {
+              case 'paid':
+                purchaseHistoryModel.findOneAndUpdate({ merchantUid }, { $set: { paymentData, progress: 'paid' } }, { new: true })
+                  .then(() => {
+                    res.send({ status: 'success', message: '일반 결제 성공' });
+                  });
+                break;
+              case 'ready':
+                const { vbank_num: bankNum, vbank_date: bankDate, vbank_name: bankName } = paymentData;
+
+                purchaseHistoryModel.findOneAndUpdate({ merchantUid }, { $set: { paymentData, progress: 'ready' } }, { new: true })
+                  .then(() => {
+                  // 가상계좌 발급 안내 문자메시지 발송
+                  // SMS.send({ text: `가상계좌 발급이 성공되었습니다. 계좌 정보 ${vbank_num} ${vbank_date} ${vbank_name}` });
+                    res.json({ status: 'vbankIssued', message: '가상계좌 발급 성공', vbank: { bankName, bankNum, bankDate } });
+                  });
+
+                break;
+              case 'cancelled':
+                purchaseHistoryModel.findOneAndDelete({ merchantUid }, { $set: { progress: 'cancelled' } })
+                  .then(() => {
+                    mentoringModel.findOneAndUpdate({ _id: document.targetId }, { $inc: { joinedParticipants: -1 } });
+                  });
+                break;
+            }
+          } else { throw new Error({ status: 'forgery', message: '위조된 결제시도' }); }
+        });
+    })
+    .catch(e => {
+      console.log(e);
+      res.status(400).send(e);
+    });
+};
+
+module.exports = { post, remove, revoke, webhook }
 ;

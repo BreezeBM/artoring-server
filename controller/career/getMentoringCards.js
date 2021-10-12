@@ -196,7 +196,7 @@ module.exports = async (req, res) => {
           // 페이지네이션에 필요한 페이지 요청시
           if (req.query.page) {
           // (req.query.page - 1) * 16 개를 뛰어넘고
-            option.skip = (Number(req.query.page) - 1) * 16;
+            option.skip = (Number(req.query.page) - 1) * (req.query.size || 16);
             if (req.query.limit) option.skip = (Number(req.query.page) - 1) * req.query.limit;
 
             // 이후 16개를 쿼리한다.

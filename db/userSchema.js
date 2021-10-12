@@ -1,7 +1,7 @@
 
 const mongoose = require('mongoose');
 const mentorSchema = require('./mentorSchema');
-
+const { date } = require('../controller/tools');
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
@@ -38,7 +38,7 @@ const userSchema = new Schema({
   likedInfo: [Schema.ObjectId],
   outdoorAct: String,
   workHistory: String,
-  createdAt: { type: Date, default: new Date() },
+  createdAt: { type: Date, default: new Date(date().add(9, 'hours').format()) },
   refOrLongTimeToken: String
 });
 

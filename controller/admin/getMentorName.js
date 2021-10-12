@@ -44,38 +44,24 @@ module.exports = async (req, res) => {
               },
               { $match: { isMentor: req.body.isRegistered } },
               {
-                $lookup: {
-                  from: 'usermodels',
-                  as: 'mentor',
-                  localField: '_id',
-                  foreignField: 'userId'
-                }
-              }, {
                 $project: {
                   _id: '$_id',
                   current: '$current',
-                  userName: '$name'
+                  userName: '$name',
+                  thumb: '$mentor.thumb'
                 }
               }
             ]
           : [
               { $match: { isMentor: req.body.isRegistered } },
               {
-                $lookup: {
-                  from: 'usermodels',
-                  as: 'Mentor',
-                  localField: '_id',
-                  foreignField: 'userId'
-                }
-              },
-              { $unwind: '$Mentor' },
-              {
                 $project: {
-                  _id: '$Mentor._id',
-                  descriptionForMentor: req.body.isRegistered ? '$Mentor.descriptionForMentor' : '',
-                  descriptionText: req.body.isRegistered ? '$Mentor.descriptionText' : '',
-                  name: '$Mentor.name',
-                  current: '$current'
+                  _id: '$_id',
+                  descriptionForMentor: req.body.isRegistered ? '$mentor.descriptionForMentor' : '',
+                  descriptionText: req.body.isRegistered ? '$mentor.descriptionText' : '',
+                  name: '$name',
+                  current: '$current',
+                  thumb: '$mentor.thumb'
                 }
               }
             ]);

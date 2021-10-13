@@ -392,6 +392,7 @@ const webhook = (req, res) => {
                 purchaseHistoryModel.findOneAndDelete({ merchantUid }, { $set: { progress: 'cancelled' } })
                   .then(() => {
                     mentoringModel.findOneAndUpdate({ _id: document.targetId }, { $inc: { joinedParticipants: -1 } });
+                    res.send({ status: 'success', message: '결제 취소 완료' });
                   });
                 break;
             }

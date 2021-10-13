@@ -26,12 +26,13 @@ module.exports = async (req, res) => {
         const adminData = await adminModel.find({ name, accessKey: accKey });
         if (!adminData) throw new AdminAccessException('no match found');
 
-        const { _id, descriptionForMentor, descriptionText, thumb, category } =
+        const { _id, userName, descriptionForMentor, descriptionText, thumb, category } =
         req.body;
         userModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(_id) }, {
           $set: {
             isMentor: true,
             mentor: {
+              name: userName,
               descriptionForMentor,
               descriptionText,
               category,

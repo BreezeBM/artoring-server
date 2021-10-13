@@ -97,6 +97,7 @@ module.exports = async (req, res) => {
                 }
               },
               // 아래와 같은 형식으로 배열 내부 요소로 집어넣는다
+              { $unwind: '$mentoring' },
               {
                 $project: {
                   title: '$mentoring.title',

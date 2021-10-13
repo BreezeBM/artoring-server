@@ -23,6 +23,8 @@ router.use('/verify', verifyRouter);
 router.use('/search', searchRouter);
 router.use('/reserve', purchaseRouter);
 router.use('/admin', adminRouter);
+
+// 아임포트 결제완료 웹훅
 router.post('/iamport', userController.payment.webhook);
 
 router.use('/', userRouter);

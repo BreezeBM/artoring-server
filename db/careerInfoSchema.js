@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { date } = require("../controller/tools");
 const Schema = mongoose.Schema;
 
 const careerInfoSchema = new Schema({
@@ -10,8 +11,16 @@ const careerInfoSchema = new Schema({
   subCategory: String,
   detailInfo: String,
   textDetailInfo: String,
-  createdAt: { type: Date, required: true, default: new Date() },
-  updatedAt: { type: Date, required: true, default: new Date() },
+  createdAt: {
+    type: Date,
+    required: true,
+    default: new Date(date().add(9, "hours").format()),
+  },
+  updatedAt: {
+    type: Date,
+    required: true,
+    default: new Date(date().add(9, "hours").format()),
+  },
   likesCount: { type: Number, default: 0 },
 });
 

@@ -3,6 +3,7 @@ require('dotenv').config();
 const { aesEncrypt, aesDecrypt, createJWT, verifyJWTToken, AdminAccessException } = require('../tools');
 const { adminModel } = require('../../model');
 const bcrypt = require('bcrypt');
+const { date } = require('../tools');
 
 const recaptchaAction = 'login';
 
@@ -17,12 +18,14 @@ module.exports = async (req, res) => {
       if (decode) {
         switch (decode) {
           case 401: {
-            res.cookie('auth', '', { expires: new Date(Date.now()) });
+            res.cookie('auth', '', { expires: date.add(9, 'hours').format() });
+            res.cookie('from', '', { expires: date.add(9, 'hours').format() });
             res.status(401).send();
             break;
           }
           case 403: {
-            res.cookie('auth', '', { expires: new Date(Date.now()) });
+            res.cookie('auth', '', { expires: date.add(9, 'hours').format() });
+            res.cookie('from', '', { expires: date.add(9, 'hours').format() });
             res.status(403).send();
             break;
           }
@@ -128,7 +131,16 @@ module.exports = async (req, res) => {
                   maxAge: 3600 * 1000,
                   sameSite: 'none',
                   path: '/'
-                }).status(200).json({ userData });
+                });
+                res.cookie('from', true, {
+                  secure: true,
+                  httpOnly: true,
+                  // domain: process.env.NODE_ENV === 'development' ? 'localhost' : 'back.artoring.com',
+                  maxAge: 3600 * 1000,
+                  sameSite: 'none',
+                  path: '/'
+                });
+                res.status(200).json({ userData });
               }
             } else {
               console.log('The action attribute in your reCAPTCHA tag ' +

@@ -1,16 +1,15 @@
 const express = require("express");
 const cors = require("cors");
 const router = require("./routes");
-const moment = require("moment");
+
 const helmet = require("helmet");
 const fs = require("fs");
 const https = require("https");
 const cookieParser = require("cookie-parser");
 const inactiveAccount = require("./controller/tools/inactiveAccount");
+
 require("moment-timezone");
 require("dotenv").config();
-
-moment.tz.setDefault("Asia/Seoul");
 const db = require("./db");
 
 const port = process.env.PORT || 4000;
@@ -32,6 +31,9 @@ const whitelist = [
   process.env.ADMIN_URL,
 ]; // undefined == EBS health check or 다른서버
 
+// 휴면 계정
+// inactiveAccount()
+
 app.use(express.json({ extended: false }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cors({
@@ -43,24 +45,19 @@ app.use(cors({
       if (whitelist.includes(origin)) callback(null, true);
       else callback(new Error("Not allowed by CORS"));
     },
+  // function (origin, callback) {
+  //   callback(null, true);
+  // },
   methods: "GET,POST,PUT,DELETE,OPTIONS",
   credentials: true,
 }));
 
-// X-powered-by제외하는 간단한 보안 모듈
-app.use(helmet());
-
-// 휴면 계정
-// inactiveAccount()
-
 app.get("/", (req, res, next) => {
-  if (req.headers.host.includes(process.env.EC2_IP)) next();
-  else res.status(401).send();
+  process.env.NODE_ENV === "development" ? next(null, true) : (() => {
+    if (req.headers.host.includes(process.env.EC2_IP)) next();
+    else res.status(401).send();
+  })();
 }, (req, res) => {
-  res.cookie("test", true, {
-    secure: true,
-  });
-  console.log(req.cookies);
   res.send();
 });
 

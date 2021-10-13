@@ -17,11 +17,18 @@ require('dotenv').config();
  * 403 : JWT 해독 실패
  * decode: JWT 해독 결과 데이터
  */
-const verifyJWTToken = async (req) => {
+const verifyJWTToken = async (req, token) => {
+  if (token) {
+    const decode = jwt.verify(token, process.env.NODE_ENV === 'development' ? process.env.JWT_SEC_KEY_DEVELOP : process.env.JWT_SEC_KEY_PRODUCTION);
+
+    if (!decode) return 403;
+    else return decode;
+  }
+
   if (!req.cookies.authorization && !req.cookies.auth) return 401;
   else {
     try {
-      if (req.cookies.auth) {
+      if (req.cookies.auth && req.cookies.from) {
         const decode = jwt.verify(req.cookies.auth, process.env.NODE_ENV === 'development' ? process.env.JWT_SEC_KEY_DEVELOP : process.env.JWT_SEC_KEY_PRODUCTION);
 
         if (!decode) return 403;

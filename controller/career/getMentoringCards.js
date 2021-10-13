@@ -9,7 +9,8 @@ module.exports = async (req, res) => {
         // 모델에서 _id가 일치한것
         { $match: { _id: mongoose.Types.ObjectId(req.params.id) } },
         // 관계형 DB의 Join과 같이 다른 콜렉션(mentor 콜렉션)에서 특정 조건에 해당되는 도큐먼트들을 임포트. === inner join
-        { $lookup: { from: 'mentormodels', localField: 'moderatorId', foreignField: 'userId', as: 'mentor' } },
+        { $lookup: { from: 'usermodels', localField: 'moderatorId', foreignField: '_id', as: 'mentor' } },
+        { $unwind: '$mentor' },
         {
           // match와 lookup으로 가져온 데이터중 어떤것들을 결과물에 나타나게 할것인가
           $project: {
@@ -30,7 +31,7 @@ module.exports = async (req, res) => {
             maximumParticipants: '$maximumParticipants',
             category: '$category',
             subCategory: '$subCategory',
-            descriptionForMentor: '$mentor.descriptionForMentor',
+            descriptionForMentor: '$mentor.mentor.descriptionForMentor',
             intro: '$mentor.intro',
             isGroup: '$isGroup',
             _id: '$_id'
@@ -63,61 +64,55 @@ module.exports = async (req, res) => {
           // $lookup 파이프라인 업데이트
           switch (Number(req.query.category)) {
             case 1: {
-              gt.push({ $gte: ['$category.employment', Number(req.query.workedFor)] });
+              gt.push({ $gte: ['$mentor.category.employment', Number(req.query.workedFor)] });
               break;
             }
             case 2: {
-              gt.push({ $gte: ['$category.founded', Number(req.query.workedFor)] });
+              gt.push({ $gte: ['$mentor.category.founded', Number(req.query.workedFor)] });
               break;
             }
             case 3: {
-              gt.push({ $gte: ['$category.professional', Number(req.query.workedFor)] });
+              gt.push({ $gte: ['$mentor.category.professional', Number(req.query.workedFor)] });
               break;
             }
             case 4: {
-              gt.push({ $gte: ['$category.free', Number(req.query.workedFor)] });
+              gt.push({ $gte: ['$mentor.category.free', Number(req.query.workedFor)] });
               break;
             }
             case 5: {
-              gt.push({ $gte: ['$category.edu', Number(req.query.workedFor)] });
+              gt.push({ $gte: ['$mentor.category.edu', Number(req.query.workedFor)] });
               break;
             }
             // 카테고리 0 === 필터링 없음
             default: {
               const or = [];
               or.push(
-                { $gte: ['$category.employment', Number(req.query.workedFor)] },
-                { $gte: ['$category.founded', Number(req.query.workedFor)] },
-                { $gte: ['$category.professional', Number(req.query.workedFor)] },
-                { $gte: ['$category.free', Number(req.query.workedFor)] },
-                { $gte: ['$category.edu', Number(req.query.workedFor)] }
+                { $gte: ['$mentor.category.employment', Number(req.query.workedFor)] },
+                { $gte: ['$mentor.category.founded', Number(req.query.workedFor)] },
+                { $gte: ['$mentor.category.professional', Number(req.query.workedFor)] },
+                { $gte: ['$mentor.category.free', Number(req.query.workedFor)] },
+                { $gte: ['$mentor.category.edu', Number(req.query.workedFor)] }
               );
               gt.push({ $or: or });
+
               break;
             }
           }
-          gt.push({ $eq: ['$userId', '$$moderatorId'] });
+          gt.push({ $eq: ['$_id', '$$moderatorId'] });
 
           // aggregate 파이프라인 생성
           const aggregate = [
             { $match: query },
             {
               $lookup: {
-                from: 'mentormodels',
+                from: 'usermodels',
                 as: 'mentor',
                 // $lookup 파이프라인 변수 선언
                 let: { moderatorId: '$moderatorId' },
                 pipeline
               }
-            }, { // 결과 프로퍼티중 mentor가 비어있는걸 제외
-              $match: {
-                $expr: {
-                  $ne: [
-                    { $size: '$mentor' }, 0
-                  ]
-                }
-              }
-            }, {
+            },
+            {
               $unwind: '$mentor'
             }, {
               $project: {
@@ -137,7 +132,7 @@ module.exports = async (req, res) => {
                 maximumParticipants: '$maximumParticipants',
                 category: '$category',
                 subCategory: '$subCategory',
-                descriptionForMentor: '$mentor.descriptionForMentor',
+                descriptionForMentor: '$mentor.mentor.descriptionForMentor',
                 intro: '$mentor.intro',
                 isGroup: '$isGroup',
                 _id: '$_id'
@@ -146,7 +141,7 @@ module.exports = async (req, res) => {
             }, {
               // 페이지네이션 카드 정보 및  카드 수 리턴
               $facet: {
-                cardList: [{ $skip: (req.query.page - 1) * (req.query.size || 16) }, { $limit: Number(req.query.size) || 16 }],
+                cardList: [{ $skip: (Number(req.query.page) - 1) * (Number(req.query.size) || 16) }, { $limit: Number(req.query.size) || 16 }],
                 totalCount: [
                   {
                     $count: 'count'
@@ -201,7 +196,7 @@ module.exports = async (req, res) => {
           // 페이지네이션에 필요한 페이지 요청시
           if (req.query.page) {
           // (req.query.page - 1) * 16 개를 뛰어넘고
-            option.skip = (Number(req.query.page) - 1) * 16;
+            option.skip = (Number(req.query.page) - 1) * (req.query.size || 16);
             if (req.query.limit) option.skip = (Number(req.query.page) - 1) * req.query.limit;
 
             // 이후 16개를 쿼리한다.

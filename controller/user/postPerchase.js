@@ -79,7 +79,8 @@ module.exports = async (req, res) => {
                           purchaseHistoryModel.findByIdAndDelete({ _id: mongoose.Types.ObjectId(data._id) })
                             .then(() => {
                               return mentoringModel.findByIdAndUpdate({ _id: mongoose.Types.ObjectId(data.targetId) }, { $inc: { joinedParticipants: -1 } });
-                            });
+                            })
+                            .then(() => {});
                         }
                       });
                   }, 1000 * 60 * 20, createdDoc.merchantUid);
@@ -139,7 +140,8 @@ module.exports = async (req, res) => {
                       purchaseHistoryModel.findByIdAndDelete({ _id: mongoose.Types.ObjectId(data._id) })
                         .then((data) => {
                           return mentoringModel.findByIdAndUpdate({ _id: mongoose.Types.ObjectId(data.targetId) }, { $inc: { joinedParticipants: -1 } });
-                        });
+                        })
+                        .then(() => {});
                     }
                   });
               }, 1000 * 60 * 20, createdDoc.merchantUid);

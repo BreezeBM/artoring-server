@@ -25,6 +25,10 @@ module.exports = async (req, res) => {
         break;
       }
       default: {
+        userModel.updateOne({
+          _id: mongoose.Types.ObjectId(decode._id),
+          name: decode.name,
+        }, { $set: { loginedAt: new Date() } });
         userModel.findOne({
           _id: mongoose.Types.ObjectId(decode._id),
           name: decode.name,
@@ -50,6 +54,7 @@ module.exports = async (req, res) => {
       }
     }
   } else if (email) {
+    userModel.updateOne({ email }, { $set: { loginedAt: new Date() } });
     userModel.findOne({ email })
       .select({
         _id: 1,

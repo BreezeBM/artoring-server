@@ -22,7 +22,7 @@ module.exports = async (req, res) => {
     const sns = userData.sns.filter(ele =>
       ele.snsType !== type);
     // 연동 해제용 인증 코드 요청 데이터.
-    res.status(400).json({ sns });
+    res.status(200).json({ code: 400, sns });
     return;
   }
 

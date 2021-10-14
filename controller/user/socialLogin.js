@@ -66,19 +66,37 @@ module.exports = async (req, res) => {
 
     const registered = await userModel
       .findOne({ email: userData.email })
-      .select({ _id: 1, thumb: 1, name: 1, email: 1, phone: 1, verifiedPhone: 1, isMentor: 1, likedCareerEdu: 1, likedMentor: 1, likedInfo: 1, verifiedEmail: 1, createdAt: 1 });
+      .select({ _id: 1, thumb: 1, name: 1, email: 1, phone: 1, verifiedPhone: 1, isMentor: 1, likedCareerEdu: 1, likedMentor: 1, likedInfo: 1, verifiedEmail: 1, createdAt: 1, sns: 1 });
 
     if (req.cookies.authorization && req.cookies.authorization !== '') {
       res.status(200).json(registered);
     } else if (registered) {
-      res.cookie('authorization', `Bearer ${access_token || token} ${type}`, {
-        secure: true,
-        httpOnly: true,
-        // domain: process.env.NODE_ENV === 'development' ? 'localhost' : 'back.artoring.com',
-        maxAge: 3600 * 1000,
-        sameSite: 'none',
-        path: '/'
-      }).status(200).json({ trimedData: registered });
+      // 등록된 이메일의 경우는 소셜로그인 종류 확인 및 토큰 발급.
+      // 등록된 소셜 로그인의 경우
+      if (!registered.sns || registered.sns.findIndex(ele => ele.snsType === type) === -1) {
+        userModel.findOneAndUpdate({ email: userData.email }, { $push: { sns: { appId: userData.appId, snsType: userData.snsType } } })
+          .then(() => {
+            res.cookie('authorization', `Bearer ${access_token || token} ${type}`, {
+              secure: true,
+              httpOnly: true,
+              // domain: process.env.NODE_ENV === 'development' ? 'localhost' : 'back.artoring.com',
+              maxAge: 3600 * 1000,
+              sameSite: 'none',
+              path: '/'
+            }).status(200).json({ trimedData: registered });
+          });
+
+      // 등록되지 않은 소셜 로그인의 경우
+      } else {
+        res.cookie('authorization', `Bearer ${access_token || token} ${type}`, {
+          secure: true,
+          httpOnly: true,
+          // domain: process.env.NODE_ENV === 'development' ? 'localhost' : 'back.artoring.com',
+          maxAge: 3600 * 1000,
+          sameSite: 'none',
+          path: '/'
+        }).status(200).json({ trimedData: registered });
+      }
     } else {
       trimUserData(userData);
 

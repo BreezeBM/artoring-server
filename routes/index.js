@@ -12,6 +12,8 @@ const purchaseRouter = require('./purchase');
 const adminRouter = require('./admin');
 const mentorRouter = require('./mentor');
 
+const findCredentialRouter = require('./credential');
+
 const { userController } = require('../controller');
 
 router.use('/career', careerRouter);
@@ -26,6 +28,8 @@ router.use('/admin', adminRouter);
 
 // 아임포트 결제완료 웹훅
 router.post('/iamport', userController.payment.webhook);
+
+router.use('/credent', findCredentialRouter);
 
 router.use('/', userRouter);
 

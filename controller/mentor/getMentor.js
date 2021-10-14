@@ -23,8 +23,9 @@ module.exports = async (req, res) => {
             avaliableTime: '$mentor.avaliableTime',
             descriptionForMentor: '$mentor.descriptionForMentor',
             category: '$mentor.category',
-            userName: '$name',
             thumb: '$mentor.thumb',
+            userName: '$name',
+            current: '$current',
             id: '$_id'
           }
         }

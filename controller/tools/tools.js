@@ -85,6 +85,7 @@ const aesEncrypt = (string) => {
   );
 
   const cipher = crypto.createCipheriv('aes-256-ctr', key, iv);
+  console.log(string, typeof string);
   let result = cipher.update(string, 'utf8', 'hex');
   result += cipher.final('hex');
 

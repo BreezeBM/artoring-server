@@ -7,7 +7,7 @@ module.exports = async (req, res) => {
   const decode = await verifyJWTToken(req);
   const { pwd, pwdChk } = req.body;
 
-  const saltRounds = Number(process.env.SALT_ROUNDS);
+  const saltRounds = Number(process.env.NODE_ENV === 'development' ? process.env.HASHING_TIME_DEV : process.env.HASHING_TIME_PRO);
 
   switch (decode) {
     case 401: {

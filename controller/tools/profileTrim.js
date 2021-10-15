@@ -9,7 +9,8 @@ const trimNaver = (profile) => {
   if (profile.name) result.name = profile.name;
   if (profile.mobile) {
     result.phone = profile.mobile;
-    result.verifiedPhone = true;
+    if (profile.phone !== '') result.verifiedPhone = true;
+    else result.verifiedPhone = false;
   }
   if (profile.birthday && profile.birthyear) { result.birth = profile.birthyear.concat(' ', profile.birthday); }
 

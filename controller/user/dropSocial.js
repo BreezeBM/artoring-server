@@ -80,7 +80,7 @@ module.exports = async (req, res) => {
         likedMentor = userData.likedMentor;
         likedInfo = userData.likedInfo;
 
-        userModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(userId) }, {
+        return userModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(userId) }, {
           $set: {
             drop: {
               reason: req.body.reason,
@@ -140,8 +140,9 @@ module.exports = async (req, res) => {
             });
 
             // 멘토링 정보 삭제
-            promise
-              .all(() => reviewModel.updateMany({ userId: mongoose.Types.ObjectId(req.body._id) }, { userName: '탈퇴한 사용자', text: '탈퇴한 사용자 입니다.', rate: 0, userThumb: 'https://artoring.com/image/1626851218536.png' }))
+            return Promise
+              .all(promise)
+              .then(() => reviewModel.updateMany({ userId: mongoose.Types.ObjectId(req.body._id) }, { userName: '탈퇴한 사용자', text: '탈퇴한 사용자 입니다.', rate: 0, userThumb: 'https://artoring.com/image/1626851218536.png' }))
               .then(() => reviewModel.find({ userId: mongoose.Types.ObjectId(req.body._id) }))
               .then(list => Promise.all(list.map(ele => mentoringModel.findOne({ _id: mongoose.Types.ObjectId(ele.targetId) }))))
               .then(list => Promise.all(list.map(ele => {
@@ -162,9 +163,6 @@ module.exports = async (req, res) => {
               .then(() => {
                 res.cookie('authorization', '', { expires: new Date(date().add(9, 'hours').format()) });
                 res.status(200).send();
-              }).catch(e => {
-                console.log(e);
-                res.status(500).send();
               });
           });
       }).catch(e => {
@@ -290,7 +288,8 @@ module.exports = async (req, res) => {
             });
         });
 
-        promise.all(() => reviewModel.find({ userId: mongoose.Types.ObjectId(userId) }))
+        return Promise.all(promise)
+          .then(() => reviewModel.find({ userId: mongoose.Types.ObjectId(userId) }))
           .then(list => Promise.all(list.map(ele => mentoringModel.findOne({ _id: mongoose.Types.ObjectId(ele.targetId) }))))
           .then(list => Promise.all(list.map(ele => {
             let count = ele.rateCount;
@@ -310,15 +309,15 @@ module.exports = async (req, res) => {
           .then(() => {
             res.cookie('authorization', '', { expires: new Date(date().add(9, 'hours').format()) });
             res.status(200).json({ url: `https://artoring.com/drop/facebook?id=${userId}`, confirmation_code: `${userId}Deleted!` });
-          })
-          .catch(e => {
-            console.log(e);
-
-            // 해당 유저가 없는경우
-            if (e.message === '1') {
-              res.status(404).send();
-            } else { res.status(500).send(); }
           });
+      })
+      .catch(e => {
+        console.log(e);
+
+        // 해당 유저가 없는경우
+        if (e.message === '1') {
+          res.status(404).send();
+        } else { res.status(500).send(); }
       });
   }
 }

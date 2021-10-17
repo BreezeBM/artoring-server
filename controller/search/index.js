@@ -126,7 +126,7 @@ const searchEngine = async (callback, keyword, model, page) => {
                 minimum_should_match: 1,
                 must: {
                   term: {
-                    isGroup: true
+                    isGroup: false
                   }
                 }
               }
@@ -148,7 +148,7 @@ const searchEngine = async (callback, keyword, model, page) => {
               bool: {
                 must: {
                   term: {
-                    isGroup: true
+                    isGroup: false
                   }
                 }
               }
@@ -187,7 +187,7 @@ const searchEngine = async (callback, keyword, model, page) => {
                     minimum_should_match: 1,
                     must: {
                       term: {
-                        isGroup: false
+                        isGroup: true
                       }
                     }
                   }
@@ -209,7 +209,7 @@ const searchEngine = async (callback, keyword, model, page) => {
                   bool: {
                     must: {
                       term: {
-                        isGroup: false
+                        isGroup: true
                       }
                     }
                   }
@@ -219,7 +219,7 @@ const searchEngine = async (callback, keyword, model, page) => {
       })
       .then(data => {
         mentorQueryResult = data.body.hits;
-        console.log(keyword);
+
         return client.search(keyword[0] !== ''
           ? {
               index: 'news',
@@ -263,7 +263,6 @@ const searchEngine = async (callback, keyword, model, page) => {
             });
       })
       .then(data => {
-        console.log('news', data);
         newsQueryResult = data.body.hits;
         callback(null, { teachQueryResult, mentorQueryResult, newsQueryResult });
       })

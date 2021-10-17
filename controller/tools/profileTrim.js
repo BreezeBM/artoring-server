@@ -2,14 +2,18 @@
 
 const trimNaver = (profile) => {
   const result = {};
-  result.appId = profile.id;
-  result.snsType = 'naver';
+  result.sns = [{
+
+  }];
+  result.sns[0].appId = profile.id;
+  result.sns[0].snsType = 'naver';
   if (profile.nickname) result.nickName = profile.nickname;
   if (profile.email) result.email = profile.email;
   if (profile.name) result.name = profile.name;
   if (profile.mobile) {
     result.phone = profile.mobile;
-    result.verifiedPhone = true;
+    if (profile.phone !== '') result.verifiedPhone = true;
+    else result.verifiedPhone = false;
   }
   if (profile.birthday && profile.birthyear) { result.birth = profile.birthyear.concat(' ', profile.birthday); }
 
@@ -19,8 +23,13 @@ const trimNaver = (profile) => {
 // 카카오 서버에서 전송되는 유저정보를 스키마에 맞게 재구성
 const trimKakao = (account) => {
   const result = {};
-  result.appId = account.id; // 연결끊기에서 카카오 id가 이메일 대신 전달됨. 이때 사용됨
-  result.snsType = 'kakao';
+  result.sns = [{
+
+  }];
+
+  result.sns[0].appId = account.id;
+  result.sns[0].snsType = 'kakao';
+
   if (!account.profile_nickname_needs_agreement && account.profile && account.profile.nickname) result.name = account.profile.name || account.profile.nickname;
   if (!account.profile_image_needs_agreement && account.profile && account.profile.thumbnail_image_url) result.thumb = account.profile.thumbnail_image_url;
   if (!account.email_needs_agreement && account.has_email && account.is_email_valid && account.is_email_verified) result.email = account.email;
@@ -31,8 +40,11 @@ const trimKakao = (account) => {
 
 const trimFacebook = (data) => {
   const result = {};
-  result.snsType = 'facebook';
-  result.appId = data.id;
+
+  result.sns = [{}];
+  result.sns[0].appId = data.id;
+  result.sns[0].snsType = 'facebook';
+
   if (data.name) result.name = data.name;
   if (data.picture && data.picture.data && data.picture.data.url) result.thumb = data.picture.data.url;
   if (data.birthday) result.birth = data.birthday;

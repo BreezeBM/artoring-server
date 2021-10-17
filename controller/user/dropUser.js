@@ -12,15 +12,13 @@ module.exports = async (req, res) => {
 
   const userData = await userModel.findById(mongoose.Types.ObjectId(_id));
 
-  let isSocial = true;
+  let isSocial = false;
 
   // 이메일로 가입하고 소셜 로그인을 연동한 경우
-  if (userData.sns.length > 0) { isSocial = false; }
+  if (userData.sns.length > 0) { isSocial = true; }
 
   if (isSocial) {
-    const type = req.cookies.authorization.split(' ')[2];
-    const sns = userData.sns.filter(ele =>
-      ele.snsType !== type);
+    const sns = userData.sns;
     // 연동 해제용 인증 코드 요청 데이터.
     res.status(200).json({ code: 400, sns });
     return;

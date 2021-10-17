@@ -18,9 +18,7 @@ module.exports = async (req, res) => {
   if (userData.sns.length > 0) { isSocial = true; }
 
   if (isSocial) {
-    const type = req.cookies.authorization.split(' ')[2];
-    const sns = userData.sns.filter(ele =>
-      ele.snsType !== type);
+    const sns = userData.sns;
     // 연동 해제용 인증 코드 요청 데이터.
     res.status(200).json({ code: 400, sns });
     return;

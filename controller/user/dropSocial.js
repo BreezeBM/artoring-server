@@ -26,6 +26,7 @@ module.exports = async (req, res) => {
 
   // 클라이언트에서 회원탈퇴 요청이 들어온 경우
   if (req.body._id) {
+    console.log('test');
     const split = req.cookies.authorization.split(' ');
     const accessToken = split[0].concat(' ', split[1]);
 
@@ -71,11 +72,12 @@ module.exports = async (req, res) => {
           paymentInfo: ''
         }
       }
-    })
+    }, { new: false })
+    // userModel.findOne({ _id: mongoose.Types.ObjectId(req.body._id) })
       .then((userData) => {
         userId = userData._id;
-        sns = userData.sns.filter(ele =>
-          ele.snsType !== split[2]);
+        sns = userData.sns;
+
         likedCareerEdu = userData.likedCareerEdu;
         likedMentor = userData.likedMentor;
         likedInfo = userData.likedInfo;
@@ -84,19 +86,23 @@ module.exports = async (req, res) => {
           $set: {
             drop: {
               reason: req.body.reason,
-              name: userData.name
+              name: userData.name,
+              date: new Date(date().add(9, 'hours').format())
             }
           }
         })
         // 쿠키에 있는 토큰 제외 3사 엑세스 토큰 발급.
           .then(() => {
-            sns.push({ access_token: accessToken, snsType: split[2] });
-            const promise = sns.map((ele, key) => {
+            // sns.push({ access_token: accessToken, snsType: split[2], appId: });
+            return sns.map((ele, key) => {
               let url;
               let clientId;
               let clientSecret;
               let contentType;
-              if (ele.access_token) return Promise.resolve(ele);
+
+              if (ele.snsType === split[2] || ele.snsType === 'facebook') {
+                return ele;
+              }
 
               const redirect_uri = process.env.NODE_ENV === 'development' ? `https://localhost:3000/callback/${ele.snsType}` : `https://artoring.com/callback/${ele.snsType}`;
               if (ele.snsType === 'kakao') {
@@ -111,37 +117,39 @@ module.exports = async (req, res) => {
                 clientSecret = process.env.NAVER_SEC;
               }
 
-              return axios.get(url.concat(`client_id=${clientId}&client_secret=${clientSecret}&grant_type=authorization_code&redirect_uri=${redirect_uri}&code=${codes[ele.snsType]}&state=${state}`), {
+              return axios.get(url.concat(`client_id=${clientId}&client_secret=${clientSecret}&grant_type=authorization_code&redirect_uri=${redirect_uri}&code=${codes[ele.snsType].code}&state=${codes[ele.snsType].state}`), {
                 'Content-Type': contentType
-              })
-                // 3사 앱 연결끊기.
-                .then(response => {
-                  ({ access_token, refresh_token } = response.data || response);
-
-                  let proof;
-                  if (ele.snsType === 'facebook') proof = sha256Encrypt(999, fbToken, process.env.FACEBOOK_SEC);
-
-                  const url = ele.snsType === 'kakao'
-                    ? 'https://kapi.kakao.com/v1/user/unlink'
-                    : ele.snsType === 'naver'
-                      ? `https://nid.naver.com/oauth2.0/token?grant_type=delete&access_token=${access_token}&client_id=${process.env.CLIENT_ID}&client_secret=${process.env.CLIENT_SECRET}`
-                      : `https://graph.facebook.com/v11.0/${ele.appId}/permissions?appsecret_proof=${proof}&access_token=${fbToken}`;
-
-                  return ele.snsType !== 'facebook'
-                    ? ele.snsType === 'kakao'
-                        ? axios.get(url, {
-                            headers: {
-                              authorization: accessToken
-                            }
-                          })
-                        : axios.get(url)
-                    : axios.delete(url);
-                });
+              });
             });
-
+          })
+          .then(promise => {
             // 멘토링 정보 삭제
             return Promise
-              .all(promise)
+              .all(promise.map(ele => {
+              // 3사 앱 연결끊기.
+
+                ({ access_token, refresh_token } = ele.data || ele);
+
+                let proof;
+                if (ele.snsType === 'facebook') proof = sha256Encrypt(999, fbToken || access_token || split[1], process.env.FACEBOOK_SEC);
+
+                const url = ele.snsType === 'kakao'
+                  ? 'https://kapi.kakao.com/v1/user/unlink'
+                  : ele.snsType === 'naver'
+                    ? `https://nid.naver.com/oauth2.0/token?grant_type=delete&access_token=${access_token || accessToken}&client_id=${process.env.CLIENT_ID}&client_secret=${process.env.CLIENT_SECRET}`
+                    : `https://graph.facebook.com/v11.0/${ele.appId}/permissions?appsecret_proof=${proof}&access_token=${fbToken || access_token || split[1]}`;
+
+                return ele.snsType !== 'facebook'
+                  ? ele.snsType === 'kakao'
+                      ? axios.get(url, {
+                          headers: {
+                            Authorization: `${accessToken}`
+                          }
+                        })
+                      : axios.get(url)
+                  : axios.delete(url);
+              })
+              )
               .then(() => reviewModel.updateMany({ userId: mongoose.Types.ObjectId(req.body._id) }, { userName: '탈퇴한 사용자', text: '탈퇴한 사용자 입니다.', rate: 0, userThumb: 'https://artoring.com/image/1626851218536.png' }))
               .then(() => reviewModel.find({ userId: mongoose.Types.ObjectId(req.body._id) }))
               .then(list => Promise.all(list.map(ele => mentoringModel.findOne({ _id: mongoose.Types.ObjectId(ele.targetId) }))))
@@ -153,7 +161,7 @@ module.exports = async (req, res) => {
 
                 return mentoringModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(ele._id) }, { $set: { count, rate } });
               })))
-              // 멘토였던 사람의 경우 좋아요를 해둔 다른 사람들 정보까지 제거.
+            // 멘토였던 사람의 경우 좋아요를 해둔 다른 사람들 정보까지 제거.
               .then(list => Promise.all(list.map(ele => userModel.findOneAndUpdate({ $or: [{ likedCareerEdu: { $in: [ele._id] } }, { likedMentor: { $in: [userId] } }] }, { $pull: { likedCareerEdu: ele._id, likedMentor: userId } }))))
               .then(() => {
                 return Promise.all(likedCareerEdu.map(ele => mentoringModel.findByIdAndUpdate({ _id: mongoose.Types.ObjectId(ele) }, { $inc: { likesCount: -1 } })))
@@ -253,42 +261,42 @@ module.exports = async (req, res) => {
           },
           drop: {
             name: userName,
-            reason: req.body.reason
+            reason: req.body.reason,
+            date: new Date(date().add(9, 'hours').format())
           }
         }
       }))
       .then(() => {
-        const promise = sns.map((ele, key) => {
-          if (ele.snsType === 'kakao') return Promise.resolve('kakao');
+        return sns.map((ele, key) => {
+          if (ele.snsType === 'kakao') return { appId: ele.appId, snsType: 'kakao' };
 
           const url = `https://graph.facebook.com/oauth/access_token?client_id=${process.env.FACEBOOK_ID}&client_secret=${process.env.FACEBOOK_SEC}&grant_type=client_credentials`;
-
-          return axios.get(url)
-            // 2사 앱 연결끊기.
-            .then(response => {
-              ({ access_token, refresh_token } = response.data || response);
-
-              let proof;
-              if (ele.snsType === 'facebook') proof = sha256Encrypt(999, access_token, process.env.FACEBOOK_SEC);
-
-              const url = ele.snsType === 'kakao'
-                ? 'https://kapi.kakao.com/v1/user/unlink'
-                : `https://graph.facebook.com/v11.0/${ele.appId}/permissions?appsecret_proof=${proof}&access_token=${access_token}`;
-
-              return ele.snsType !== 'facebook'
-                ? axios.post(url, {
-                    target_id_type: 'user_id',
-                    target_id: ele.appId
-                  }, {
-                    headers: {
-                      authorization: `KakaoAK ${process.env.KAKAO_ADM}`
-                    }
-                  })
-                : axios.delete(url);
-            });
+          return axios.get(url);
         });
+      })
+      .then(promise => {
+        return Promise.all(promise.map(ele => {
+          // 2사 앱 연결끊기.
+          ({ access_token, refresh_token } = response.data || response);
 
-        return Promise.all(promise)
+          let proof;
+          if (ele.snsType === 'facebook') proof = sha256Encrypt(999, access_token, process.env.FACEBOOK_SEC);
+
+          const url = ele.snsType === 'kakao'
+            ? 'https://kapi.kakao.com/v1/user/unlink'
+            : `https://graph.facebook.com/v11.0/${ele.appId}/permissions?appsecret_proof=${proof}&access_token=${access_token}`;
+
+          return ele.snsType !== 'facebook'
+            ? axios.post(url, {
+                target_id_type: 'user_id',
+                target_id: ele.appId
+              }, {
+                headers: {
+                  authorization: `KakaoAK ${process.env.KAKAO_ADM}`
+                }
+              })
+            : axios.delete(url);
+        }))
           .then(() => reviewModel.find({ userId: mongoose.Types.ObjectId(userId) }))
           .then(list => Promise.all(list.map(ele => mentoringModel.findOne({ _id: mongoose.Types.ObjectId(ele.targetId) }))))
           .then(list => Promise.all(list.map(ele => {

@@ -106,7 +106,6 @@ module.exports = {
                     }
                   })
                   .then(result => {
-                    console.log(result);
                     // 비밀번호가 이전거와 일치
                     if (result) {
                       res.status(200).send({ code: 400, message: 'same password' });

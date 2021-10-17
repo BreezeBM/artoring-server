@@ -26,7 +26,6 @@ module.exports = async (req, res) => {
 
   // 클라이언트에서 회원탈퇴 요청이 들어온 경우
   if (req.body._id) {
-    console.log('test');
     const split = req.cookies.authorization.split(' ');
     const accessToken = split[0].concat(' ', split[1]);
 

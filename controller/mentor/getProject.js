@@ -58,6 +58,7 @@ module.exports = async (req, res) => {
                 { $lookup: { from: 'usermodels', as: 'users', localField: 'userId', foreignField: '_id' } },
                 // { $unwind: '$users' },
                 // 해당 포멧으로 리턴함.
+                { $unwind: '$users' },
                 {
                   $project: {
                     zoomLike: '$zoomLink',
@@ -67,6 +68,7 @@ module.exports = async (req, res) => {
                     userThumb: '$users.thumb',
                     userName: '$users.name',
                     major: '$users.major',
+                    gender: '$users.gender',
                     current: '$users.current',
                     interestedIn: '$users.interestedIn',
                     questions: '$questions'

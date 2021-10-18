@@ -7,6 +7,7 @@ const trimNaver = (profile) => {
   }];
   result.sns[0].appId = profile.id;
   result.sns[0].snsType = 'naver';
+  result.verifiedEmail = true;
   if (profile.nickname) result.nickName = profile.nickname;
   if (profile.email) result.email = profile.email;
   if (profile.name) result.name = profile.name;
@@ -29,6 +30,7 @@ const trimKakao = (account) => {
 
   result.sns[0].appId = account.id;
   result.sns[0].snsType = 'kakao';
+  result.verifiedEmail = true;
 
   if (!account.profile_nickname_needs_agreement && account.profile && account.profile.nickname) result.name = account.profile.name || account.profile.nickname;
   if (!account.profile_image_needs_agreement && account.profile && account.profile.thumbnail_image_url) result.thumb = account.profile.thumbnail_image_url;
@@ -44,6 +46,8 @@ const trimFacebook = (data) => {
   result.sns = [{}];
   result.sns[0].appId = data.id;
   result.sns[0].snsType = 'facebook';
+
+  result.verifiedEmail = true;
 
   if (data.name) result.name = data.name;
   if (data.picture && data.picture.data && data.picture.data.url) result.thumb = data.picture.data.url;

@@ -165,7 +165,7 @@ const verifyAndCallback = async function (callback, type, accessToken, res, user
 
       // 토큰 검증 에러 핸들러
     }).catch(err => {
-      console.log(err);
+      console.log('error', err);
       // 카카오 토큰 에러. -1, -2는 카카오의 서버응답이 없거나 인수를 잘못 적었을때
       if (err.message.code !== -1 || err.message.code !== -2) {
         console.log('token expired', err);
@@ -175,6 +175,7 @@ const verifyAndCallback = async function (callback, type, accessToken, res, user
         // 10번 동안 인터벌로 유효성 검사 시도.
       } else {
         let count = 0;
+        console.log('here?');
         const timer = setInterval(async (...args) => {
           if (count >= args[0]) {
             res.status(500).json({ code: 500, desc: 'OAuth Server no response' });

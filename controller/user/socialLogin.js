@@ -46,6 +46,8 @@ module.exports = async (req, res) => {
 
         // 선언없이 구조분해 할당을 사용/
         ({ access_token, refresh_token } = response.data);
+
+        // 프로필 요청 혹은 토큰검증을 통해 id를 가져와야 한다.
       }
     } else {
       token = token || req.cookies.authorization.split(" ")[1];
@@ -61,7 +63,7 @@ module.exports = async (req, res) => {
       ? "https://openapi.naver.com/v1/nid/me" // 네이버
       : type === "kakao"
       ? "https://kapi.kakao.com//v2/user/me" // 카카오
-      : `https://graph.facebook.com/v11.0/${id}?fields=id,name,picture,birthday,email,gender&appsecret_proof=${proof}&access_token=${token}`; // 페이스북
+      : `https://graph.facebook.com/v11.0/${id}?fields=id,name,picture,birthday,email&appsecret_proof=${proof}&access_token=${token}`; // 페이스북
 
     let response;
     type !== "facebook"
@@ -95,28 +97,78 @@ module.exports = async (req, res) => {
         likedInfo: 1,
         verifiedEmail: 1,
         createdAt: 1,
+        sns: 1,
       });
-
-    // 로그인 시간 기록 저장
-    await userModel.updateOne({ email: userData.email }, {
-      $set: { loginedAt: new Date() },
-    });
 
     if (req.cookies.authorization && req.cookies.authorization !== "") {
       res.status(200).json(registered);
     } else if (registered) {
-      res.cookie("authorization", `Bearer ${access_token || token} ${type}`, {
-        secure: true,
-        httpOnly: true,
-        // domain: process.env.NODE_ENV === 'development' ? 'localhost' : 'back.artoring.com',
-        maxAge: 3600 * 1000,
-        sameSite: "none",
-        path: "/",
-      }).status(200).json({ trimedData: registered });
+      // 등록된 이메일의 경우는 소셜로그인 종류 확인 및 토큰 발급.
+      // 등록되어 있지 않은 소셜 로그인의 경우
+      if (
+        !registered.sns ||
+        registered.sns.findIndex((ele) => ele.snsType === type) === -1
+      ) {
+        // 유저 id 정보를 토큰검증을 통해 획득한다.
+        if (type === "kakao") {
+          const { data: tokenInfo } = await axios.get(
+            "https://kapi.kakao.com/v1/user/access_token_info",
+            {
+              headers: {
+                authorization: `Bearer ${access_token}`,
+                "Content-type":
+                  "application/x-www-form-urlencoded;charset=utf-8",
+              },
+            },
+          );
+          userData.sns[0].appId = tokenInfo.id;
+        }
+
+        userModel.findOneAndUpdate({ email: userData.email }, {
+          $push: { sns: userData.sns[0] },
+        })
+          .then(() => {
+            res.cookie(
+              "authorization",
+              `Bearer ${access_token || token} ${type}`,
+              {
+                secure: true,
+                httpOnly: true,
+                // domain: process.env.NODE_ENV === 'development' ? 'localhost' : 'back.artoring.com',
+                maxAge: 3600 * 1000,
+                sameSite: "none",
+                path: "/",
+              },
+            ).status(200).json({ trimedData: registered });
+          });
+
+        // 등록되어 있는 소셜 로그인의 경우
+      } else {
+        res.cookie("authorization", `Bearer ${access_token || token} ${type}`, {
+          secure: true,
+          httpOnly: true,
+          // domain: process.env.NODE_ENV === 'development' ? 'localhost' : 'back.artoring.com',
+          maxAge: 3600 * 1000,
+          sameSite: "none",
+          path: "/",
+        }).status(200).json({ trimedData: registered });
+      }
     } else {
       trimUserData(userData);
 
-      userData.verifiedEmail = true;
+      // 카카오 id를 토큰검증을 통해 확인
+      if (type === "kakao") {
+        const { data: tokenInfo } = await axios.get(
+          "https://kapi.kakao.com/v1/user/access_token_info",
+          {
+            headers: {
+              authorization: `Bearer ${access_token}`,
+              "Content-type": "application/x-www-form-urlencoded;charset=utf-8",
+            },
+          },
+        );
+        userData.sns[0].appId = tokenInfo.id;
+      }
 
       const createdDoc = await userModel.create(userData);
       userData._id = createdDoc._id;

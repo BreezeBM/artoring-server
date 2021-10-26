@@ -17,6 +17,8 @@ const logout = require('./logout');
 const dropUser = require('./dropUser');
 const dropSocial = require('./dropSocial');
 
+const findCredential = require('./findCredent');
+
 const careerCardController = {
   getProfile,
   putProfile,
@@ -34,7 +36,8 @@ const careerCardController = {
   dropUser,
   dropSocial,
   payment,
-  postQuestions
+  postQuestions,
+  findCredential
 };
 
 module.exports = careerCardController;

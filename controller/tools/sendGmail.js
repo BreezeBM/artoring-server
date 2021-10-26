@@ -23,7 +23,7 @@ const sendGMAIL = async function (data, email = data.email, res, emailData) {
   await authClient.authorize();
   const gmail = new gmail_v1.Gmail({ auth: authClient });
 
-  if (!option) {
+  if (!emailData) {
     res.cookie("authorization", `Bearer ${accessToken} email`, {
       secure: true,
       httpOnly: true,
@@ -33,7 +33,7 @@ const sendGMAIL = async function (data, email = data.email, res, emailData) {
       path: "/",
     });
     return res.status(200).json({ responses, accessToken });
-  } else if (option) {
+  } else if (emailData) {
     const subject = emailData.subject;
     const utf8Subject = `=?utf-8?B?${
       Buffer.from(subject).toString("base64")

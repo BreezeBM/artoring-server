@@ -4,10 +4,24 @@ require("dotenv").config();
 
 const { createJWT, aesEncrypt } = require("./tools");
 
-const sendGMAIL = async function (data, email = data.email, res, option) {
+const sendGMAIL = async function (data, email = data.email, res, emailData) {
   const { userData, accessToken } = data;
   const encryptEmail = await aesEncrypt(email);
   const verifyToken = await createJWT({ encryptEmail }, 600);
+
+  const authClient = new google.auth.JWT({
+    keyFile: process.env.CREDENTIAL_LOCATION,
+    scopes: [
+      "https://mail.google.com/",
+      "https://www.googleapis.com/auth/gmail.modify",
+      "https://www.googleapis.com/auth/gmail.compose",
+      "https://www.googleapis.com/auth/gmail.send",
+    ],
+    subject: "no-reply@artoring.com",
+  });
+
+  await authClient.authorize();
+  const gmail = new gmail_v1.Gmail({ auth: authClient });
 
   if (!option) {
     res.cookie("authorization", `Bearer ${accessToken} email`, {
@@ -19,23 +33,34 @@ const sendGMAIL = async function (data, email = data.email, res, option) {
       path: "/",
     });
     return res.status(200).json({ responses, accessToken });
-  } else {
-    const authClient = new google.auth.JWT({
-      keyFile: "../../credentials.json",
-      scopes: [
-        "https://mail.google.com/",
-        "https://www.googleapis.com/auth/gmail.modify",
-        "https://www.googleapis.com/auth/gmail.compose",
-        "https://www.googleapis.com/auth/gmail.send",
-      ],
-      subject: "no-reply@artoring.com",
+  } else if (option) {
+    const subject = emailData.subject;
+    const utf8Subject = `=?utf-8?B?${
+      Buffer.from(subject).toString("base64")
+    }?=`;
+    const messageParts = [
+      "From: no-reply@artoring.com",
+      `To: ${userData.email}`,
+      "Content-Type: text/html; charset=utf-8",
+      "MIME-Version: 1.0",
+      `Subject: ${utf8Subject}`,
+      `${emailData.html}`,
+    ];
+    const message = messageParts.join("\n");
+
+    const encodedMessage = Buffer.from(message)
+      .toString("base64")
+      .replace(/\+/g, "-")
+      .replace(/\//g, "_")
+      .replace(/=+$/, "");
+
+    await gmail.users.messages.send({
+      userId: "no-reply@artoring.com",
+      requestBody: {
+        raw: encodedMessage,
+      },
     });
-
-    await authClient.authorize();
-    const gmail = new gmail_v1.Gmail({ auth: authClient });
-
-    // You can use UTF-8 encoding for the subject using the method below.
-    // You can also just use a plain string if you don't need anything fancy.
+  } else {
     const subject = "[아토링] 인증 관련 이메일 입니다.";
     const utf8Subject = `=?utf-8?B?${
       Buffer.from(subject).toString("base64")
@@ -82,7 +107,6 @@ const sendGMAIL = async function (data, email = data.email, res, option) {
     ];
     const message = messageParts.join("\n");
 
-    // The body needs to be base64url encoded.
     const encodedMessage = Buffer.from(message)
       .toString("base64")
       .replace(/\+/g, "-")

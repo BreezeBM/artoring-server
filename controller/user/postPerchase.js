@@ -4,7 +4,7 @@ const { verifyJWTToken, verifyAndCallback, sha256Encrypt } = require('../tools')
 module.exports = async (req, res) => {
   const { cardId, userId, reservationType, startDate, endDate } = req.body;
   if (!req.cookies.authorization) {
-    res.status(401).send();
+    res.status(200).json({ code: 401, message: 'not authorized' });
     return;
   }
   const split = req.cookies.authorization.split(' ');

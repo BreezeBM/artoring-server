@@ -3,6 +3,11 @@ const { purchaseHistoryModel, mentoringModel, mongoose } = require('../../model'
 const { verifyJWTToken, verifyAndCallback, date } = require('../tools');
 // 아임포트 결제이후 결제 내역 검증 및 저장
 const post = (req, res) => {
+  if (!req.cookies.authorization) {
+    res.status(200).json({ code: 401, message: 'not authorized' });
+    return null;
+  }
+
   const { imp_uid, merchant_uid } = req.body;
 
   const split = req.cookies.authorization.split(' ');
@@ -108,7 +113,7 @@ const remove = async (req, res) => {
   const { merchantUid } = req.params;
 
   if (!req.cookies.authorization) {
-    res.status(401).send();
+    res.status(200).json({ code: 401, message: 'not authorized' });
     return;
   }
   const split = req.cookies.authorization.split(' ');

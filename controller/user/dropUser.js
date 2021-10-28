@@ -24,6 +24,11 @@ module.exports = async (req, res) => {
     return;
   }
 
+  if (!req.cookies.authorization) {
+    res.status(200).json({ code: 401, message: 'not authorized' });
+    return null;
+  }
+
   if (!req.cookies.authorization.includes('email')) {
     const [Bearer, token, snsType] = req.cookies.authorization.split(' ');
 
@@ -112,7 +117,7 @@ module.exports = async (req, res) => {
 
               rate /= count--;
 
-              return mentoringModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(ele._id) }, { $set: { count, rate } });
+              return mentoringModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(ele._id) }, { $set: { count, rate, tags: [], category: [], subCategory: [] } });
             })))
           // 멘토였던 사람의 경우 좋아요를 해둔 다른 사람들 정보까지 제거.
             .then(list => Promise.all(list.map(ele => userModel.findOneAndUpdate({ $or: [{ likedCareerEdu: { $in: [ele._id] } }, { likedMentor: { $in: [userId] } }] }, { $pull: { likedCareerEdu: ele._id, likedMentor: userId } }))))

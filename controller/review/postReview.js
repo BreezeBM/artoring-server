@@ -1,6 +1,11 @@
 const { reviewModel, purchaseHistoryModel, userModel, mongoose, mentoringModel } = require('../../model');
 const { verifyJWTToken, verifyAndCallback } = require('../tools');
 module.exports = async (req, res) => {
+  if (!req.cookies.authorization) {
+    res.status(200).json({ code: 401, message: 'not authorized' });
+    return null;
+  }
+
   const split = req.cookies.authorization.split(' ');
   const accessToken = split[0].concat(' ', split[1]);
   const type = split[2];

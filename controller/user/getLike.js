@@ -5,7 +5,7 @@ module.exports = async (req, res) => {
   const decode = await verifyJWTToken(req);
 
   if (!req.cookies.authorization) {
-    res.status(401).send();
+    res.status(200).json({ code: 401, message: 'not authorized' });
     return;
   }
   const split = req.cookies.authorization.split(' ');
@@ -45,11 +45,17 @@ module.exports = async (req, res) => {
               $lookup: {
               }
             },
-            { $skip: Math.pow((req.query.page - 1), queryType === 'info' ? 8 : 16) },
-            { $limit: queryType === 'info' ? 8 : 16 },
+            // { $skip: Math.pow((req.query.page - 1), queryType === 'info' ? 8 : 16) },
+            // { $limit: queryType === 'info' ? 8 : 16 },
             {
               $project: {
                 likedList: '$target'
+              }
+            },
+            {
+              $facet: {
+                cardList: [{ $skip: Math.pow((page - 1), queryType === 'info' ? 8 : 16) }, { $limit: queryType === 'info' ? 8 : 16 }],
+                total: [{ $count: 'count' }]
               }
             }
           ];
@@ -128,6 +134,12 @@ module.exports = async (req, res) => {
           {
             $project: {
               likedList: '$target'
+            }
+          },
+          {
+            $facet: {
+              cardList: [{ $skip: Math.pow((page - 1), queryType === 'info' ? 8 : 16) }, { $limit: queryType === 'info' ? 8 : 16 }],
+              total: [{ $count: 'count' }]
             }
           }
         ];

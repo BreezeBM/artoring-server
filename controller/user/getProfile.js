@@ -4,7 +4,7 @@ const { verifyJWTToken, verifyAndCallback } = require('../tools');
 
 module.exports = async (req, res) => {
   if (!req.cookies.authorization) {
-    res.status(401).send();
+    res.status(200).json({ code: 401, message: 'not authorized' });
 
     return;
   }

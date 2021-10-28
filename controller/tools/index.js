@@ -2,6 +2,7 @@ const { verifyJWTToken, createJWT, verifyAndCallback, sha256Encrypt, aesEncrypt,
 const { trimKakao, trimNaver, trimFacebook, trimUserData } = require('./profileTrim');
 const sendEmail = require('./sendEmail');
 const date = require('./date');
+const { createSeo, deleteSeo } = require('./seo');
 
 module.exports = {
   verifyJWTToken,
@@ -17,6 +18,8 @@ module.exports = {
   trimFacebook,
   trimUserData,
   sendEmail,
-  date
+  date,
+  createSeo,
+  deleteSeo
 }
 ;

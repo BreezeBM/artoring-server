@@ -23,6 +23,7 @@ app.use(cookieParser());
 
 app.use(helmet());
 
+
 const whitelist = [
   "https://insideart-dev.artoring.com",
   "https://artoring.com",
@@ -33,6 +34,7 @@ const whitelist = [
 
 // 휴면 계정
 // inactiveAccount()
+
 
 app.use(express.json({ extended: false }));
 app.use(express.urlencoded({ extended: true }));

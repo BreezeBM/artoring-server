@@ -1,5 +1,5 @@
 const { mentoringModel, adminModel, mongoose } = require('../../model');
-const { verifyJWTToken, aesDecrypt, AdminAccessException } = require('../tools');
+const { verifyJWTToken, aesDecrypt, AdminAccessException, deleteSeo } = require('../tools');
 
 module.exports = async (req, res) => {
   // delete 메서드는 바디를 가지지 않는다고 가정한다.
@@ -28,13 +28,19 @@ module.exports = async (req, res) => {
 
         const accKey = await aesDecrypt(accessKey);
 
-        const adminData = await adminModel.find({ name, accessKey: accKey });
-        if (!adminData) throw new AdminAccessException('no match found');
+        adminModel.find({ name, accessKey: accKey })
+          .then(adminData => {
+            if (!adminData) throw new AdminAccessException('no match found');
 
-        // 해당 카드 제거.
-        mentoringModel.findOneAndDelete({ _id: mongoose.Types.ObjectId(_id) })
-          .then(() => {
-            res.status(204).send();
+            // 해당 카드 제거.
+            mentoringModel.findOneAndDelete({ _id: mongoose.Types.ObjectId(_id) })
+              .then((cardData) => {
+                // 크롤링 html 파일 제거
+                deleteSeo(`/static/html/career/growing/${cardData.isGroup ? 'teach' : 'mentor'}/${cardData._id}/index.html`)
+                  .then(() => {
+                    res.status(204).send();
+                  });
+              });
           });
       } catch (e) {
         console.log(e);

@@ -1,7 +1,7 @@
 const createDOMPurify = require('dompurify');
 const { JSDOM } = require('jsdom');
 
-const { verifyJWTToken, AdminAccessException, aesDecrypt } = require(
+const { verifyJWTToken, AdminAccessException, aesDecrypt, createSeo } = require(
   '../tools'
 );
 const { mentoringModel, careerInfoModel, adminModel, mongoose } = require('../../model');
@@ -80,24 +80,53 @@ module.exports = async (req, res) => {
           issuedDate,
           createrName
         };
+        // isGoup == undefined => 커리어 인포, 아니면 멘토링 프로그램
         const targetModel = isGroup !== undefined ? mentoringModel : careerInfoModel;
-        if (_id) {
-          const careerCardData = await targetModel.findOne({ _id: mongoose.Types.ObjectId(_id) });
 
-          if (!careerCardData) {
-            await targetModel.create(postCardData);
-            return res.send(201);
-          } else {
-            const t = await targetModel.findOneAndUpdate({ _id }, {
-              $set: postCardData
-            }, { new: true });
+        // 타겟 모델에 따라 올려야할 html 주소가 다름
+        const url = targetModel === mentoringModel
+          ? `/static/html/career/growing/${isGroup ? 'teach' : 'mentor'}/${_id}/index.html`
+          : `/static/html/career/info/${_id}/index.html`;
 
-            return res.sendStatus(200);
-          }
-        } else {
-          await targetModel.create(postCardData);
-          return res.send(201);
-        }
+        const objData = [
+          { key: 'og:url', value: `https://artoring.com/career/growing/${isGroup ? 'teach' : 'mentor'}/${_id}`, isProperty: true },
+          { key: 'og:title', value: '아토링', isProperty: true },
+          { key: 'og:description', value: '아토링은 청년 예술인을 위한 문화예술계 커리어 문제해결 플랫폼입니다.', isProperty: true },
+          { key: 'og:locale', value: 'ko_KR', isProperty: true },
+          { key: 'og:type', value: 'website', isProperty: true },
+          { key: 'og:image', value: 'http://artoring.com/image/openGraphImg.png', isProperty: true },
+          { key: 'og:image:secure_url', value: 'https://artoring.com/image/openGraphImg.png', isProperty: true },
+          { key: 'fb:app_id', value: '290939452791975', isProperty: true },
+          { key: 'og:image:width', value: '1200px', isProperty: true },
+          { key: 'og:image:height', value: '600px', isProperty: true }
+        ];
+
+        createSeo(url, objData)
+          .then(() => {
+            if (_id) {
+              targetModel.findOne({ _id: mongoose.Types.ObjectId(_id) })
+                .then(careerCardData => {
+                  if (!careerCardData) {
+                    targetModel.create(postCardData)
+                      .then(() => {
+                        return res.send(201);
+                      });
+                  } else {
+                    targetModel.findOneAndUpdate({ _id }, {
+                      $set: postCardData
+                    }, { new: true })
+                      .then(() => {
+                        return res.sendStatus(200);
+                      });
+                  }
+                });
+            } else {
+              targetModel.create(postCardData)
+                .then(() => {
+                  return res.send(201);
+                });
+            }
+          });
       }
     }
   } catch (e) {

@@ -4,6 +4,11 @@ const { userModel, mongoose } = require('../../model');
 const { verifyJWTToken } = require('../tools');
 
 module.exports = async (req, res) => {
+  if (!req.cookies.authorization) {
+    res.status(200).json({ code: 401, message: 'not authorized' });
+    return null;
+  }
+
   const decode = await verifyJWTToken(req);
   const { pwd, pwdChk } = req.body;
 

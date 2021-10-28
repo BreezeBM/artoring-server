@@ -29,7 +29,7 @@ module.exports = async (req, res) => {
         const adminData = await adminModel.find({ name, accessKey: accKey });
         if (!adminData) throw new AdminAccessException('no match found');
 
-        let mentorData = await userModel.aggregate(req.body.name !== ''
+        const mentorData = await userModel.aggregate(req.body.name !== ''
           ? [
               {
                 $search: {
@@ -50,6 +50,20 @@ module.exports = async (req, res) => {
                   userName: '$name',
                   thumb: '$mentor.thumb'
                 }
+              },
+              {
+                $facet: {
+                  cardList: [{ $skip: (page - 1) * (req.query.size || 8) }, { $limit: Number(req.query.size) || 8 }],
+                  total: [
+                    { $project: { users: '$users' } },
+                    { $unwind: '$users' },
+                    {
+                      $group: {
+                        _id: null,
+                        count: { $sum: 1 }
+                      }
+                    }]
+                }
               }
             ]
           : [
@@ -63,16 +77,30 @@ module.exports = async (req, res) => {
                   current: '$current',
                   thumb: '$mentor.thumb'
                 }
+              },
+              {
+                $facet: {
+                  cardList: [{ $skip: (page - 1) * (req.query.size || 8) }, { $limit: Number(req.query.size) || 8 }],
+                  total: [
+                    { $project: { users: '$users' } },
+                    { $unwind: '$users' },
+                    {
+                      $group: {
+                        _id: null,
+                        count: { $sum: 1 }
+                      }
+                    }]
+                }
               }
             ]);
 
-        mentorData = mentorData.filter(ele => ele._id !== undefined);
-        const total = mentorData.length;
-        if (page) {
-          mentorData = mentorData.splice((page - 1) * 8, 8);
-        }
+        // mentorData = mentorData.filter(ele => ele._id !== undefined);
+        // const total = mentorData.length;
+        // if (page) {
+        //   mentorData = mentorData.splice((page - 1) * 8, 8);
+        // }
 
-        res.status(200).json({ mentorData, total });
+        res.status(200).json(mentorData);
       }
         break;
     }

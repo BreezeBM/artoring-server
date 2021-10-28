@@ -1,5 +1,5 @@
 const { careerInfoModel, adminModel, mongoose } = require('../../model');
-const { verifyJWTToken, aesDecrypt, AdminAccessException } = require('../tools');
+const { verifyJWTToken, aesDecrypt, AdminAccessException, deleteSeo } = require('../tools');
 
 module.exports = async (req, res) => {
   // delete 메서드는 바디를 가지지 않는다고 가정한다.
@@ -33,8 +33,12 @@ module.exports = async (req, res) => {
 
         // 해당 카드 제거.
         careerInfoModel.findOneAndDelete({ _id: mongoose.Types.ObjectId(_id) })
-          .then(() => {
-            res.status(204).send();
+          .then((cardData) => {
+            // 크롤러 제공요 html 파일 제거
+            deleteSeo(`/static/html/career/info/${cardData._id}/index.html`)
+              .then(() => {
+                res.status(204).send();
+              });
           });
       } catch (e) {
         res.status(500).send(e.message);

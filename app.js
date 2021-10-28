@@ -22,7 +22,18 @@ app.use(cookieParser());
 
 app.use(helmet());
 
-const whitelist = ['https://insideart-dev.artoring.com', 'https://artoring.com', 'https://www.gstatic.com', undefined, process.env.ADMIN_URL]; // undefined == EBS health check or 다른서버
+app.get('/', (req, res, next) => {
+  process.env.NODE_ENV === 'development'
+    ? next(null, true)
+    : (() => {
+        if (req.headers.host.includes(process.env.EC2_IP)) next();
+        else res.status(401).send();
+      })();
+}, (req, res) => {
+  res.send();
+});
+
+const whitelist = ['https://insideart-dev.artoring.com', 'https://artoring.com', 'https://www.gstatic.com', process.env.ADMIN_URL]; // undefined == EBS health check or 다른서버
 
 app.use(express.json({ extended: false }));
 app.use(express.urlencoded({ extended: true }));
@@ -41,17 +52,6 @@ app.use(cors({
   methods: 'GET,POST,PUT,DELETE,OPTIONS',
   credentials: true
 }));
-
-app.get('/', (req, res, next) => {
-  process.env.NODE_ENV === 'development'
-    ? next(null, true)
-    : (() => {
-        if (req.headers.host.includes(process.env.EC2_IP)) next();
-        else res.status(401).send();
-      })();
-}, (req, res) => {
-  res.send();
-});
 
 app.use('/', router);
 

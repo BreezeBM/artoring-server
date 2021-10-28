@@ -85,7 +85,7 @@ module.exports = async (data, email = data.email, res, option) => {
         });
         return res.status(200).json({ responses, accessToken });
       } else {
-        return res.status(200).json({ responses });
+        return res.status(200).json({ responses, code: 200 });
       }
     }
   });

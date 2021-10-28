@@ -52,7 +52,7 @@ const sendGMAIL = async function (data, email = data.email, res, emailData) {
       },
     });
 
-    return res.sendStatus(200);
+    return res.status(200).json({ code: 200 });
   }
 
   // emailData가 없는 경우는 이메일 인증 메일 -> 로그인 처리

@@ -1,8 +1,8 @@
-const express = require('express');
+import express from "express";
 const router = express.Router();
 
-const userContorller = require('../../controller/user');
+import userContorller from "../../controller/user/index.js";
 
-router.get('/', userContorller.logout);
+router.get("/", userContorller.logout);
 
-module.exports = router;
+export default router;

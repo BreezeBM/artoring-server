@@ -1,21 +1,20 @@
-const express = require('express');
+import express from "express";
 const router = express.Router();
-const applyRouter = require('./apply');
-const calculatorRouter = require('./calculate');
+import applyRouter from "./apply.js";
+import calculatorRouter from "./calculate.js";
 
-const mentorController = require('../../controller/mentor');
+import mentorController from "../../controller/mentor/index.js";
 
-router.use('/apply', applyRouter);
-router.use('/calculate', calculatorRouter);
+router.use("/apply", applyRouter);
+router.use("/calculate", calculatorRouter);
 
-router.get('/project', mentorController.getProject);
+router.get("/project", mentorController.getProject);
 
-router.get('/', mentorController.getMentor);
-router.get('/:id', mentorController.getMentor);
-router.post('/', mentorController.modifiMentor);
-router.put('/', mentorController.modifiMentor);
+router.get("/", mentorController.getMentor);
+router.get("/:id", mentorController.getMentor);
+router.post("/", mentorController.modifiMentor);
+router.put("/", mentorController.modifiMentor);
 
-router.use('/*', (req, res) => res.status(404).send());
+router.use("/*", (req, res) => res.status(404).send());
 
-module.exports = router
-;
+export default router;

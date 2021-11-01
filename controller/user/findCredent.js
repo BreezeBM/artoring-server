@@ -1,7 +1,7 @@
 require('dotenv').config();
 const bcrypt = require('bcrypt');
 const { userModel, tokenModel, mongoose } = require('../../model');
-const { sendEmail, createJWT, aesEncrypt, aesDecrypt, verifyJWTToken } = require('../tools');
+const { sendGmail, createJWT, aesEncrypt, aesDecrypt, verifyJWTToken } = require('../tools');
 
 module.exports = {
   // 아래 핸들러들은 로그인 없이 진행됨.
@@ -32,9 +32,7 @@ module.exports = {
 
           tokenModel.create({ name: verifyToken })
             .then(() => {
-              sendEmail({ email }, email, res, {
-                from: `no-reply <${process.env.STMP_NAVER_USER_ID}@naver.com>`,
-                to: userData.email,
+              sendGmail({ userData: { email } }, email, res, {
                 subject: '[아토링] 비밀번호 관련 이메일 입니다',
                 html: `<table style="border-collapse: collapse; width: 490px; margin-left: auto; margin-right: auto; height: 435px;" border="0">
               <tbody>

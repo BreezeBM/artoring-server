@@ -38,7 +38,7 @@ module.exports = async (req, res) => {
                   from: 'mentoringmodels',
                   as: 'mentoring',
                   // purchaseHistory의 targetId를 변수를 지정한
-                  let: { targetId: '$targetId' },
+                  let: { targetId: '$targetId', isGroup: req.query.isGroup },
                   // 파이프라인을 이용해서 targetId 변수와 멘터링 문서의 _id가 일치하며 isGroup이 purchasedType과 일치하는 문서들만 추출
                   pipeline: [
                     {
@@ -90,7 +90,10 @@ module.exports = async (req, res) => {
                       {
                         $match: {
                           $expr: {
-                            $eq: ['$_id', '$$targetId']
+                            $and: [
+                              { $eq: ['$_id', '$$targetId'] },
+                              { $eq: ['$isGroup', req.query.isGroup === 'true'] }
+                            ]
                           }
                         }
                       }
@@ -204,7 +207,10 @@ module.exports = async (req, res) => {
                   {
                     $match: {
                       $expr: {
-                        $eq: ['$_id', '$$targetId']
+                        $and: [
+                          { $eq: ['$_id', '$$targetId'] },
+                          { $eq: ['$isGroup', req.query.isGroup === 'true'] }
+                        ]
                       }
                     }
                   }
@@ -223,7 +229,8 @@ module.exports = async (req, res) => {
                 progress: '$progress',
                 targetId: '$mentoring._id',
                 isReviewed: '$isReviewed',
-                questions: '$questions'
+                questions: '$questions',
+                isGroup: '$mentoring.isGroup'
               }
             },
 

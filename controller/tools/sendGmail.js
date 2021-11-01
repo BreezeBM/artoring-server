@@ -1,8 +1,8 @@
-const { google, gmail_v1 } = require("googleapis");
+const { google, gmail_v1 } = require('googleapis');
 
-require("dotenv").config();
+require('dotenv').config();
 
-const { createJWT, aesEncrypt } = require("./tools");
+const { createJWT, aesEncrypt } = require('./tools');
 
 const sendGMAIL = async function (data, email = data.email, res, emailData) {
   const { userData, accessToken } = data;
@@ -10,14 +10,14 @@ const sendGMAIL = async function (data, email = data.email, res, emailData) {
   const verifyToken = await createJWT({ encryptEmail }, 600);
 
   const authClient = new google.auth.JWT({
-    keyFile: process.env.CREDENTIAL_LOCATION,
+    keyFile: __dirname + '/../../credentials.json',
     scopes: [
-      "https://mail.google.com/",
-      "https://www.googleapis.com/auth/gmail.modify",
-      "https://www.googleapis.com/auth/gmail.compose",
-      "https://www.googleapis.com/auth/gmail.send",
+      'https://mail.google.com/',
+      'https://www.googleapis.com/auth/gmail.modify',
+      'https://www.googleapis.com/auth/gmail.compose',
+      'https://www.googleapis.com/auth/gmail.send'
     ],
-    subject: "no-reply@artoring.com",
+    subject: 'no-reply@artoring.com'
   });
 
   await authClient.authorize();
@@ -27,29 +27,31 @@ const sendGMAIL = async function (data, email = data.email, res, emailData) {
   if (emailData) {
     const subject = emailData.subject;
     const utf8Subject = `=?utf-8?B?${
-      Buffer.from(subject).toString("base64")
+      Buffer.from(subject).toString('base64')
     }?=`;
     const messageParts = [
-      "From: no-reply@artoring.com",
+      'From: no-reply@artoring.com',
       `To: ${userData.email}`,
-      "Content-Type: text/html; charset=utf-8",
-      "MIME-Version: 1.0",
+      'Content-Type: text/html; charset=utf-8',
+      'MIME-Version: 1.0',
       `Subject: ${utf8Subject}`,
-      `${emailData.html}`,
+      '',
+      emailData.html
     ];
-    const message = messageParts.join("\n");
+
+    const message = messageParts.join('\n');
 
     const encodedMessage = Buffer.from(message)
-      .toString("base64")
-      .replace(/\+/g, "-")
-      .replace(/\//g, "_")
-      .replace(/=+$/, "");
+      .toString('base64')
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=+$/, '');
 
     await gmail.users.messages.send({
-      userId: "no-reply@artoring.com",
+      userId: 'no-reply@artoring.com',
       requestBody: {
-        raw: encodedMessage,
-      },
+        raw: encodedMessage
+      }
     });
 
     return res.status(200).json({ code: 200 });
@@ -57,16 +59,17 @@ const sendGMAIL = async function (data, email = data.email, res, emailData) {
 
   // emailData가 없는 경우는 이메일 인증 메일 -> 로그인 처리
   if (!emailData) {
-    const subject = "[아토링] 인증 관련 이메일 입니다.";
+    const subject = '[아토링] 인증 관련 이메일 입니다.';
     const utf8Subject = `=?utf-8?B?${
-      Buffer.from(subject).toString("base64")
+      Buffer.from(subject).toString('base64')
     }?=`;
     const messageParts = [
-      "From: no-reply@artoring.com",
+      'From: no-reply@artoring.com',
       `To: ${userData.email}`,
-      "Content-Type: text/html; charset=utf-8",
-      "MIME-Version: 1.0",
+      'Content-Type: text/html; charset=utf-8',
+      'MIME-Version: 1.0',
       `Subject: ${utf8Subject}`,
+      '',
       `<table style="border-collapse: collapse; width: 490px; margin-left: auto; margin-right: auto; height: 435px;" border="0">
           <tbody>
           <tr style="height: 353px;">
@@ -77,7 +80,7 @@ const sendGMAIL = async function (data, email = data.email, res, emailData) {
           <div><strong><span style="font-size: 14pt; font-family: NanumSquareRound;">안녕하세요 아토링입니다!</span></strong></div>
           <div style="margin-bottom: 50px;"><span style="font-size: 14pt; font-family: NanumSquareRoundOTFEB;">아래 버튼을 클릭하여 인증을 완료해 주세요!</span></div>
           <a href="${
-        process.env.NODE_ENV !== "development"
+        process.env.NODE_ENV !== 'development'
           ? `https://artoring.com/verify?token=${verifyToken}`
           : `https://localhost:3000/verify?token=${verifyToken}`
       }" target="_blank" rel="noopener"><button style="width: 336px; height: 50px; border-radius: 10px; background-color: #000000; font-family: NanumSquareRoundOTFEB; font-size: 16px; font-weight: normal; font-stretch: noraml; line-heigth: 1.69; letter-spacing: normal; color: #ffffff;">이메일 주소 인증</button></a></div>
@@ -99,32 +102,32 @@ const sendGMAIL = async function (data, email = data.email, res, emailData) {
           </tr>
           </tbody>
           </table>
-          `,
+          `
     ];
-    const message = messageParts.join("\n");
+    const message = messageParts.join('\n');
 
     const encodedMessage = Buffer.from(message)
-      .toString("base64")
-      .replace(/\+/g, "-")
-      .replace(/\//g, "_")
-      .replace(/=+$/, "");
+      .toString('base64')
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=+$/, '');
 
     await gmail.users.messages.send({
-      userId: "no-reply@artoring.com",
+      userId: 'no-reply@artoring.com',
       requestBody: {
-        raw: encodedMessage,
-      },
+        raw: encodedMessage
+      }
     });
 
-    res.cookie("authorization", `Bearer ${accessToken} email`, {
+    res.cookie('authorization', `Bearer ${accessToken} email`, {
       secure: true,
       httpOnly: true,
       // domain: process.env.NODE_ENV === 'development' ? 'localhost' : 'back.artoring.com',
       maxAge: 3600 * 1000,
-      sameSite: "none",
-      path: "/",
+      sameSite: 'none',
+      path: '/'
     });
-    return res.status(200).json({ responses, accessToken });
+    return res.status(200).json({ accessToken });
   }
 
   if (module === require.main) {

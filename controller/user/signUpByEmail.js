@@ -1,5 +1,5 @@
 const { userModel } = require('../../model');
-const { sha256Encrypt, sendEmail, createJWT } = require('../tools');
+const { sha256Encrypt, sendGmail, createJWT } = require('../tools');
 
 const bcrypt = require('bcrypt');
 
@@ -51,7 +51,7 @@ module.exports = async (req, res) => {
             const accessToken = await createJWT({ _id: userData._id, name: userData.name }, 3600);
 
             // 유저정보를 이용하여 구글 메일 서버를 활용하여 이메일을 보낸다
-            await sendEmail({ userData, accessToken }, userData.email, res);
+            await sendGmail({ userData, accessToken }, userData.email, res);
           })
           .catch(err => {
             console.log(err);

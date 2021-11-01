@@ -1,5 +1,5 @@
 const { userModel, mongoose } = require('../../model');
-const { verifyJWTToken, sendEmail } = require('../tools');
+const { verifyJWTToken, sendGmail } = require('../tools');
 
 module.exports = async (req, res) => {
   if (!req.cookies.authorization) {
@@ -25,7 +25,7 @@ module.exports = async (req, res) => {
 
         userModel.findOne({ _id: mongoose.Types.ObjectId(_id) })
           .then(async userData => {
-            await sendEmail({ userData, accessToken }, userData.email, res);
+            await sendGmail({ userData, accessToken }, userData.email, res);
           });
 
         break;

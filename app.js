@@ -49,14 +49,18 @@ app.use(cors({
   credentials: true
 }));
 
-app.use('/', (req, res, next) => {
+app.get('/', (req, res, next) => {
   process.env.NODE_ENV === 'development'
     ? next(null, true)
     : (() => {
         if (req.headers.host.includes(process.env.EC2_IP)) next();
         else res.status(401).send();
       })();
-}, router);
+}, (req, res) => {
+  res.send();
+});
+
+app.use('/', router);
 
 module.exports = process.env.NODE_ENV === 'development'
   ? https.createServer({

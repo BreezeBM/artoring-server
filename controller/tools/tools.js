@@ -175,7 +175,7 @@ const verifyAndCallback = async function (callback, type, accessToken, res, user
         // 10번 동안 인터벌로 유효성 검사 시도.
       } else {
         let count = 0;
-        console.log('here?');
+
         const timer = setInterval(async (...args) => {
           if (count >= args[0]) {
             res.status(500).json({ code: 500, desc: 'OAuth Server no response' });

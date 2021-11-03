@@ -1,5 +1,5 @@
-const postLikes = require('./postLikes');
-const deleteLikes = require('./deleteLikes');
+import postLikes from './postLikes.js';
+import deleteLikes from './deleteLikes.js';
 
-module.exports = { postLikes, deleteLikes }
-;
+// likeController
+export { postLikes, deleteLikes };

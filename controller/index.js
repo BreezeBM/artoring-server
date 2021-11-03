@@ -1,6 +1,6 @@
-const careerController = require('./career');
-const uploaderController = require('./uploader');
-const userController = require('./user');
+import * as careerController from './career/index.js';
+import uploaderController from './uploader/index.js';
+import userController from './user/index.js';
 
-module.exports = { careerController, uploaderController, userController }
+export { careerController, uploaderController, userController }
 ;

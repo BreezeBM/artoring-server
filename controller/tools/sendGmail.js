@@ -3,7 +3,7 @@ import * as googleapis from "googleapis"
 
 require('dotenv').config();
 
-import * as tools from "./tool.js"
+import {tool} from "./index.js"
 // const { createJWT, aesEncrypt } = require('./tools');
 
 const sendGMAIL = async function (data, email = data.email, res, emailData) {

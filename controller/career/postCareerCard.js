@@ -1,5 +1,5 @@
 import createDOMPurify from 'dompurify';
-import { JSDOM } from 'jsdom'
+import jsdom from "jsdom";
 // const createDOMPurify = require('dompurify');
 // const { JSDOM } = require('jsdom');
 
@@ -9,7 +9,7 @@ import { tool, seo } from '../tools/index.js'
 // );
 import { mentoringModel, careerInfoModel, adminModel, mongoose } from '../../model/index.js';
 
-const window = new JSDOM().window;
+const window = new jsdom.JSDOM().window;
 const DOMPurify = createDOMPurify(window);
 
 DOMPurify.addHook('uponSanitizeElement', (node, data) => {
@@ -104,7 +104,7 @@ export default async (req, res) => {
           { key: 'og:image:height', value: '600px', isProperty: true }
         ];
 
-        tool.createSeo(url, objData)
+        seo.createSeo(url, objData)
           .then(() => {
             if (_id) {
               targetModel.findOne({ _id: mongoose.Types.ObjectId(_id) })

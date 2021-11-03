@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   middle: (req, res, next) => {
     next();
   },

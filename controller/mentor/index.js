@@ -1,11 +1,11 @@
-const getHandler = require('./getMentor');
-const modifiMentor = require('./postMentor');
+import getHandler from './getMentor.js';
+import modifiMentor from './postMentor.js';
 
-const getProject = require('./getProject');
+import getProject from './getProject.js';
 const mentorController = {
   getMentor: getHandler,
   modifiMentor,
   getProject
 };
 
-module.exports = mentorController;
+export default mentorController

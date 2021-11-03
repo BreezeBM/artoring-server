@@ -1,6 +1,6 @@
 import searchEngine from './index.js';
 
-module.exports = (req, res) => {
+export default async (req, res) => {
   let { keyword, model, page } = req.query;
   keyword = decodeURIComponent(keyword).split(' ');
 

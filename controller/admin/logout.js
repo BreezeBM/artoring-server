@@ -1,14 +1,15 @@
 require('dotenv').config();
 
-const { verifyJWTToken, AdminAccessException, date } = require('../tools');
+import {tool, date} from '../tools/index.js'
+// const { verifyJWTToken, AdminAccessException, date } = require('../tools');
 
-module.exports = async (req, res) => {
+export default async (req, res) => {
   /*
    * 어드민 계정들은 email, pwd, 접근 레벨, 고유한 accessKey를 가집니다.
    */
   try {
     if (req.cookies.auth) {
-      const decode = await verifyJWTToken(req);
+      const decode = await tool.verifyJWTToken(req);
 
       switch (decode) {
         case 401: {
@@ -26,7 +27,7 @@ module.exports = async (req, res) => {
 
           const { name, accessKey, authLevel } = decode;
 
-          if (!accessKey) throw new AdminAccessException('need authorize');
+          if (!accessKey) throw new tool.AdminAccessException('need authorize');
           res.cookie('auth', '', { expires: new Date(date().add(9, 'hours').format()) });
 
           res.status(200).json({ userData: { name, accessKey, authLevel } });

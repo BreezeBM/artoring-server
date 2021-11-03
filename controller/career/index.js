@@ -1,8 +1,8 @@
-const getHandler = require('./getMentoringCards');
-const deleteMentoring = require('./deleteMentoringCard');
-const deleteInfo = require('./deleteInfoCard');
-const postCareerCard = require('./postCareerCard');
-const getInfo = require('./getCareerInfo');
+import getHandler from './getMentoringCards.js';
+import deleteMentoring from './deleteMentoringCard.js';
+import deleteInfo from './deleteInfoCard.js';
+import postCareerCard from './postCareerCard.js';
+import getInfo from './getCareerInfo.js';
 
 const careerCardController = {
   getCard: getHandler,
@@ -14,4 +14,4 @@ const careerCardController = {
   getInfo
 };
 
-module.exports = careerCardController;
+export default careerCardController;

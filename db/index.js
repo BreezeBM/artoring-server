@@ -1,8 +1,8 @@
 
 require('dotenv').config();
 
-const mongoose = require('mongoose');
-module.exports = () => {
+import mongoose from 'mongoose';
+const connectDB = () => {
   const pass = encodeURIComponent(process.env.MONGO_SEC_KEY);
 
   // const uri = "mongodb://localhost:27017/artoring";
@@ -28,3 +28,5 @@ module.exports = () => {
   }
   dbconnect();
 };
+
+export default connectDB

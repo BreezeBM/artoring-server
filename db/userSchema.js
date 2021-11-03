@@ -1,6 +1,8 @@
-const mongoose = require("mongoose");
-const mentorSchema = require("./mentorSchema");
-const { date } = require("../controller/tools");
+import mongoose from "mongoose";
+import {date} from "../controller/tools/index.js"
+
+import mentorSchema from "./mentorSchema.js";
+// const { date } = require("../controller/tools");
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
@@ -48,4 +50,4 @@ const userSchema = new Schema({
   },
 });
 
-module.exports = userSchema;
+export default userSchema;

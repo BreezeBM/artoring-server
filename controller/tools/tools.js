@@ -1,7 +1,9 @@
-
-const crypto = require('crypto');
-const jwt = require('jsonwebtoken');
-const axios = require('axios');
+import crypto from "crypto"
+import jwt from "jsonwebtoken"
+import axios from "axios"
+// const crypto = require('crypto');
+// const jwt = require('jsonwebtoken');
+// const axios = require('axios');
 
 require('dotenv').config();
 
@@ -200,4 +202,4 @@ const verifyAndCallback = async function (callback, type, accessToken, res, user
     });
 };
 
-module.exports = { verifyJWTToken, createJWT, verifyAndCallback, sha256Encrypt, aesEncrypt, aesDecrypt, AdminAccessException, UserException };
+export { verifyJWTToken, createJWT, verifyAndCallback, sha256Encrypt, aesEncrypt, aesDecrypt, AdminAccessException, UserException };

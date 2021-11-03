@@ -271,4 +271,4 @@ const searchEngine = async (callback, keyword, model, page) => {
 }
 ;
 
-module.exports = searchEngine;
+export default searchEngine;

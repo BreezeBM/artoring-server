@@ -1,5 +1,6 @@
 // import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
-const aws = require('aws-sdk');
+import aws from 'aws-sdk';
+// const aws = require('aws-sdk');
 aws.config.loadFromPath(__dirname + '/../../config/s3.json');
 aws.config.update({ accessKeyId: process.env.S3_KEY_ID });
 aws.config.update({ secretAccessKey: process.env.S3_ACC_KEY });
@@ -37,4 +38,4 @@ const deleteSeo = (path) => {
   return s3.deleteObject({ Key: path }).promise();
 };
 
-module.exports = { createSeo, deleteSeo };
+export { createSeo, deleteSeo };

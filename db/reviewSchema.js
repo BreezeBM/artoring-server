@@ -1,5 +1,7 @@
-const mongoose = require('mongoose');
-const { date } = require('../controller/tools');
+import mongoose from 'mongoose';
+import {date} from "../controller/tools/index.js"
+
+//const { date } = require('../controller/tools');
 const Schema = mongoose.Schema;
 
 const reviewSchema = new Schema({
@@ -14,5 +16,5 @@ const reviewSchema = new Schema({
   modifiedAt: { type: Date, default: new Date(date().add(9, 'hours').format()) }
 });
 
-module.exports = reviewSchema
+export default reviewSchema
 ;

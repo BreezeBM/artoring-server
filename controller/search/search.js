@@ -1,4 +1,4 @@
-const searchEngine = require('./index');
+import searchEngine from './index.js';
 
 module.exports = (req, res) => {
   let { keyword, model, page } = req.query;

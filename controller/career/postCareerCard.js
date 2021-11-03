@@ -1,10 +1,13 @@
-const createDOMPurify = require('dompurify');
-const { JSDOM } = require('jsdom');
+import createDOMPurify from 'dompurify';
+import { JSDOM } from 'jsdom'
+// const createDOMPurify = require('dompurify');
+// const { JSDOM } = require('jsdom');
 
-const { verifyJWTToken, AdminAccessException, aesDecrypt, createSeo } = require(
-  '../tools'
-);
-const { mentoringModel, careerInfoModel, adminModel, mongoose } = require('../../model');
+import { tool, seo } from '../tools/index.js'
+// const { verifyJWTToken, AdminAccessException, aesDecrypt, createSeo } = require(
+//   '../tools'
+// );
+import { mentoringModel, careerInfoModel, adminModel, mongoose } from '../../model/index.js';
 
 const window = new JSDOM().window;
 const DOMPurify = createDOMPurify(window);
@@ -18,9 +21,9 @@ DOMPurify.addHook('uponSanitizeElement', (node, data) => {
   }
 });
 
-module.exports = async (req, res) => {
+export default async (req, res) => {
   try {
-    const decode = await verifyJWTToken(req);
+    const decode = await tool.verifyJWTToken(req);
     switch (decode) {
       case 401: {
         res.status(401).send();
@@ -51,12 +54,12 @@ module.exports = async (req, res) => {
         const { name, accessKey, authLevel } = decode;
         if (authLevel === 0) return res.send(403);
 
-        if (!accessKey) throw new AdminAccessException('need authorize');
+        if (!accessKey) throw new tool.AdminAccessException('need authorize');
 
-        const accKey = await aesDecrypt(accessKey);
+        const accKey = await tool.aesDecrypt(accessKey);
 
         const adminData = await adminModel.find({ name, accessKey: accKey });
-        if (!adminData) throw new AdminAccessException('no match found');
+        if (!adminData) throw new tool.AdminAccessException('no match found');
 
         const purifiedDetailInfo = DOMPurify.sanitize(
           decodeURIComponent(detailInfo), {
@@ -101,7 +104,7 @@ module.exports = async (req, res) => {
           { key: 'og:image:height', value: '600px', isProperty: true }
         ];
 
-        createSeo(url, objData)
+        tool.createSeo(url, objData)
           .then(() => {
             if (_id) {
               targetModel.findOne({ _id: mongoose.Types.ObjectId(_id) })

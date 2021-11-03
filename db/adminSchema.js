@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const Schema = mongoose.Schema;
 
@@ -11,4 +11,4 @@ const adminSchema = new Schema({
   attempts: { type: Number, default: 5 }
 });
 
-module.exports = adminSchema;
+export default adminSchema;

@@ -1,5 +1,7 @@
-const mongoose = require('mongoose');
-const { date } = require('../controller/tools');
+import mongoose from 'mongoose';
+import {date} from "../controller/tools/index.js"
+
+// const { date } = require('../controller/tools');
 const Schema = mongoose.Schema;
 
 // 디자인을 확인한 결과, 커리어 교육과 개인 멘토링은 스키마의 차이가 매우 적음
@@ -36,4 +38,4 @@ const mentoringSchema = new Schema({
   updatedAt: { type: Date, default: new Date(date().add(9, 'hours').format()) }
 });
 
-module.exports = mentoringSchema;
+export default mentoringSchema;

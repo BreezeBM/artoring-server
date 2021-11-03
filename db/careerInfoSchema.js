@@ -1,5 +1,6 @@
-const mongoose = require("mongoose");
-const { date } = require("../controller/tools");
+import mongoose from "mongoose";
+import {date} from "../controller/tools/index.js"
+// const { date } = require("../controller/tools");
 const Schema = mongoose.Schema;
 
 const careerInfoSchema = new Schema({
@@ -24,4 +25,4 @@ const careerInfoSchema = new Schema({
   likesCount: { type: Number, default: 0 },
 });
 
-module.exports = careerInfoSchema;
+export default  careerInfoSchema;

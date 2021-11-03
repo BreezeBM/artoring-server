@@ -14,7 +14,7 @@ import inactiveAccount from "./controller/tools/inactiveAccount.js";
 
 require("moment-timezone");
 require("dotenv").config();
-const db = require("./db");
+import * as db from "./db/index.js";
 
 const port = process.env.PORT || 4000;
 

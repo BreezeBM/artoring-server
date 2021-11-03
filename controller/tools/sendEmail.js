@@ -1,22 +1,24 @@
 require('dotenv').config();
 
-const { createJWT, aesEncrypt } = require('./tools');
+import * as tools from "./tools.js"
+// const { createJWT, aesEncrypt } = require('./tools');
 
 // 이메일 검증을 위해 이메일에 링크를 전달할 모듈
-const nodemailer = require('nodemailer');
+import nodemailer from "nodemailer"
+// const nodemailer = require('nodemailer');
 /**
  *
  * @param {*} data 유저데이터
  * @param {*} res response 객체
  * @param {*} option 비밀번호 찾기에서 전달하는 메세지 양식
  */
-module.exports = async (data, email = data.email, res, option) => {
+export default async (data, email = data.email, res, option) => {
   const { userData, accessToken } = data;
   // 이메일 검증용 링크에 담길 토큰에 저장할 이메일 정보를 암호화한다. URL에 저장되기도 하고, JWT는 인코딩된 데이터이기 때문에, 암호화를 진행한다.
-  const encryptEmail = await aesEncrypt(email);
+  const encryptEmail = await tools.tool.aesEncrypt(email);
 
   // 암호화된 데이터를 바탕으로 10분짜리 JWT 토큰을 생성한다.
-  const verifyToken = await createJWT({ encryptEmail }, 600);
+  const verifyToken = await tools.tool.createJWT({ encryptEmail }, 600);
 
   // 메일을 보내기위한 메일서버 설정
   const smtpTransport = nodemailer.createTransport({

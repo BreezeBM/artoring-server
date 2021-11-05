@@ -65,7 +65,7 @@ app.get("/", (req, res, next) => {
 
 app.use("/", router);
 
-module.exports = process.env.NODE_ENV === "development"
+export default process.env.NODE_ENV === "development"
   ? https.createServer({
     key: fs.readFileSync("./key.pem"),
     cert: fs.readFileSync("./cert.pem"),

@@ -10,7 +10,9 @@
     "nodemon": "nodemon app.js",
     "poststart": "node ./node_modules/pm2/bin/pm2 logs",
     "start": "node ./node_modules/pm2/bin/pm2 start app.js --name server",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "semistandard --verbose | snazzy",
+    "lint-fix": "semistandard --fix | snazzy"
   },
   "repository": {
     "type": "git",
@@ -54,6 +56,8 @@
   "devDependencies": {
     "mocha": "^9.0.1",
     "nock": "^13.1.0",
-    "nodemon": "^2.0.14"
+    "nodemon": "^2.0.14",
+    "semistandard": "^16.0.1",
+    "snazzy": "^9.0.0"
   }
 }

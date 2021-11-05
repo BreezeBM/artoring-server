@@ -9,6 +9,7 @@
   [설치](#설치)
   [실행](#실행)
   [테스트](#npm_test)
+  [린팅](#린팅)
 - [스키마](#스키마)
   - [어드민](#어드민)
   - [커리어정보스키마](#커리어정보스키마)
@@ -27,6 +28,9 @@
 ## 린팅
 [세미 스탠다드](https://marketplace.visualstudio.com/items?itemName=flet.vscode-semistandard) 를 사용중이며,
 작은 따옴표, 탭 사이즈 2를 사용중임.
+
+또한 [npm 세미 스탠다드](https://www.npmjs.com/package/semistandard) 및 [snazzy](https://github.com/standard/snazzy)를 이용하여
+린팅을 확인하고 수정할수 있음.
 ## npm_명령어
 ### 설치
 `npm install`
@@ -38,6 +42,9 @@
 ### npm_test
 TDD는 예정입니다.
 
+### 린팅
+`npm run lint` 세미스탠다드 룰에 위반한 코드를 콘솔에 출력.
+`npm run lint-fix` 룰 위반한 코드 출력 및 일부 린팅 적용.
 ## 스키마
 
 ### 어드민

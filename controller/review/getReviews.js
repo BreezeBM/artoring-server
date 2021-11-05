@@ -1,6 +1,6 @@
-const { reviewModel } = require('../../model');
+import { reviewModel } from '../../model/index.js';
 
-module.exports = async (req, res) => {
+export default async (req, res) => {
   // 배열정보가 URI인코된 상태로 들어옵니다.
   const ids = JSON.parse(decodeURIComponent(req.params.cardids));
 

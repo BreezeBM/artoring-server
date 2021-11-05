@@ -1,7 +1,8 @@
-const { userModel, mongoose } = require('../../model');
-const { verifyJWTToken, sendGmail } = require('../tools');
+import { userModel, mongoose } from '../../model/index.js';
+import { tool, sendGmail } from '../tools/index.js'
+// const { verifyJWTToken, sendGmail } = require('../tools');
 
-module.exports = async (req, res) => {
+export default async (req, res) => {
   if (!req.cookies.authorization) {
     res.status(200).json({ code: 401, message: 'not authorized' });
     return null;
@@ -9,7 +10,7 @@ module.exports = async (req, res) => {
   const split = req.cookies.authorization.split(' ');
   const accessToken = split[0].concat(' ', split[1]);
   try {
-    const decode = await verifyJWTToken(req);
+    const decode = await tool.verifyJWTToken(req);
 
     switch (decode) {
       case 401: {

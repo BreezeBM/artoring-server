@@ -1,8 +1,9 @@
-const { careerInfoModel, mongoose } = require('../../model');
+import { careerInfoModel, mongoose } from '../../model/index.js';
 
-require('dotenv').config();
+import dotenv from 'dotenv';
+dotenv.config()
 
-module.exports = async (req, res) => {
+export default async (req, res) => {
   try {
     // 특정 카드의 상세 데이터 요청시
     if (req.params.id) {

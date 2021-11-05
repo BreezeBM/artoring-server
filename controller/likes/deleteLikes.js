@@ -1,10 +1,10 @@
-const { mentoringModel, careerInfoModel, userModel, mongoose } = require('../../model');
-const { verifyJWTToken, UserException } = require('../tools');
-
-const { verifyAndCallback } = require('../tools');
+import { mentoringModel, careerInfoModel, userModel, mongoose } from '../../model/index.js';
+import { tool } from '../tools/index.js'
+// const { verifyJWTToken, UserException } = require('../tools');
+// const { verifyAndCallback } = require('../tools');
 
 // 좋아요는 유저가 등록하고, 삭제해야함.
-module.exports = async (req, res) => {
+export default async (req, res) => {
   const { targetModel, targetId } = req.params;
   const { id: _id } = req.query;
 
@@ -21,7 +21,7 @@ module.exports = async (req, res) => {
   if (type) {
     if (type === 'email') {
       try {
-        const decode = await verifyJWTToken(req);
+        const decode = await tool.verifyJWTToken(req);
 
         switch (decode) {
           case 401: {
@@ -40,7 +40,7 @@ module.exports = async (req, res) => {
               ? await userModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(_id) }, { $pull: { likedCareerEdu: targetId } }, { new: true })
               : await userModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(_id) }, { $pull: { likedInfo: targetId } }, { new: true });
 
-            if (!userData) throw new UserException('user fail', 'matched user not found');
+            if (!userData) throw new tool.UserException('user fail', 'matched user not found');
 
             // 좋아요한곳에서 좋아요 숫자를 하나 증가시킴
             targetModel === 'teach'
@@ -55,14 +55,14 @@ module.exports = async (req, res) => {
         if (e.type) { res.status(404).send(e.message); } else { res.status(500).send(e.message); }
       }
     } else {
-      verifyAndCallback(async () => {
+      tool.verifyAndCallback(async () => {
         const userData = targetModel === 'teach'
           ? await userModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(_id) }, { $pull: { likedCareerEdu: targetId } }, { new: true })
           : targetModel === 'mentor'
             ? await userModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(_id) }, { $pull: { likedMentor: targetId } }, { new: true })
             : await userModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(_id) }, { $pull: { likedInfo: targetId } }, { new: true });
 
-        if (!userData) throw new UserException('user fail', 'matched user not found');
+        if (!userData) throw new tool.UserException('user fail', 'matched user not found');
 
         // 좋아요한곳에서 좋아요 숫자를 하나 증가시킴
         targetModel === 'teach' || targetModel === 'mentor'

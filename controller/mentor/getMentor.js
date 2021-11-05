@@ -1,6 +1,6 @@
-const { userModel, mongoose } = require('../../model');
+import { userModel, mongoose } from '../../model/index.js';
 
-module.exports = async (req, res) => {
+export default async (req, res) => {
   // params에 id가 담겨있으면 id에 해당하는 상세정보 리턴. 아니면 최신의 데이터 8개를 리턴
   try {
     // 특정 멘토의 상세 데이터 요청시

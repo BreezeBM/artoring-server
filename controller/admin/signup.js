@@ -1,11 +1,16 @@
-require('dotenv').config();
+import dotenv from 'dotenv';
+dotenv.config()
 
-const { sha256Encrypt } = require('../tools');
-const { adminModel } = require('../../model');
-const randWords = require('random-words');
-const bcrypt = require('bcrypt');
+import  { tool } from '../tools/index.js';
+// const { sha256Encrypt } = require('../tools');
+import { adminModel } from '../../model/index.js';
 
-module.exports = async (req, res) => {
+import randWords from 'random-words'
+import bcrypt from 'bcrypt'
+// const randWords = require('random-words');
+// const bcrypt = require('bcrypt');
+
+export default  async (req, res) => {
   try {
     const hashingTime = process.env.NODE_ENV === 'development' ? process.env.HASHING_TIME_DEV_ADM : process.env.HASHING_TIME_PRO_ADM;
     const salt = process.env.NODE_ENV === 'development' ? process.env.SALT_DEV_ADM : process.env.SALT_PRO_ADM;
@@ -19,7 +24,7 @@ module.exports = async (req, res) => {
         const { email, name } = req.body;
         const randomWords = randWords({ min: 3, exactly: 24, join: ' ' });
 
-        const accessKey = sha256Encrypt(999, randomWords, salt);
+        const accessKey = tool.sha256Encrypt(999, randomWords, salt);
 
         // 접근 레벨(authorityLevel 은 1이 가장 작은 권한. 5가 맥스)
         await adminModel.create({ email, encrypt, pwd: encrypt, authorityLevel: 1, accessKey, name });

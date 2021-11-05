@@ -1,9 +1,11 @@
-require("dotenv").config();
-const { userModel, mongoose } = require("../../model");
-const { createJWT, verifyJWTToken, sha256Encrypt } = require("../tools");
-const bcrypt = require("bcrypt");
+import dotenv from 'dotenv';
+dotenv.config()
+import { userModel, mongoose } from "../../model/index.js";
+import { tool } from '../tools/index.js'
+// const { createJWT, verifyJWTToken, sha256Encrypt } = require("../tools");
+import bcrypt from "bcrypt";
 
-module.exports = async (req, res) => {
+export default async (req, res) => {
   const { password, email } = req.body;
   const hashingTime = process.env.NODE_ENV === "development"
     ? process.env.HASHING_TIME_DEV
@@ -13,7 +15,7 @@ module.exports = async (req, res) => {
     : process.env.SALT_PRO;
 
   if (req.cookies.authorization) {
-    const decode = await verifyJWTToken(req);
+    const decode = await tool.verifyJWTToken(req);
 
     switch (decode) {
       case 401: {
@@ -73,7 +75,7 @@ module.exports = async (req, res) => {
             .then(async (result) => {
               if (result) {
                 delete data.pwd;
-                const token = await createJWT({
+                const token = await tool.createJWT({
                   _id: data._id,
                   name: data.name,
                 }, 3600);

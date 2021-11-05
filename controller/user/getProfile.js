@@ -1,8 +1,9 @@
 
-const { userModel } = require('../../model');
-const { verifyJWTToken, verifyAndCallback } = require('../tools');
+import { userModel } from '../../model/index.js';
+import { tool } from '../tools/index.js'
+// const { verifyJWTToken, verifyAndCallback } = require('../tools');
 
-module.exports = async (req, res) => {
+export default async (req, res) => {
   if (!req.cookies.authorization) {
     res.status(200).json({ code: 401, message: 'not authorized' });
 

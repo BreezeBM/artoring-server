@@ -1,6 +1,7 @@
-const { reviewModel, purchaseHistoryModel, userModel, mongoose, mentoringModel } = require('../../model');
-const { verifyJWTToken, verifyAndCallback } = require('../tools');
-module.exports = async (req, res) => {
+import { reviewModel, purchaseHistoryModel, userModel, mongoose, mentoringModel } from '../../model/index.js';
+import { tool } from '../tools/index.js'
+// const { verifyJWTToken, verifyAndCallback } = require('../tools');
+export default async (req, res) => {
   if (!req.cookies.authorization) {
     res.status(200).json({ code: 401, message: 'not authorized' });
     return null;
@@ -13,7 +14,7 @@ module.exports = async (req, res) => {
   if (type) {
     if (type === 'email') {
       try {
-        const decode = await verifyJWTToken(req);
+        const decode = await tool.verifyJWTToken(req);
 
         switch (decode) {
           case 401: {
@@ -72,7 +73,7 @@ module.exports = async (req, res) => {
     } else {
       const { originType, rate, targetId, text, _id, userName, userThumb, userId } = req.body;
 
-      verifyAndCallback(() => {
+      tool.verifyAndCallback(() => {
         let reviewId;
         reviewModel.create({
           userThumb, userName, userId, originType, targetId, text, rate

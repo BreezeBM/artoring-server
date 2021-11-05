@@ -1,5 +1,6 @@
-const { mentoringModel, careerInfoModel, userModel, mongoose } = require('../../model');
-const { verifyJWTToken, verifyAndCallback } = require('../tools');
+import { mentoringModel, careerInfoModel, userModel, mongoose } from '../../model/index.js';
+import { tool } from '../tools/index.js';
+// const { verifyJWTToken, verifyAndCallback } = require('../tools');
 
 // 에러시 throw를 하기위한 템플릿
 function UserException (type, message) {
@@ -11,7 +12,7 @@ function UserException (type, message) {
 }
 
 // 좋아요는 유저가 등록하고, 삭제해야함.
-module.exports = async (req, res) => {
+export default async (req, res) => {
   const { targetId, _id } = req.body;
   const { targetModel } = req.params || req.body;
 
@@ -29,7 +30,7 @@ module.exports = async (req, res) => {
   if (type) {
     if (type === 'email') {
       try {
-        const decode = await verifyJWTToken(req);
+        const decode = await tool.verifyJWTToken(req);
 
         switch (decode) {
           case 401: {
@@ -68,7 +69,7 @@ module.exports = async (req, res) => {
       }
     } else {
       try {
-        verifyAndCallback(async () => {
+        tool.verifyAndCallback(async () => {
           const userData = targetModel === 'teach'
             ? await userModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(_id) }, { $push: { likedCareerEdu: targetId } }, { new: true })
             : targetModel === 'mentor'

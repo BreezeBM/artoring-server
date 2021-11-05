@@ -1,10 +1,11 @@
-const express = require('express');
+import express from "express";
 const router = express.Router();
 
-const { verifyEmail, retryVerify } = require('../../controller/user');
+import {userController} from "../../controller/index.js";
+// const { verifyEmail, retryVerify } = require("../../controller/user");
 
-router.post('/email', verifyEmail);
+router.post("/email", userController.verifyEmail);
 
-router.post('/retry', retryVerify);
+router.post("/retry", userController.retryVerify);
 
-module.exports = router;
+export default router;

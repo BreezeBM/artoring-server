@@ -1,10 +1,13 @@
-require('dotenv').config();
+import dotenv from 'dotenv';
+dotenv.config()
 
-const { default: axios } = require('axios');
-const { userModel, reviewModel, mentoringModel, mongoose, careerInfoModel } = require('../../model');
-const { sha256Encrypt, verifyAndCallback, date } = require('../tools');
+import axios from 'axios'
+// const { default: axios } = require('axios');
+import { userModel, reviewModel, mentoringModel, mongoose, careerInfoModel } from '../../model/index.js';
+import { tool, date } from '../tools/index.js'
+// const { sha256Encrypt, verifyAndCallback, date } = require('../tools');
 
-const randWords = require('random-words');
+import randWords from 'random-words';
 
 function base64decode (data) {
   while (data.length % 4 !== 0) {
@@ -18,7 +21,7 @@ function base64decode (data) {
 // 클라이언트에서는 각 로그인마다 사용할 코드를 codes로 보냄
 // 페북에서는 sdk로 토큰을 받아올수 있음.
 
-module.exports = async (req, res) => {
+export default async (req, res) => {
   const { model } = req.params;
   const { codes, fbToken } = req.body;
 
@@ -44,7 +47,7 @@ module.exports = async (req, res) => {
         thumb: 'https://artoring.com/image/1626851218536.png',
         sns: [],
         nickName: '',
-        email: sha256Encrypt(999, randomWords, Date.toString()),
+        email: tool.sha256Encrypt(999, randomWords, Date.toString()),
         gender: '',
         birth: '',
         phone: '',
@@ -130,7 +133,7 @@ module.exports = async (req, res) => {
                 ({ access_token, refresh_token } = ele.data || ele);
 
                 let proof;
-                if (ele.snsType === 'facebook') proof = sha256Encrypt(999, fbToken || access_token || split[1], process.env.FACEBOOK_SEC);
+                if (ele.snsType === 'facebook') proof = tool.sha256Encrypt(999, fbToken || access_token || split[1], process.env.FACEBOOK_SEC);
 
                 const url = ele.snsType === 'kakao'
                   ? 'https://kapi.kakao.com/v1/user/unlink'
@@ -194,7 +197,7 @@ module.exports = async (req, res) => {
     } else {
       [signedHeader, signedPayload] = req.body.signed_request.split('.', 2);
       promise = Promise.resolve(
-        sha256Encrypt(999, signedPayload, process.env.FACEBOOK_SEC, 'base64').replace(/\+/g, '-').replace(/\//g, '_').replace('=', ''))
+        tool.sha256Encrypt(999, signedPayload, process.env.FACEBOOK_SEC, 'base64').replace(/\+/g, '-').replace(/\//g, '_').replace('=', ''))
         .then(expectedToken => {
           if (expectedToken !== signedHeader) throw new Error('token mismatch');
 
@@ -232,7 +235,7 @@ module.exports = async (req, res) => {
           name: '탈퇴한 사용자입니다.',
           appId: '',
           nickName: '',
-          email: sha256Encrypt(999, randomWords, Date.toString()),
+          email: tool.sha256Encrypt(999, randomWords, Date.toString()),
           gender: '',
           birth: '',
           phone: '',
@@ -279,7 +282,7 @@ module.exports = async (req, res) => {
           ({ access_token, refresh_token } = response.data || response);
 
           let proof;
-          if (ele.snsType === 'facebook') proof = sha256Encrypt(999, access_token, process.env.FACEBOOK_SEC);
+          if (ele.snsType === 'facebook') proof = tool.sha256Encrypt(999, access_token, process.env.FACEBOOK_SEC);
 
           const url = ele.snsType === 'kakao'
             ? 'https://kapi.kakao.com/v1/user/unlink'

@@ -1,11 +1,11 @@
 import dotenv from 'dotenv';
-dotenv.config()
 
 import { userModel, reviewModel, careerInfoModel, mentoringModel, mongoose } from '../../model/index.js';
-import {tool, date} from '../tools/index.js'
+import { tool, date } from '../tools/index.js';
 // const { verifyJWTToken, verifyAndCallback, sha256Encrypt, date } = require('../tools');
 
 import randWords from 'random-words';
+dotenv.config();
 
 export default async (req, res) => {
   const { _id, reason } = req.body;

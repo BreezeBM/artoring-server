@@ -1,5 +1,5 @@
-import mongoose from "mongoose";
-import {date} from "../controller/tools/index.js"
+import mongoose from 'mongoose';
+import { date } from '../controller/tools/index.js';
 // const { date } = require("../controller/tools");
 const Schema = mongoose.Schema;
 
@@ -15,14 +15,14 @@ const careerInfoSchema = new Schema({
   createdAt: {
     type: Date,
     required: true,
-    default: new Date(date().add(9, "hours").format()),
+    default: new Date(date().add(9, 'hours').format())
   },
   updatedAt: {
     type: Date,
     required: true,
-    default: new Date(date().add(9, "hours").format()),
+    default: new Date(date().add(9, 'hours').format())
   },
-  likesCount: { type: Number, default: 0 },
+  likesCount: { type: Number, default: 0 }
 });
 
-export default  careerInfoSchema;
+export default careerInfoSchema;

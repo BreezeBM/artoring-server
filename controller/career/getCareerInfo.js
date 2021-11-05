@@ -1,7 +1,7 @@
 import { careerInfoModel, mongoose } from '../../model/index.js';
 
 import dotenv from 'dotenv';
-dotenv.config()
+dotenv.config();
 
 export default async (req, res) => {
   try {

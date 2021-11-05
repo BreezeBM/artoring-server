@@ -1,8 +1,8 @@
 import dotenv from 'dotenv';
-dotenv.config()
 import axios from 'axios';
 
-import { tool } from '../tools/index.js'
+import { tool } from '../tools/index.js';
+dotenv.config();
 // const { verifyJWTToken, createJWT, verifyAndCallback, sha256Encrypt } = require('../tools');
 
 export default async (req, res) => {
@@ -17,7 +17,7 @@ export default async (req, res) => {
   if (type) {
     if (type === 'email') {
       try {
-const decode = await tool.verifyJWTToken(req);
+        const decode = await tool.verifyJWTToken(req);
 
         switch (decode) {
           case 401: {

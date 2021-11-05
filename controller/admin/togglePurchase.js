@@ -1,10 +1,10 @@
 import dotenv from 'dotenv';
-dotenv.config()
-import { tool } from "../tools/index.js"
+import { tool } from '../tools/index.js';
 import { purchaseHistoryModel, adminModel, mongoose } from '../../model/index.js';
+dotenv.config();
 // const { verifyJWTToken, aesDecrypt, AdminAccessException } = require('../tools');
 
-export default  async (req, res) => {
+export default async (req, res) => {
   try {
     const decode = await tool.verifyJWTToken(req);
     switch (decode) {

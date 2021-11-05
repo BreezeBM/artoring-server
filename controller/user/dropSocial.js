@@ -1,13 +1,14 @@
+/* eslint-disable camelcase */
 import dotenv from 'dotenv';
-dotenv.config()
 
-import axios from 'axios'
+import axios from 'axios';
 // const { default: axios } = require('axios');
 import { userModel, reviewModel, mentoringModel, mongoose, careerInfoModel } from '../../model/index.js';
-import { tool, date } from '../tools/index.js'
+import { tool, date } from '../tools/index.js';
 // const { sha256Encrypt, verifyAndCallback, date } = require('../tools');
 
 import randWords from 'random-words';
+dotenv.config();
 
 function base64decode (data) {
   while (data.length % 4 !== 0) {
@@ -130,7 +131,7 @@ export default async (req, res) => {
               .all(promise.map(ele => {
               // 3사 앱 연결끊기.
 
-                ({ access_token, refresh_token } = ele.data || ele);
+                const { access_token, refresh_token } = ele.data || ele;
 
                 let proof;
                 if (ele.snsType === 'facebook') proof = tool.sha256Encrypt(999, fbToken || access_token || split[1], process.env.FACEBOOK_SEC);
@@ -143,12 +144,12 @@ export default async (req, res) => {
 
                 return ele.snsType !== 'facebook'
                   ? ele.snsType === 'kakao'
-                      ? axios.get(url, {
-                          headers: {
-                            Authorization: `${accessToken}`
-                          }
-                        })
-                      : axios.get(url)
+                    ? axios.get(url, {
+                      headers: {
+                        Authorization: `${accessToken}`
+                      }
+                    })
+                    : axios.get(url)
                   : axios.delete(url);
               })
               )
@@ -279,7 +280,7 @@ export default async (req, res) => {
       .then(promise => {
         return Promise.all(promise.map(ele => {
           // 2사 앱 연결끊기.
-          ({ access_token, refresh_token } = response.data || response);
+          const { access_token, refresh_token } = ele.data || ele;
 
           let proof;
           if (ele.snsType === 'facebook') proof = tool.sha256Encrypt(999, access_token, process.env.FACEBOOK_SEC);
@@ -290,13 +291,13 @@ export default async (req, res) => {
 
           return ele.snsType !== 'facebook'
             ? axios.post(url, {
-                target_id_type: 'user_id',
-                target_id: ele.appId
-              }, {
-                headers: {
-                  authorization: `KakaoAK ${process.env.KAKAO_ADM}`
-                }
-              })
+              target_id_type: 'user_id',
+              target_id: ele.appId
+            }, {
+              headers: {
+                authorization: `KakaoAK ${process.env.KAKAO_ADM}`
+              }
+            })
             : axios.delete(url);
         }))
           .then(() => reviewModel.find({ userId: mongoose.Types.ObjectId(userId) }))

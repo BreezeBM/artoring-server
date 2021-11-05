@@ -1,16 +1,15 @@
-import * as googleapis from "googleapis"
+import * as googleapis from 'googleapis';
 import path from 'path';
 // const { google, gmail_v1 } = require('googleapis');
 
 import dotenv from 'dotenv';
-dotenv.config()
 
-import {tool} from "./index.js"
+import { tools } from './index.js';
+dotenv.config();
 // const { createJWT, aesEncrypt } = require('./tools');
 const __dirname = path.resolve();
 
-
-const sendGMAIL = async function (data, email = data.email, res, emailData) {
+const sendGMAIL = async function (data, res, emailData, email = data.email) {
   const { userData, accessToken } = data;
   const encryptEmail = await tools.tool.aesEncrypt(email);
   const verifyToken = await tools.tool.createJWT({ encryptEmail }, 600);

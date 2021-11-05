@@ -1,12 +1,12 @@
 import dotenv from 'dotenv';
-dotenv.config()
 
-import {tool, date} from "../tools/index.js"
+import { tool, date } from '../tools/index.js';
 // const { aesEncrypt, aesDecrypt, createJWT, verifyJWTToken, AdminAccessException } = require('../tools');
 // const { date } = require('../tools');
 
 import { adminModel } from '../../model/index.js';
-import bcrypt from "bcrypt"
+import bcrypt from 'bcrypt';
+dotenv.config();
 // const bcrypt = require('bcrypt');
 
 const recaptchaAction = 'login';

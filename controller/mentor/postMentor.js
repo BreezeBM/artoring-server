@@ -1,5 +1,5 @@
 import { userModel, adminModel, mongoose } from '../../model/index.js';
-import { tool } from '../tools/index.js'
+import { tool } from '../tools/index.js';
 // const { verifyJWTToken, aesDecrypt, AdminAccessException } = require('../tools');
 
 export default async (req, res) => {

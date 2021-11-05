@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
-dotenv.config()
 
-import {tool, date} from '../tools/index.js'
+import { tool, date } from '../tools/index.js';
+dotenv.config();
 // const { verifyJWTToken, AdminAccessException, date } = require('../tools');
 
 export default async (req, res) => {

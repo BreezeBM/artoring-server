@@ -1,11 +1,11 @@
 import { userModel } from '../../model/index.js';
-import { tool, sendGmail } from '../tools/index.js'
+import { tool, sendGmail } from '../tools/index.js';
 // const { sha256Encrypt, sendGmail, createJWT } = require('../tools');
 
 import bcrypt from 'bcrypt';
 
 import dotenv from 'dotenv';
-dotenv.config()
+dotenv.config();
 
 export default async (req, res) => {
   const { email, name, gender, birth, phone, address } = req.body;

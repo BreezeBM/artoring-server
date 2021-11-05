@@ -1,5 +1,5 @@
-import { tool, seo } from '../tools/index.js'
-import { mentoringModel, adminModel, mongoose } from '../../model/index.js'
+import { tool, seo } from '../tools/index.js';
+import { mentoringModel, adminModel, mongoose } from '../../model/index.js';
 // const { verifyJWTToken, aesDecrypt, AdminAccessException, deleteSeo } = require('../tools');
 
 export default async (req, res) => {
@@ -37,7 +37,7 @@ export default async (req, res) => {
             mentoringModel.findOneAndDelete({ _id: mongoose.Types.ObjectId(_id) })
               .then((cardData) => {
                 // 크롤링 html 파일 제거
-               seo.deleteSeo(`/static/html/career/growing/${cardData.isGroup ? 'teach' : 'mentor'}/${cardData._id}/index.html`)
+                seo.deleteSeo(`/static/html/career/growing/${cardData.isGroup ? 'teach' : 'mentor'}/${cardData._id}/index.html`)
                   .then(() => {
                     res.status(204).send();
                   });

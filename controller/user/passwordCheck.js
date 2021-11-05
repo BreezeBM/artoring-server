@@ -1,8 +1,8 @@
 import dotenv from 'dotenv';
-dotenv.config()
 import bcrypt from 'bcrypt';
 import { userModel, mongoose } from '../../model/index.js';
-import { tool } from '../tools/index.js'
+import { tool } from '../tools/index.js';
+dotenv.config();
 // const { verifyJWTToken } = require('../tools');
 
 export default async (req, res) => {

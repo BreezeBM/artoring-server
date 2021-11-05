@@ -1,16 +1,16 @@
 import dotenv from 'dotenv';
-dotenv.config()
 
-import  { tool } from '../tools/index.js';
+import { tool } from '../tools/index.js';
 // const { sha256Encrypt } = require('../tools');
 import { adminModel } from '../../model/index.js';
 
-import randWords from 'random-words'
-import bcrypt from 'bcrypt'
+import randWords from 'random-words';
+import bcrypt from 'bcrypt';
+dotenv.config();
 // const randWords = require('random-words');
 // const bcrypt = require('bcrypt');
 
-export default  async (req, res) => {
+export default async (req, res) => {
   try {
     const hashingTime = process.env.NODE_ENV === 'development' ? process.env.HASHING_TIME_DEV_ADM : process.env.HASHING_TIME_PRO_ADM;
     const salt = process.env.NODE_ENV === 'development' ? process.env.SALT_DEV_ADM : process.env.SALT_PRO_ADM;

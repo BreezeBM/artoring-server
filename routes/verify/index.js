@@ -1,11 +1,11 @@
-import express from "express";
-const router = express.Router();
+import express from 'express';
 
-import {userController} from "../../controller/index.js";
+import { userController } from '../../controller/index.js';
+const router = express.Router();
 // const { verifyEmail, retryVerify } = require("../../controller/user");
 
-router.post("/email", userController.verifyEmail);
+router.post('/email', userController.verifyEmail);
 
-router.post("/retry", userController.retryVerify);
+router.post('/retry', userController.retryVerify);
 
 export default router;

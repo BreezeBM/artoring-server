@@ -14,10 +14,10 @@ import getInfo from './getCareerInfo.js';
 //   getInfo
 // };
 
-export { 
+export {
   getHandler,
   postCareerCard,
   deleteMentoring,
   deleteInfo,
-  getInfo 
-}
+  getInfo
+};

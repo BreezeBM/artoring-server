@@ -1,11 +1,11 @@
 import dotenv from 'dotenv';
-dotenv.config()
 
-import * as tools from "./tools.js"
+import * as tools from './tools.js';
 // const { createJWT, aesEncrypt } = require('./tools');
 
 // 이메일 검증을 위해 이메일에 링크를 전달할 모듈
-import nodemailer from "nodemailer"
+import nodemailer from 'nodemailer';
+dotenv.config();
 // const nodemailer = require('nodemailer');
 /**
  *

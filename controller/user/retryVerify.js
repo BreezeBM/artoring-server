@@ -1,5 +1,5 @@
 import { userModel, mongoose } from '../../model/index.js';
-import { tool, sendGmail } from '../tools/index.js'
+import { tool, sendGmail } from '../tools/index.js';
 // const { verifyJWTToken, sendGmail } = require('../tools');
 
 export default async (req, res) => {

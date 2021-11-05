@@ -1,9 +1,9 @@
 import createDOMPurify from 'dompurify';
-import jsdom from "jsdom";
+import jsdom from 'jsdom';
 // const createDOMPurify = require('dompurify');
 // const { JSDOM } = require('jsdom');
 
-import { tool, seo } from '../tools/index.js'
+import { tool, seo } from '../tools/index.js';
 // const { verifyJWTToken, AdminAccessException, aesDecrypt, createSeo } = require(
 //   '../tools'
 // );

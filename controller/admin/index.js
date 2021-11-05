@@ -5,13 +5,20 @@ import putPurchase from "./togglePurchase.js";
 import queryName from "./getMentorName.js";
 import logout from "./logout.js";
 
-const adminController = {
+// const adminController = {
+//   singup,
+//   login,
+//   getPurchase,
+//   putPurchase,
+//   queryName,
+//   logout,
+// }
+
+export { 
   singup,
   login,
   getPurchase,
   putPurchase,
   queryName,
-  logout,
-}
-
-export { adminController };
+  logout 
+};

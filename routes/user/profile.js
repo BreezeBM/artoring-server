@@ -1,7 +1,7 @@
 import express from "express";
 const router = express.Router();
 
-import * as userController from "../../controller/index.js";
+import {userController} from "../../controller/index.js";
 // const { userController } = require("../../controller");
 
 // 마이페이지에 접근하기 전에 한번더 비밀번호를 체크하는 로직, 와이어에는 없지만 혹시나 해서 넣었습니다

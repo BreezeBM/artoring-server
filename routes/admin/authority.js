@@ -1,10 +1,10 @@
 import express from "express";
 const router = express.Router();
 
-import * as authorityController from "../../controller/admin/index.js";
+import { adminController } from "../../controller/index.js";
 
-router.use("/login", authorityController.login);
-router.use("/logout", authorityController.logout);
-router.use("/signup", authorityController.singup);
+router.use("/login", adminController.login);
+router.use("/logout", adminController.logout);
+router.use("/signup", adminController.singup);
 
 export default router;

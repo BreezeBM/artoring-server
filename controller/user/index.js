@@ -19,8 +19,28 @@ import dropSocial from './dropSocial.js'
 
 import * as findCredential from './findCredent.js'
 
-const userController = {
-  getProfile,
+// const userController = {
+//   getProfile,
+//   putProfile,
+//   loginWithEmail,
+//   verifyEmail,
+//   retryVerify,
+//   signUpByEmail,
+//   socialLogin,
+//   logout,
+//   passwordMod,
+//   passwordCheck,
+//   getLike,
+//   postPurchase,
+//   getPurchase,
+//   dropUser,
+//   dropSocial,
+//   payment,
+//   postQuestions,
+//   findCredential
+// };
+
+export { getProfile,
   putProfile,
   loginWithEmail,
   verifyEmail,
@@ -37,7 +57,4 @@ const userController = {
   dropSocial,
   payment,
   postQuestions,
-  findCredential
-};
-
-export { userController };
+  findCredential };

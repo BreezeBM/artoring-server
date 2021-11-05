@@ -1,7 +1,7 @@
 import express from "express";
 const router = express.Router();
 
-import * as adminController from "../../controller/admin/index.js";
+import { adminController } from "../../controller/index.js";
 
 router.get("/:id", adminController.getPurchase);
 router.get("/", adminController.getPurchase);

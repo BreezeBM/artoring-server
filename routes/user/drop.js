@@ -1,7 +1,7 @@
 import express from "express";
 const router = express.Router();
 
-import * as userController from "../../controller/index.js";
+import { userController } from "../../controller/index.js";
 // const { userController } = require("../../controller");
 
 // 회원탈퇴

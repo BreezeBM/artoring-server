@@ -2,7 +2,7 @@
 import express from "express";
 const router = express.Router();
 
-import * as likesController from "../../controller/likes/index.js";
+import { likesController } from "../../controller/index.js";
 
 router.post("/:targetModel", likesController.postLikes);
 router.delete("/:targetModel/:targetId", likesController.deleteLikes);

@@ -4,14 +4,20 @@ import deleteInfo from './deleteInfoCard.js';
 import postCareerCard from './postCareerCard.js';
 import getInfo from './getCareerInfo.js';
 
-const careerCardController = {
-  getCard: getHandler,
-  postCard: postCareerCard,
-  deleteCard: deleteMentoring,
-  deleteInfo,
-  putCard: postCareerCard,
-  postCareerCard: postCareerCard,
-  getInfo
-};
+// const careerCardController = {
+//   getCard: getHandler,
+//   postCard: postCareerCard,
+//   deleteCard: deleteMentoring,
+//   deleteInfo,
+//   putCard: postCareerCard,
+//   postCareerCard: postCareerCard,
+//   getInfo
+// };
 
-export { careerCardController }
+export { 
+  getHandler,
+  postCareerCard,
+  deleteMentoring,
+  deleteInfo,
+  getInfo 
+}

@@ -2,7 +2,7 @@ import express from "express";
 
 const router = express.Router();
 
-import * as uploaderController from "../../controller/index.js";
+import { uploaderController } from "../../controller/index.js";
 // const { uploaderController } = require("../../controller");
 
 import multer from "multer";
@@ -39,7 +39,7 @@ const upload = multer({
   }),
 });
 
-router.post("/img", upload.single("file"), uploaderController.handler);
+router.post("/img", upload.single("file"), uploaderController.default.handler);
 
 router.use("/*", (req, res) => res.status(404).send());
 

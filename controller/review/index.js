@@ -1,7 +1,6 @@
-
 import getReview from './getReviews.js';
 import postReview from './postReview.js';
 
-const reviewController = { getReview, postReview };
+// const reviewController = { getReview, postReview };
 
-export { reviewController };
+export { getReview, postReview };

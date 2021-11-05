@@ -13,15 +13,15 @@ import inactiveAccount from "./controller/tools/inactiveAccount.js";
 // const cookieParser = require("cookie-parser");
 // const inactiveAccount = require("./controller/tools/inactiveAccount");
 
-require("moment-timezone");
+import moment from 'moment-timezone'
 dotenv.config();
-import * as db from "./db/index.js";
+import connectDB from "./db/index.js";
 
 const port = process.env.PORT || 4000;
 
 const app = express();
 
-db();
+connectDB();
 
 app.use(express.json({ extended: false }));
 app.use(cookieParser());

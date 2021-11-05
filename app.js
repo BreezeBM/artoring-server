@@ -6,6 +6,7 @@ import helmet from "helmet";
 import fs from "fs";
 import https from "https";
 import cookieParser from "cookie-parser";
+import dotenv from 'dotenv';
 import inactiveAccount from "./controller/tools/inactiveAccount.js";
 // const fs = require("fs");
 // const https = require("https");
@@ -13,7 +14,7 @@ import inactiveAccount from "./controller/tools/inactiveAccount.js";
 // const inactiveAccount = require("./controller/tools/inactiveAccount");
 
 require("moment-timezone");
-require("dotenv").config();
+dotenv.config();
 import * as db from "./db/index.js";
 
 const port = process.env.PORT || 4000;

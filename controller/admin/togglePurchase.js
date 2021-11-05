@@ -1,4 +1,5 @@
-require('dotenv').config();
+import dotenv from 'dotenv';
+dotenv.config()
 import { tool } from "../tools/index.js"
 import { purchaseHistoryModel, adminModel, mongoose } from '../../model/index.js';
 // const { verifyJWTToken, aesDecrypt, AdminAccessException } = require('../tools');

@@ -1,4 +1,5 @@
-require('dotenv').config();
+import dotenv from 'dotenv';
+dotenv.config()
 
 import  { tool } from '../tools/index.js';
 // const { sha256Encrypt } = require('../tools');

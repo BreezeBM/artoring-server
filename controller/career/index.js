@@ -14,4 +14,4 @@ const careerCardController = {
   getInfo
 };
 
-export default careerCardController
+export { careerCardController }

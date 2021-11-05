@@ -1,25 +1,25 @@
-const getProfile = require('./getProfile');
-const putProfile = require('./putProfile');
-const loginWithEmail = require('./loginWithEmail');
-const signUpByEmail = require('./signUpByEmail');
-const verifyEmail = require('./verifyEmail');
-const retryVerify = require('./retryVerify');
-const socialLogin = require('./socialLogin');
-const passwordMod = require('./passwordMod');
-const passwordCheck = require('./passwordCheck');
-const getLike = require('./getLike');
-const postPurchase = require('./postPerchase');
-const postQuestions = require('./postQuestions');
-const getPurchase = require('./getPurchase');
-const payment = require('./iamport');
-const logout = require('./logout');
+import getProfile from './getProfile.js'
+import putProfile from './putProfile.js'
+import loginWithEmail from './loginWithEmail.js'
+import signUpByEmail from './signUpByEmail.js'
+import verifyEmail from './verifyEmail.js'
+import retryVerify from './retryVerify.js'
+import socialLogin from './socialLogin.js'
+import passwordMod from './passwordMod.js'
+import passwordCheck from './passwordCheck.js'
+import getLike from './getLike.js'
+import postPurchase from './postPerchase.js'
+import postQuestions from './postQuestions.js'
+import getPurchase from './getPurchase.js'
+import * as payment from './iamport.js'
+import logout from './logout.js'
 
-const dropUser = require('./dropUser');
-const dropSocial = require('./dropSocial');
+import dropUser from './dropUser.js'
+import dropSocial from './dropSocial.js'
 
-const findCredential = require('./findCredent');
+import * as findCredential from './findCredent.js'
 
-const careerCardController = {
+const userController = {
   getProfile,
   putProfile,
   loginWithEmail,
@@ -40,4 +40,4 @@ const careerCardController = {
   findCredential
 };
 
-module.exports = careerCardController;
+export { userController };

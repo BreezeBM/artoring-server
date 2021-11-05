@@ -5,11 +5,13 @@ import putPurchase from "./togglePurchase.js";
 import queryName from "./getMentorName.js";
 import logout from "./logout.js";
 
-export {
+const adminController = {
   singup,
   login,
   getPurchase,
   putPurchase,
   queryName,
   logout,
-};
+}
+
+export { adminController };

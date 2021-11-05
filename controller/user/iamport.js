@@ -1,6 +1,7 @@
-const axios = require('axios');
-const { purchaseHistoryModel, mentoringModel, mongoose } = require('../../model');
-const { verifyJWTToken, verifyAndCallback, date } = require('../tools');
+import axios from 'axios';
+import { purchaseHistoryModel, mentoringModel, mongoose } from '../../model/index.js';
+import { tool, date } from '../tools/index.js'
+// const { verifyJWTToken, verifyAndCallback, date } = require('../tools');
 // 아임포트 결제이후 결제 내역 검증 및 저장
 const post = (req, res) => {
   if (!req.cookies.authorization) {
@@ -17,7 +18,7 @@ const post = (req, res) => {
   const tokenUrl = 'https://api.iamport.kr/users/getToken';
   const paymentUrl = 'https://api.iamport.kr/payments';
   if (loginType === 'email') {
-    const decode = verifyJWTToken(req);
+    const decode = tool.verifyJWTToken(req);
 
     switch (decode) {
       case 401: {
@@ -69,7 +70,7 @@ const post = (req, res) => {
       }
     }
   } else {
-    verifyAndCallback(() => {
+    tool.verifyAndCallback(() => {
       axios.post(tokenUrl, { imp_key: process.env.IAMPORT_KEY, imp_secret: process.env.IAMPORT_SEC })
         .then(({ data }) => {
           const { access_token } = data.response;
@@ -122,7 +123,7 @@ const remove = async (req, res) => {
 
   if (!merchantUid) res.status(404).send();
   else if (loginType === 'email') {
-    const decode = verifyJWTToken(req);
+    const decode = tool.verifyJWTToken(req);
 
     switch (decode) {
       case 401: {
@@ -160,7 +161,7 @@ const remove = async (req, res) => {
       }
     }
   } else {
-    verifyAndCallback(async () => {
+    tool.verifyAndCallback(async () => {
       const session = await purchaseHistoryModel.startSession();
       const transactionOptions = {
         readPreference: 'primary',
@@ -196,7 +197,7 @@ const revoke = async (req, res) => {
   const loginType = split[2];
 
   if (loginType === 'email') {
-    const decode = await verifyJWTToken(req);
+    const decode = await tool.verifyJWTToken(req);
 
     switch (decode) {
       case 401: {
@@ -277,7 +278,7 @@ const revoke = async (req, res) => {
       }
     }
   } else {
-    verifyAndCallback(() => {
+    tool.verifyAndCallback(() => {
       // 결제 정보 확인
       //
       let purchaseData;
@@ -410,5 +411,5 @@ const webhook = (req, res) => {
     });
 };
 
-module.exports = { post, remove, revoke, webhook }
+export { post, remove, revoke, webhook }
 ;

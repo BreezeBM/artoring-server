@@ -1,4 +1,5 @@
-require('dotenv').config();
+import dotenv from 'dotenv';
+dotenv.config()
 
 import * as tools from "./tools.js"
 // const { createJWT, aesEncrypt } = require('./tools');

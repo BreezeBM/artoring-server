@@ -4,4 +4,4 @@ import postReview from './postReview.js';
 
 const reviewController = { getReview, postReview };
 
-export default reviewController;
+export { reviewController };

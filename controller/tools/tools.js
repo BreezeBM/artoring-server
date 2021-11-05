@@ -5,7 +5,8 @@ import axios from "axios"
 // const jwt = require('jsonwebtoken');
 // const axios = require('axios');
 
-require('dotenv').config();
+import dotenv from 'dotenv';
+dotenv.config()
 
 /**
  * * 자주 사용되는 함수, 생성자들이 작성되어 있음

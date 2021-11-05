@@ -1,4 +1,5 @@
-require('dotenv').config();
+import dotenv from 'dotenv';
+dotenv.config()
 
 import {tool, date} from '../tools/index.js'
 // const { verifyJWTToken, AdminAccessException, date } = require('../tools');

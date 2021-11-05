@@ -2,7 +2,7 @@ import express from "express";
 const router = express.Router();
 
 // const { userController } = require("../../controller");
-import userController from "../../controller/index.js";
+import * as userController from "../../controller/index.js";
 // 이메일 찾기
 router.post("/email", userController.findCredential.email);
 

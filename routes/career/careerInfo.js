@@ -1,7 +1,7 @@
 import express from "express";
 const router = express.Router();
 
-import infoController from "../../controller/career/index.js";
+import * as infoController from "../../controller/career/index.js";
 
 // 교육, 모임등을 가진 모든 카테고리 정보를 리턴해야 합니다.
 router.get("/", infoController.getInfo);

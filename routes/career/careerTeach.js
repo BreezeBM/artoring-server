@@ -1,6 +1,6 @@
 import express from "express";
 // const { careerController } = require("../../controller");
-import careerController from "../../controller/index.js";
+import * as careerController from "../../controller/index.js";
 const router = express.Router();
 
 // 교육, 모임등을 가진 모든 카테고리 정보를 리턴해야 합니다.

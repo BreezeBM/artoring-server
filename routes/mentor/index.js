@@ -3,7 +3,7 @@ const router = express.Router();
 import applyRouter from "./apply.js";
 import calculatorRouter from "./calculate.js";
 
-import mentorController from "../../controller/mentor/index.js";
+import * as mentorController from "../../controller/mentor/index.js";
 
 router.use("/apply", applyRouter);
 router.use("/calculate", calculatorRouter);

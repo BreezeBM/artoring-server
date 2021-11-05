@@ -5,7 +5,7 @@ const router = express.Router();
 // const calculateRouter = require('./adminCalculate');
 // const adminCareerInfoRouter = require('./adminCareerInfo');
 // const adminCareerTeachRouter = require('./adminCareerTeach');
-import adminController from "../../controller/admin/index.js";
+import * as adminController from "../../controller/admin/index.js";
 
 // router.use('/grade', gradeRouter);
 // router.use('/calculate', calculateRouter);

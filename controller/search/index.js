@@ -1,4 +1,5 @@
-require('dotenv').config();
+import dotenv from 'dotenv';
+dotenv.config()
 
 import { Client } from '@elastic/elasticsearch'
 //const { Client } = require('@elastic/elasticsearch');

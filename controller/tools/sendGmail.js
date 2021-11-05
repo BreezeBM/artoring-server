@@ -1,10 +1,14 @@
 import * as googleapis from "googleapis"
+import path from 'path';
 // const { google, gmail_v1 } = require('googleapis');
 
-require('dotenv').config();
+import dotenv from 'dotenv';
+dotenv.config()
 
 import {tool} from "./index.js"
 // const { createJWT, aesEncrypt } = require('./tools');
+const __dirname = path.resolve();
+
 
 const sendGMAIL = async function (data, email = data.email, res, emailData) {
   const { userData, accessToken } = data;
@@ -12,7 +16,8 @@ const sendGMAIL = async function (data, email = data.email, res, emailData) {
   const verifyToken = await tools.tool.createJWT({ encryptEmail }, 600);
 
   const authClient = new googleapis.google.auth.JWT({
-    keyFile: __dirname + '/../../credentials.json',
+  // keyFile: __dirname + '/../../credentials.json',
+    keyFile: __dirname + '/config/s3.json',
     scopes: [
       'https://mail.google.com/',
       'https://www.googleapis.com/auth/gmail.modify',

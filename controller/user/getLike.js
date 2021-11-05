@@ -1,8 +1,9 @@
-const { userModel, mongoose } = require('../../model');
-const { verifyJWTToken, verifyAndCallback } = require('../tools');
+import { userModel, mongoose } from '../../model/index.js';
+import { tool } from "../tools/index.js"
+// const { verifyJWTToken, verifyAndCallback } = require('../tools');
 
-module.exports = async (req, res) => {
-  const decode = await verifyJWTToken(req);
+export default async (req, res) => {
+  const decode = await tool.verifyJWTToken(req);
 
   if (!req.cookies.authorization) {
     res.status(200).json({ code: 401, message: 'not authorized' });
@@ -107,7 +108,7 @@ module.exports = async (req, res) => {
       }
     }
   } else {
-    verifyAndCallback(async () => {
+    tool.verifyAndCallback(async () => {
       try {
         // if (Object.keys(req.query).length >= 2) {
         //   const result = {};

@@ -1,7 +1,8 @@
-const { userModel, purchaseHistoryModel, mentoringModel, mongoose } = require('../../model');
-const { verifyJWTToken, verifyAndCallback, sha256Encrypt } = require('../tools');
+import { userModel, purchaseHistoryModel, mentoringModel, mongoose } from '../../model/index.js';
+import { tool } from '../tools/index.js'
+// const { verifyJWTToken, verifyAndCallback, sha256Encrypt } = require('../tools');
 
-module.exports = async (req, res) => {
+export default async (req, res) => {
   const { cardId, userId, reservationType, startDate, endDate } = req.body;
   if (!req.cookies.authorization) {
     res.status(200).json({ code: 401, message: 'not authorized' });
@@ -13,7 +14,7 @@ module.exports = async (req, res) => {
 
   try {
     if (type === 'email') {
-      const decode = await verifyJWTToken(req);
+      const decode = await tool.verifyJWTToken(req);
 
       switch (decode) {
         case 401: {
@@ -51,7 +52,7 @@ module.exports = async (req, res) => {
                   bookedStartTime: startDate || targetData.startDate,
                   bookedEndTime: endDate || targetData.endDate,
                   // 아임포트에서 관리하는 merchant_id 는 40글자가 최대이다.
-                  merchantUid: `mid_${sha256Encrypt(36, _id, Date().toString())}`,
+                  merchantUid: `mid_${tool.sha256Encrypt(36, _id, Date().toString())}`,
                   originType: reservationType,
                   loginType: type,
                   startDate,
@@ -94,7 +95,7 @@ module.exports = async (req, res) => {
         }
       }
     } else {
-      verifyAndCallback(async () => {
+      tool.verifyAndCallback(async () => {
         const session = await purchaseHistoryModel.startSession();
 
         const targetData = await mentoringModel.findOne({ _id: cardId }).select({ price: 1, startDate: 1, endDate: 1 });
@@ -113,7 +114,7 @@ module.exports = async (req, res) => {
               price: targetData.price,
               bookedStartTime: startDate || targetData.startDate,
               bookedEndTime: endDate || targetData.endDate,
-              merchantUid: `mid_${sha256Encrypt(36, userId, Date().toString())}`,
+              merchantUid: `mid_${tool.sha256Encrypt(36, userId, Date().toString())}`,
               originType: reservationType,
               loginType: type,
               startDate,

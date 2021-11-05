@@ -1,14 +1,15 @@
-const dotenv = require("dotenv");
+import dotenv from "dotenv";
 
-const axios = require("axios");
-const { userModel } = require("../../model");
-const { trimNaver, trimKakao, trimFacebook, trimUserData } = require(
-  "../tools",
-);
-const { sha256Encrypt } = require("../tools");
+import axios from "axios";
+import { userModel } from "../../model/index.js"
+import { tool, profileTrim } from '../tools/index.js';
+// const { trimNaver, trimKakao, trimFacebook, trimUserData } = require(
+//   "../tools",
+// );
+// const { sha256Encrypt } = require("../tools");
 
 dotenv.config();
-module.exports = async (req, res) => {
+export default async (req, res) => {
   try {
     const { type } = req.params;
     const { code, state, id } = req.body; // 여기의 id는 페이스북만의 특수한 숫자 아이디.
@@ -56,7 +57,7 @@ module.exports = async (req, res) => {
 
     let proof;
     if (type === "facebook") {
-      proof = sha256Encrypt(999, token, process.env.FACEBOOK_SEC);
+      proof = tool.sha256Encrypt(999, token, process.env.FACEBOOK_SEC);
     }
 
     const api_url = type === "naver"
@@ -77,10 +78,10 @@ module.exports = async (req, res) => {
       : response = await axios.get(api_url);
 
     const userData = response.data.resultcode
-      ? trimNaver(response.data.response)
+      ? profileTrim.trimNaver(response.data.response)
       : response.data.kakao_account
-      ? trimKakao(response.data.kakao_account)
-      : trimFacebook(response.data);
+      ? profileTrim.trimKakao(response.data.kakao_account)
+      : profileTrim.trimFacebook(response.data);
 
     const registered = await userModel
       .findOne({ email: userData.email })
@@ -154,7 +155,7 @@ module.exports = async (req, res) => {
         }).status(200).json({ trimedData: registered });
       }
     } else {
-      trimUserData(userData);
+      profileTrim.trimUserData(userData);
 
       // 카카오 id를 토큰검증을 통해 확인
       if (type === "kakao") {

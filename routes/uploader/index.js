@@ -1,21 +1,26 @@
 import express from "express";
+
 const router = express.Router();
 
-import uploaderController from "../../controller/index.js";
+import * as uploaderController from "../../controller/index.js";
 // const { uploaderController } = require("../../controller");
 
 import multer from "multer";
 import multers3 from "multer-s3";
 // const multer = require("multer");
 // const multers3 = require("multer-s3");
-require("dotenv").config();
+import dotenv from 'dotenv';
+dotenv.config()
 
 import fs from "fs";
 import aws from "aws-sdk";
 // const fs = require("fs");
 // const aws = require("aws-sdk");
+import path from 'path';
+const __dirname = path.resolve();
 
-aws.config.loadFromPath(__dirname + "/../../config/s3.json");
+// aws.config.loadFromPath(__dirname + "/../../config/s3.json");
+aws.config.loadFromPath(__dirname + '/config/s3.json');
 aws.config.update({ accessKeyId: process.env.S3_KEY_ID });
 aws.config.update({ secretAccessKey: process.env.S3_ACC_KEY });
 

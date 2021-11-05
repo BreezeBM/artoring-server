@@ -1,11 +1,13 @@
-require('dotenv').config();
-const bcrypt = require('bcrypt');
-const { userModel, mongoose } = require('../../model');
-const { verifyJWTToken } = require('../tools');
+import dotenv from 'dotenv';
+dotenv.config()
+import bcrypt from 'bcrypt';
+import { userModel, mongoose } from '../../model/index.js';
+import { tool } from '../tools/index.js'
+// const { verifyJWTToken } = require('../tools');
 
-module.exports = async (req, res) => {
+export default async (req, res) => {
   try {
-    const decode = await verifyJWTToken(req);
+    const decode = await tool.verifyJWTToken(req);
     const { pwd, _id } = req.body;
 
     switch (decode) {

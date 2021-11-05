@@ -9,4 +9,4 @@ import getProject from './getProject.js';
 //   getProject
 // };
 
-export { getMentor, modifiMentor, getProject}
+export { getMentor, modifiMentor, getProject };

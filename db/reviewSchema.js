@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
-import {date} from "../controller/tools/index.js"
+import { date } from '../controller/tools/index.js';
 
-//const { date } = require('../controller/tools');
+// const { date } = require('../controller/tools');
 const Schema = mongoose.Schema;
 
 const reviewSchema = new Schema({

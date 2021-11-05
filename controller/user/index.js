@@ -1,23 +1,23 @@
-import getProfile from './getProfile.js'
-import putProfile from './putProfile.js'
-import loginWithEmail from './loginWithEmail.js'
-import signUpByEmail from './signUpByEmail.js'
-import verifyEmail from './verifyEmail.js'
-import retryVerify from './retryVerify.js'
-import socialLogin from './socialLogin.js'
-import passwordMod from './passwordMod.js'
-import passwordCheck from './passwordCheck.js'
-import getLike from './getLike.js'
-import postPurchase from './postPerchase.js'
-import postQuestions from './postQuestions.js'
-import getPurchase from './getPurchase.js'
-import * as payment from './iamport.js'
-import logout from './logout.js'
+import getProfile from './getProfile.js';
+import putProfile from './putProfile.js';
+import loginWithEmail from './loginWithEmail.js';
+import signUpByEmail from './signUpByEmail.js';
+import verifyEmail from './verifyEmail.js';
+import retryVerify from './retryVerify.js';
+import socialLogin from './socialLogin.js';
+import passwordMod from './passwordMod.js';
+import passwordCheck from './passwordCheck.js';
+import getLike from './getLike.js';
+import postPurchase from './postPerchase.js';
+import postQuestions from './postQuestions.js';
+import getPurchase from './getPurchase.js';
+import * as payment from './iamport.js';
+import logout from './logout.js';
 
-import dropUser from './dropUser.js'
-import dropSocial from './dropSocial.js'
+import dropUser from './dropUser.js';
+import dropSocial from './dropSocial.js';
 
-import * as findCredential from './findCredent.js'
+import * as findCredential from './findCredent.js';
 
 // const userController = {
 //   getProfile,
@@ -40,7 +40,8 @@ import * as findCredential from './findCredent.js'
 //   findCredential
 // };
 
-export { getProfile,
+export {
+  getProfile,
   putProfile,
   loginWithEmail,
   verifyEmail,
@@ -57,4 +58,5 @@ export { getProfile,
   dropSocial,
   payment,
   postQuestions,
-  findCredential };
+  findCredential
+};

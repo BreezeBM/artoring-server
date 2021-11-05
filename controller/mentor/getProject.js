@@ -1,5 +1,5 @@
 import { purchaseHistoryModel, mentoringModel, mongoose } from '../../model/index.js';
-import { tool } from '../tools/index.js'
+import { tool } from '../tools/index.js';
 // const { verifyJWTToken, verifyAndCallback } = require('../tools');
 
 // 멘토 개인페이지, 프로젝트 리스트 및 그 참여명단 처리 핸들러

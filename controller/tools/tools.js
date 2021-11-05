@@ -1,12 +1,12 @@
-import crypto from "crypto"
-import jwt from "jsonwebtoken"
-import axios from "axios"
+import crypto from 'crypto';
+import jwt from 'jsonwebtoken';
+import axios from 'axios';
 // const crypto = require('crypto');
 // const jwt = require('jsonwebtoken');
 // const axios = require('axios');
 
 import dotenv from 'dotenv';
-dotenv.config()
+dotenv.config();
 
 /**
  * * 자주 사용되는 함수, 생성자들이 작성되어 있음

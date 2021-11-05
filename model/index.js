@@ -1,15 +1,15 @@
-import mongoose from 'mongoose'
+import mongoose from 'mongoose';
+
+import mentoringSchema from '../db/mentoringSchema.js';
+import careerInfoSchema from '../db/careerInfoSchema.js';
+import userSchema from '../db/userSchema.js';
+import purchaseHistorySchema from '../db/purchaseHistorySchema.js';
+import reviewSchema from '../db/reviewSchema.js';
+import adminSchema from '../db/adminSchema.js';
+import tokenSchema from '../db/tokenSchema.js';
 // const mongoose = require('mongoose');
 
 mongoose.set('returnOriginal', false);
-
-import mentoringSchema from '../db/mentoringSchema.js'
-import careerInfoSchema from '../db/careerInfoSchema.js'
-import userSchema from '../db/userSchema.js'
-import purchaseHistorySchema from '../db/purchaseHistorySchema.js'
-import reviewSchema from '../db/reviewSchema.js'
-import adminSchema from '../db/adminSchema.js'
-import tokenSchema from '../db/tokenSchema.js'
 
 const mentoringModel = mongoose.model('mentoringModel', mentoringSchema);
 const careerInfoModel = mongoose.model('careerInfoModel', careerInfoSchema);

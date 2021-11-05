@@ -1,5 +1,5 @@
 import { mentoringModel, careerInfoModel, userModel, mongoose } from '../../model/index.js';
-import { tool } from '../tools/index.js'
+import { tool } from '../tools/index.js';
 // const { verifyJWTToken, UserException } = require('../tools');
 // const { verifyAndCallback } = require('../tools');
 

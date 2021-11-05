@@ -1,8 +1,8 @@
-import express from "express";
+import express from 'express';
+
+import { userController } from '../../controller/index.js';
 const router = express.Router();
 
-import {userController} from "../../controller/index.js";
-
-router.get("/", userController.logout);
+router.get('/', userController.logout);
 
 export default router;

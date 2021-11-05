@@ -1,8 +1,8 @@
 
 import dotenv from 'dotenv';
-dotenv.config()
 
 import mongoose from 'mongoose';
+dotenv.config();
 const connectDB = () => {
   const pass = encodeURIComponent(process.env.MONGO_SEC_KEY);
 
@@ -30,4 +30,4 @@ const connectDB = () => {
   dbconnect();
 };
 
-export default connectDB
+export default connectDB;

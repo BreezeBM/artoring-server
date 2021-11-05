@@ -1,5 +1,5 @@
-import {userModel} from '../../model/index.js';
-import { tool } from '../tools/index.js'
+import { userModel } from '../../model/index.js';
+import { tool } from '../tools/index.js';
 // const { verifyJWTToken, createJWT, aesDecrypt } = require('../tools');
 
 export default async (req, res) => {

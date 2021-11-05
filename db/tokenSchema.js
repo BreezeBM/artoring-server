@@ -1,9 +1,9 @@
 // 한번만 사용되어야 할 토큰을 관리하는 스키마
 
-import mongoose from'mongoose';
-import {date} from "../controller/tools/index.js"
+import mongoose from 'mongoose';
+import { date } from '../controller/tools/index.js';
 
-//const { date } = require('../controller/tools');
+// const { date } = require('../controller/tools');
 const Schema = mongoose.Schema;
 
 const tokenSchema = new Schema({

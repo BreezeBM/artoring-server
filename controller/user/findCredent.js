@@ -1,20 +1,20 @@
 import dotenv from 'dotenv';
-dotenv.config()
 import bcrypt from 'bcrypt';
-import { userModel, tokenModel, mongoose } from '../../model/index.js'
-import { tool, sendGmail } from '../tools/index.js'
+import { userModel, tokenModel } from '../../model/index.js';
+import { tool, sendGmail } from '../tools/index.js';
+dotenv.config();
 // const { sendGmail, createJWT, aesEncrypt, aesDecrypt, verifyJWTToken } = require('../tools');
 
 // 이메일 찾기 요청 핸들러
 // 아래 핸들러들은 로그인 없이 진행됨.
-const email = function(req, res) {
+const email = function (req, res) {
   const { userName: name, phone } = req.body;
   userModel.findOne({ name, phone }).select({ email: 1 })
     .then(userData => {
       if (userData) res.status(200).json({ code: 200, data: userData });
       else res.status(200).send({ code: 404, message: 'no match found' });
     });
-}
+};
 
 // 비밀번호 찾기 요청 핸들러
 const pwdReq = function (req, res) {
@@ -66,10 +66,10 @@ const pwdReq = function (req, res) {
           });
       }
     });
-}
+};
 
 // 비밀번호 변경 검증 요청 핸들러
-const pwdVerify = function(req, res) {
+const pwdVerify = function (req, res) {
   try {
     const { token, pwd } = req.body;
 
@@ -134,6 +134,6 @@ const pwdVerify = function(req, res) {
     console.log(e);
     if (e.type) { res.status(e.type).send(e.message); } else { res.status(500).send(e.message); }
   }
-}
+};
 
 export { email, pwdReq, pwdVerify };

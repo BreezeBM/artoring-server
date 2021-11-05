@@ -1,5 +1,5 @@
-import { tool, seo } from '../tools/index.js'
-import { careerInfoModel, adminModel, mongoose } from '../../model/index.js'
+import { tool, seo } from '../tools/index.js';
+import { careerInfoModel, adminModel, mongoose } from '../../model/index.js';
 // const { verifyJWTToken, aesDecrypt, AdminAccessException, deleteSeo } = require('../tools');
 
 export default async (req, res) => {

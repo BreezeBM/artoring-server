@@ -1,14 +1,14 @@
-import mongoose from "mongoose";
-import {date} from "../controller/tools/index.js"
+import mongoose from 'mongoose';
+import { date } from '../controller/tools/index.js';
 
-import mentorSchema from "./mentorSchema.js";
+import mentorSchema from './mentorSchema.js';
 // const { date } = require("../controller/tools");
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
   thumb: {
     type: String,
-    default: "https://artoring.com/image/1626851218536.png",
+    default: 'https://artoring.com/image/1626851218536.png'
   },
   name: { type: String },
 
@@ -29,11 +29,11 @@ const userSchema = new Schema({
     jobTitle: { type: String },
     belongs: { type: String },
     howLong: { type: String },
-    dept: String,
+    dept: String
   },
   interestedIn: [{
     name: String,
-    val: Boolean,
+    val: Boolean
   }],
 
   likedCareerEdu: [Schema.ObjectId],
@@ -41,13 +41,13 @@ const userSchema = new Schema({
   likedInfo: [Schema.ObjectId],
   outdoorAct: String,
   workHistory: String,
-  createdAt: { type: Date, default: new Date(date().add(9, "hours").format()) },
+  createdAt: { type: Date, default: new Date(date().add(9, 'hours').format()) },
   refOrLongTimeToken: String,
   drop: {
     name: String,
     reason: {},
-    date: { type: Date, default: new Date(date().add(9, "hours").format()) },
-  },
+    date: { type: Date, default: new Date(date().add(9, 'hours').format()) }
+  }
 });
 
 export default userSchema;

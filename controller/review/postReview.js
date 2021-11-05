@@ -1,5 +1,5 @@
 import { reviewModel, purchaseHistoryModel, userModel, mongoose, mentoringModel } from '../../model/index.js';
-import { tool } from '../tools/index.js'
+import { tool } from '../tools/index.js';
 // const { verifyJWTToken, verifyAndCallback } = require('../tools');
 export default async (req, res) => {
   if (!req.cookies.authorization) {

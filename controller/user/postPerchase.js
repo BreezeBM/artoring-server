@@ -1,5 +1,5 @@
 import { userModel, purchaseHistoryModel, mentoringModel, mongoose } from '../../model/index.js';
-import { tool } from '../tools/index.js'
+import { tool } from '../tools/index.js';
 // const { verifyJWTToken, verifyAndCallback, sha256Encrypt } = require('../tools');
 
 export default async (req, res) => {

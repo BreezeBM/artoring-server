@@ -1,6 +1,7 @@
+/* eslint-disable camelcase */
 import axios from 'axios';
 import { purchaseHistoryModel, mentoringModel, mongoose } from '../../model/index.js';
-import { tool, date } from '../tools/index.js'
+import { tool, date } from '../tools/index.js';
 // const { verifyJWTToken, verifyAndCallback, date } = require('../tools');
 // 아임포트 결제이후 결제 내역 검증 및 저장
 const post = (req, res) => {
@@ -377,13 +378,14 @@ const webhook = (req, res) => {
         .then((document) => {
           if (document.price === paymentData.amount) {
             switch (paymentData.status) {
-              case 'paid':
+              case 'paid': {
                 purchaseHistoryModel.findOneAndUpdate({ merchantUid }, { $set: { paymentData, progress: 'paid' } }, { new: true })
                   .then(() => {
                     res.send({ status: 'success', message: '일반 결제 성공' });
                   });
                 break;
-              case 'ready':
+              }
+              case 'ready': {
                 const { vbank_num: bankNum, vbank_date: bankDate, vbank_name: bankName } = paymentData;
 
                 purchaseHistoryModel.findOneAndUpdate({ merchantUid }, { $set: { paymentData, progress: 'ready' } }, { new: true })
@@ -394,13 +396,15 @@ const webhook = (req, res) => {
                   });
 
                 break;
-              case 'cancelled':
+              }
+              case 'cancelled': {
                 purchaseHistoryModel.findOneAndDelete({ merchantUid }, { $set: { progress: 'cancelled' } })
                   .then(() => {
                     mentoringModel.findOneAndUpdate({ _id: document.targetId }, { $inc: { joinedParticipants: -1 } });
                     res.send({ status: 'success', message: '결제 취소 완료' });
                   });
                 break;
+              }
             }
           } else { throw new Error({ status: 'forgery', message: '위조된 결제시도' }); }
         });

@@ -20,7 +20,8 @@ const purchaseHistorySchema = new Schema({
   questions: [{ type: String }],
   createdAt: { type: Date, default: new Date(date().add(9, 'hours').format()) },
   // 아임포트 결제 상태 저장
-  paymentData: { type: Object }
+  paymentData: { type: Object },
+  hopeTime: { type: String }
 });
 
 export default purchaseHistorySchema

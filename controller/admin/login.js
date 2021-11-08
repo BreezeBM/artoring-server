@@ -1,20 +1,24 @@
-require('dotenv').config();
+import dotenv from 'dotenv';
 
-const { aesEncrypt, aesDecrypt, createJWT, verifyJWTToken, AdminAccessException } = require('../tools');
-const { adminModel } = require('../../model');
-const bcrypt = require('bcrypt');
-const { date } = require('../tools');
+import { tool, date } from '../tools/index.js';
+// const { aesEncrypt, aesDecrypt, createJWT, verifyJWTToken, AdminAccessException } = require('../tools');
+// const { date } = require('../tools');
+import { RecaptchaEnterpriseServiceClient } from '@google-cloud/recaptcha-enterprise';
+import { adminModel } from '../../model/index.js';
+import bcrypt from 'bcrypt';
+dotenv.config();
+// const bcrypt = require('bcrypt');
 
 const recaptchaAction = 'login';
 
 let userEmail;
-module.exports = async (req, res) => {
+export default async (req, res) => {
   /*
    * 어드민 계정들은 email, pwd, 접근 레벨, 고유한 accessKey를 가집니다.
    */
   try {
     if (req.cookies.auth) {
-      const decode = await verifyJWTToken(req);
+      const decode = await tool.verifyJWTToken(req);
       if (decode) {
         switch (decode) {
           case 401: {
@@ -39,11 +43,11 @@ module.exports = async (req, res) => {
             if (!accessKey || authLevel === 0) throw new Error(1); // ('need authorize. request increase auth level');
 
             // AES 암호화된 데이터를 복호하 하여 권한을 검증.
-            const accKey = await aesDecrypt(accessKey);
+            const accKey = await tool.aesDecrypt(accessKey);
 
             const adminData = await adminModel.findOne({ name, accessKey: accKey }).select({ name: 1, accessKey: 1 });
 
-            if (!adminData) throw new AdminAccessException(2);
+            if (!adminData) throw new tool.AdminAccessException(2);
 
             res.status(200).json({ userData: adminData });
           }
@@ -64,9 +68,6 @@ module.exports = async (req, res) => {
             const recaptchaSiteKey = process.env.CAPTCHA_KEY;
             const token = captcha;
             const assessmentName = 'your_assessment_name';
-
-            const { RecaptchaEnterpriseServiceClient } =
-         require('@google-cloud/recaptcha-enterprise');
 
             // Create the reCAPTCHA client.
             const client = new RecaptchaEnterpriseServiceClient();
@@ -99,7 +100,7 @@ module.exports = async (req, res) => {
             if (!userData.accessKey || userData.attempts <= 0) {
               throw new Error(3);
             } else {
-              userData.accessKey = aesEncrypt(userData.accessKey);
+              userData.accessKey = tool.aesEncrypt(userData.accessKey);
 
               return createAssessment();
             }
@@ -121,7 +122,7 @@ module.exports = async (req, res) => {
               if (response[0].riskAnalysis.score <= 0.86) {
                 throw new Error('suspected as bot');
               } else {
-                const token = await createJWT({ name: userData.name, accessKey: userData.accessKey, authLevel: userData.authorityLevel }, 3600);
+                const token = await tool.createJWT({ name: userData.name, accessKey: userData.accessKey, authLevel: userData.authorityLevel }, 3600);
 
                 delete userData.pwd;
                 res.cookie('auth', token, {

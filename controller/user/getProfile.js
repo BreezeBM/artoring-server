@@ -1,8 +1,9 @@
 
-const { userModel } = require('../../model');
-const { verifyJWTToken, verifyAndCallback } = require('../tools');
+import { userModel } from '../../model/index.js';
+import { tool as tools } from '../tools/index.js';
+// const { verifyJWTToken, verifyAndCallback } = require('../tools');
 
-module.exports = async (req, res) => {
+export default async (req, res) => {
   if (!req.cookies.authorization) {
     res.status(200).json({ code: 401, message: 'not authorized' });
 
@@ -15,7 +16,7 @@ module.exports = async (req, res) => {
   const { id } = req.query;
   try {
     if (type === 'email') {
-      const decode = await verifyJWTToken(req);
+      const decode = await tools.verifyJWTToken(req);
 
       switch (decode) {
         case 401: {
@@ -33,7 +34,7 @@ module.exports = async (req, res) => {
         }
       }
     } else {
-      verifyAndCallback(async () => {
+      tools.verifyAndCallback(async () => {
         const userInfo = await userModel.findOne({ _id: id }).select({ pwd: 0 });
 
         res.status(200).json(userInfo);

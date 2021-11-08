@@ -1,8 +1,9 @@
-const { purchaseHistoryModel, mentoringModel, mongoose } = require('../../model');
-const { verifyJWTToken, verifyAndCallback } = require('../tools');
+import { purchaseHistoryModel, mentoringModel, mongoose } from '../../model/index.js';
+import { tool } from '../tools/index.js';
+// const { verifyJWTToken, verifyAndCallback } = require('../tools');
 
 // 멘토 개인페이지, 프로젝트 리스트 및 그 참여명단 처리 핸들러
-module.exports = async (req, res) => {
+export default async (req, res) => {
   const { userId, programId, size } = req.query;
   const page = Number(req.query.page);
 
@@ -17,7 +18,7 @@ module.exports = async (req, res) => {
 
   try {
     if (type === 'email') {
-      const decode = await verifyJWTToken(req);
+      const decode = await tool.verifyJWTToken(req);
 
       switch (decode) {
         case 401: {
@@ -95,7 +96,7 @@ module.exports = async (req, res) => {
         }
       }
     } else {
-      verifyAndCallback(async () => {
+      tool.verifyAndCallback(async () => {
         if (userId) {
           // 필수 정보 없으면 400 에러 리턴
           if (userId === '' || !page || page === '') res.status(400).send();

@@ -1,20 +1,20 @@
-const express = require('express');
+import express from 'express';
+
+import careerRouter from './career/index.js';
+import uploader from './uploader/index.js';
+import userRouter from './user/index.js';
+import reviewRouter from './review/index.js';
+import likesRouter from './likes/index.js';
+import verifyRouter from './verify/index.js';
+import searchRouter from './search/index.js';
+import purchaseRouter from './purchase/index.js';
+import adminRouter from './admin/index.js';
+import mentorRouter from './mentor/index.js';
+
+import findCredentialRouter from './credential/index.js';
+
+import { userController } from '../controller/index.js';
 const router = express.Router();
-
-const careerRouter = require('./career');
-const uploader = require('./uploader');
-const userRouter = require('./user');
-const reviewRouter = require('./review');
-const likesRouter = require('./likes');
-const verifyRouter = require('./verify');
-const searchRouter = require('./search');
-const purchaseRouter = require('./purchase');
-const adminRouter = require('./admin');
-const mentorRouter = require('./mentor');
-
-const findCredentialRouter = require('./credential');
-
-const { userController } = require('../controller');
 
 router.use('/career', careerRouter);
 router.use('/mentor', mentorRouter);
@@ -33,4 +33,5 @@ router.use('/credent', findCredentialRouter);
 
 router.use('/', userRouter);
 
-module.exports = router;
+// module.exports = router;
+export default router;

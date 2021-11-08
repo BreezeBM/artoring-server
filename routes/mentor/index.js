@@ -1,9 +1,9 @@
-const express = require('express');
-const router = express.Router();
-const applyRouter = require('./apply');
-const calculatorRouter = require('./calculate');
+import express from 'express';
+import applyRouter from './apply.js';
+import calculatorRouter from './calculate.js';
 
-const mentorController = require('../../controller/mentor');
+import { mentorController } from '../../controller/index.js';
+const router = express.Router();
 
 router.use('/apply', applyRouter);
 router.use('/calculate', calculatorRouter);
@@ -17,5 +17,4 @@ router.put('/', mentorController.modifiMentor);
 
 router.use('/*', (req, res) => res.status(404).send());
 
-module.exports = router
-;
+export default router;

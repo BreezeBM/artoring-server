@@ -1,7 +1,6 @@
+import getReview from './getReviews.js';
+import postReview from './postReview.js';
 
-const getReview = require('./getReviews');
-const postReview = require('./postReview');
+// const reviewController = { getReview, postReview };
 
-const reviewController = { getReview, postReview };
-
-module.exports = reviewController;
+export { getReview, postReview };

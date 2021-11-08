@@ -1,7 +1,8 @@
-const express = require('express');
-const router = express.Router();
+import express from 'express';
 
-const { userController } = require('../../controller');
+import { userController } from '../../controller/index.js';
+const router = express.Router();
+// const { userController } = require("../../controller");
 
 // 회원탈퇴
 
@@ -18,4 +19,4 @@ router.use('/*', (req, res) => {
   res.status(404).send();
 });
 
-module.exports = router;
+export default router;

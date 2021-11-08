@@ -1,6 +1,7 @@
-const { purchaseHistoryModel, mongoose } = require('../../model');
-const { verifyJWTToken, verifyAndCallback } = require('../tools');
-module.exports = async (req, res) => {
+import { purchaseHistoryModel, mongoose } from '../../model/index.js';
+import { tool } from '../tools/index.js';
+// const { verifyJWTToken, verifyAndCallback } = require('../tools');
+export default async (req, res) => {
   if (!req.cookies.authorization) {
     res.status(200).json({ code: 401, message: 'not authorized' });
     return null;
@@ -13,7 +14,7 @@ module.exports = async (req, res) => {
   if (loginType) {
     if (loginType === 'email') {
       try {
-        const decode = await verifyJWTToken(req);
+        const decode = await tool.verifyJWTToken(req);
 
         switch (decode) {
           case 401: {
@@ -49,7 +50,7 @@ module.exports = async (req, res) => {
         res.json(e.message);
       }
     } else {
-      verifyAndCallback(() => {
+      tool.verifyAndCallback(() => {
         const { _id, questions } = req.body;
 
         purchaseHistoryModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(_id) }, {

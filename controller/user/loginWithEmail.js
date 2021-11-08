@@ -1,19 +1,21 @@
-require("dotenv").config();
-const { userModel, mongoose } = require("../../model");
-const { createJWT, verifyJWTToken, sha256Encrypt } = require("../tools");
-const bcrypt = require("bcrypt");
+import dotenv from 'dotenv';
+import { userModel, mongoose } from '../../model/index.js';
+import { tool } from '../tools/index.js';
+// const { createJWT, verifyJWTToken, sha256Encrypt } = require("../tools");
+import bcrypt from 'bcrypt';
+dotenv.config();
 
-module.exports = async (req, res) => {
+export default async (req, res) => {
   const { password, email } = req.body;
-  const hashingTime = process.env.NODE_ENV === "development"
-    ? process.env.HASHING_TIME_DEV
-    : process.env.HASHING_TIME_PRO;
-  const salt = process.env.NODE_ENV === "development"
-    ? process.env.SALT_DEV
-    : process.env.SALT_PRO;
+  // const hashingTime = process.env.NODE_ENV === 'development'
+  //   ? process.env.HASHING_TIME_DEV
+  //   : process.env.HASHING_TIME_PRO;
+  // const salt = process.env.NODE_ENV === 'development'
+  //   ? process.env.SALT_DEV
+  //   : process.env.SALT_PRO;
 
   if (req.cookies.authorization) {
-    const decode = await verifyJWTToken(req);
+    const decode = await tool.verifyJWTToken(req);
 
     switch (decode) {
       case 401: {
@@ -27,7 +29,7 @@ module.exports = async (req, res) => {
       default: {
         userModel.findOne({
           _id: mongoose.Types.ObjectId(decode._id),
-          name: decode.name,
+          name: decode.name
         })
           .select({
             _id: 1,
@@ -42,7 +44,7 @@ module.exports = async (req, res) => {
             likedInfo: 1,
             verifiedEmail: 1,
             verifiedPhone: 1,
-            createdAt: 1,
+            createdAt: 1
           })
           .then((data) => {
             res.status(200).json(data);
@@ -65,7 +67,7 @@ module.exports = async (req, res) => {
         likedInfo: 1,
         verifiedEmail: 1,
         verifiedPhone: 1,
-        createdAt: 1,
+        createdAt: 1
       })
       .then((data) => {
         if (data) {
@@ -73,24 +75,24 @@ module.exports = async (req, res) => {
             .then(async (result) => {
               if (result) {
                 delete data.pwd;
-                const token = await createJWT({
+                const token = await tool.createJWT({
                   _id: data._id,
-                  name: data.name,
+                  name: data.name
                 }, 3600);
-                res.cookie("authorization", `Bearer ${token} email`, {
+                res.cookie('authorization', `Bearer ${token} email`, {
                   secure: true,
                   httpOnly: true,
                   // domain: process.env.NODE_ENV === 'development' ? 'localhost' : 'back.artoring.com',
                   maxAge: 3600 * 1000,
-                  sameSite: "none",
-                  path: "/",
+                  sameSite: 'none',
+                  path: '/'
                 }).status(201).json({ userData: data });
               } else {
-                res.status(401).send({ message: "잘못된 비밀번호" });
+                res.status(401).send({ message: '잘못된 비밀번호' });
               }
             });
         } else {
-          res.status(404).send({ message: "유저정보를 찾을수 없습니다." });
+          res.status(404).send({ message: '유저정보를 찾을수 없습니다.' });
         }
       })
       .catch((e) => {
@@ -98,6 +100,6 @@ module.exports = async (req, res) => {
         res.status(500).json(e.message);
       });
   } else {
-    res.status(400).send({ message: "Invalid Access" });
+    res.status(400).send({ message: 'Invalid Access' });
   }
 };

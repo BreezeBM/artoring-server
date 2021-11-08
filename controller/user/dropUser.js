@@ -1,11 +1,13 @@
-require('dotenv').config();
+import dotenv from 'dotenv';
 
-const { userModel, reviewModel, careerInfoModel, mentoringModel, mongoose } = require('../../model');
-const { verifyJWTToken, verifyAndCallback, sha256Encrypt, date } = require('../tools');
+import { userModel, reviewModel, careerInfoModel, mentoringModel, mongoose } from '../../model/index.js';
+import { tool, date } from '../tools/index.js';
+// const { verifyJWTToken, verifyAndCallback, sha256Encrypt, date } = require('../tools');
 
-const randWords = require('random-words');
+import randWords from 'random-words';
+dotenv.config();
 
-module.exports = async (req, res) => {
+export default async (req, res) => {
   const { _id, reason } = req.body;
 
   const randomWords = randWords({ min: 3, exactly: 24, join: ' ' });
@@ -32,7 +34,7 @@ module.exports = async (req, res) => {
   if (!req.cookies.authorization.includes('email')) {
     const [Bearer, token, snsType] = req.cookies.authorization.split(' ');
 
-    verifyAndCallback(() => {
+    tool.verifyAndCallback(() => {
       dropUser();
     }, snsType, Bearer.concat(' ', token), res);
   } else {
@@ -41,7 +43,7 @@ module.exports = async (req, res) => {
 
   async function dropUser () {
     try {
-      const decode = await verifyJWTToken(req);
+      const decode = await tool.verifyJWTToken(req);
 
       switch (decode) {
         case 401: {
@@ -63,7 +65,7 @@ module.exports = async (req, res) => {
                 thumb: 'https://artoring.com/image/1626851218536.png',
                 appId: '',
                 nickName: '',
-                email: sha256Encrypt(999, randomWords, Date.toString()),
+                email: tool.sha256Encrypt(999, randomWords, Date.toString()),
                 gender: '',
                 birth: '',
                 phone: '',

@@ -1,6 +1,8 @@
-const axios = require('axios');
-const { purchaseHistoryModel, mentoringModel, mongoose } = require('../../model');
-const { verifyJWTToken, verifyAndCallback, date } = require('../tools');
+/* eslint-disable camelcase */
+import axios from 'axios';
+import { purchaseHistoryModel, mentoringModel, mongoose, userModel } from '../../model/index.js';
+import { tool, date } from '../tools/index.js';
+// const { verifyJWTToken, verifyAndCallback, date } = require('../tools');
 // 아임포트 결제이후 결제 내역 검증 및 저장
 const post = (req, res) => {
   if (!req.cookies.authorization) {
@@ -17,7 +19,7 @@ const post = (req, res) => {
   const tokenUrl = 'https://api.iamport.kr/users/getToken';
   const paymentUrl = 'https://api.iamport.kr/payments';
   if (loginType === 'email') {
-    const decode = verifyJWTToken(req);
+    const decode = tool.verifyJWTToken(req);
 
     switch (decode) {
       case 401: {
@@ -69,7 +71,7 @@ const post = (req, res) => {
       }
     }
   } else {
-    verifyAndCallback(() => {
+    tool.verifyAndCallback(() => {
       axios.post(tokenUrl, { imp_key: process.env.IAMPORT_KEY, imp_secret: process.env.IAMPORT_SEC })
         .then(({ data }) => {
           const { access_token } = data.response;
@@ -122,7 +124,7 @@ const remove = async (req, res) => {
 
   if (!merchantUid) res.status(404).send();
   else if (loginType === 'email') {
-    const decode = verifyJWTToken(req);
+    const decode = tool.verifyJWTToken(req);
 
     switch (decode) {
       case 401: {
@@ -160,7 +162,7 @@ const remove = async (req, res) => {
       }
     }
   } else {
-    verifyAndCallback(async () => {
+    tool.verifyAndCallback(async () => {
       const session = await purchaseHistoryModel.startSession();
       const transactionOptions = {
         readPreference: 'primary',
@@ -196,7 +198,7 @@ const revoke = async (req, res) => {
   const loginType = split[2];
 
   if (loginType === 'email') {
-    const decode = await verifyJWTToken(req);
+    const decode = await tool.verifyJWTToken(req);
 
     switch (decode) {
       case 401: {
@@ -269,6 +271,9 @@ const revoke = async (req, res) => {
           .then(() => {
             return mentoringModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(purchaseData.targetId) }, { $inc: { joinedParticipants: -1 } });
           })
+          .then((mentoringData) => {
+            if (purchaseData.progress === 'completed') return userModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(mentoringData.moderatorId) }, { $inc: { 'mentor.settledAmount': purchaseData.price * -1 } });
+          })
           .then(() => res.status(200).send())
           .catch(e => {
             console.log(e);
@@ -277,7 +282,7 @@ const revoke = async (req, res) => {
       }
     }
   } else {
-    verifyAndCallback(() => {
+    tool.verifyAndCallback(() => {
       // 결제 정보 확인
       //
       let purchaseData;
@@ -336,6 +341,9 @@ const revoke = async (req, res) => {
         .then(() => {
           return mentoringModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(purchaseData.targetId) }, { $inc: { joinedParticipants: -1 } });
         })
+        .then((mentoringData) => {
+          if (purchaseData.progress === 'completed') return userModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(mentoringData.moderatorId) }, { $inc: { 'mentor.settledAmount': purchaseData.price * -1 } });
+        })
         .then(() => res.status(200).send())
         .catch(e => {
           console.log(e);
@@ -376,13 +384,14 @@ const webhook = (req, res) => {
         .then((document) => {
           if (document.price === paymentData.amount) {
             switch (paymentData.status) {
-              case 'paid':
+              case 'paid': {
                 purchaseHistoryModel.findOneAndUpdate({ merchantUid }, { $set: { paymentData, progress: 'paid' } }, { new: true })
                   .then(() => {
                     res.send({ status: 'success', message: '일반 결제 성공' });
                   });
                 break;
-              case 'ready':
+              }
+              case 'ready': {
                 const { vbank_num: bankNum, vbank_date: bankDate, vbank_name: bankName } = paymentData;
 
                 purchaseHistoryModel.findOneAndUpdate({ merchantUid }, { $set: { paymentData, progress: 'ready' } }, { new: true })
@@ -393,13 +402,20 @@ const webhook = (req, res) => {
                   });
 
                 break;
-              case 'cancelled':
+              }
+              case 'cancelled': {
                 purchaseHistoryModel.findOneAndDelete({ merchantUid }, { $set: { progress: 'cancelled' } })
-                  .then(() => {
-                    mentoringModel.findOneAndUpdate({ _id: document.targetId }, { $inc: { joinedParticipants: -1 } });
+                  .then((purchaseData) => {
+                    mentoringModel.findOneAndUpdate({ _id: document.targetId }, { $inc: { joinedParticipants: -1 } })
+                      .then(() => {
+                        if (purchaseData.process === 'completed') {
+                          return userModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(purchaseData.moderatorId) }, { $inc: { 'mentor.settledAmount': purchaseData.price * -1 } });
+                        }
+                      });
                     res.send({ status: 'success', message: '결제 취소 완료' });
                   });
                 break;
+              }
             }
           } else { throw new Error({ status: 'forgery', message: '위조된 결제시도' }); }
         });
@@ -410,5 +426,5 @@ const webhook = (req, res) => {
     });
 };
 
-module.exports = { post, remove, revoke, webhook }
+export { post, remove, revoke, webhook }
 ;

@@ -1,11 +1,13 @@
-const { userModel } = require('../../model');
-const { sha256Encrypt, sendGmail, createJWT } = require('../tools');
+import { userModel } from '../../model/index.js';
+import { tool, sendGmail } from '../tools/index.js';
+// const { sha256Encrypt, sendGmail, createJWT } = require('../tools');
 
-const bcrypt = require('bcrypt');
+import bcrypt from 'bcrypt';
 
-require('dotenv').config();
+import dotenv from 'dotenv';
+dotenv.config();
 
-module.exports = async (req, res) => {
+export default async (req, res) => {
   const { email, name, gender, birth, phone, address } = req.body;
   const { password } = req.body;
 
@@ -15,7 +17,7 @@ module.exports = async (req, res) => {
       // 데이터가 존재하는 경우라면, 이미 가입한 경우
 
       if (data) {
-        const accessToken = await createJWT({ _id: data._id, name: data.name }, 3600);
+        const accessToken = await tool.createJWT({ _id: data._id, name: data.name }, 3600);
         res.status(409).send({ message: '이미 가입된 이메일입니다.', userData: data, accessToken });
       } else {
         // 환경변수에따라 해싱하는 횟수와 사용되는 솔트의 값이 달라진다.
@@ -48,7 +50,7 @@ module.exports = async (req, res) => {
                 { name: '구분 외 관심사 or 기타', val: false }]
             });
 
-            const accessToken = await createJWT({ _id: userData._id, name: userData.name }, 3600);
+            const accessToken = await tool.createJWT({ _id: userData._id, name: userData.name }, 3600);
 
             // 유저정보를 이용하여 구글 메일 서버를 활용하여 이메일을 보낸다
             await sendGmail({ userData, accessToken }, userData.email, res);

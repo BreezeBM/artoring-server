@@ -1,10 +1,10 @@
-const express = require('express');
-const router = express.Router();
+import express from 'express';
 
-const adminController = require('../../controller/admin');
+import { adminController } from '../../controller/index.js';
+const router = express.Router();
 
 router.get('/:id', adminController.getPurchase);
 router.get('/', adminController.getPurchase);
 router.post('/', adminController.putPurchase);
 
-module.exports = router;
+export default router;

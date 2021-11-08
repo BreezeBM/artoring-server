@@ -1,15 +1,24 @@
-const singup = require("./signup");
-const login = require("./login");
-const getPurchase = require("./getAdminPurchase");
-const putPurchase = require("./togglePurchase");
-const queryName = require("./getMentorName");
-const logout = require("./logout");
+import singup from './signup.js';
+import login from './login.js';
+import getPurchase from './getAdminPurchase.js';
+import putPurchase from './togglePurchase.js';
+import queryName from './getMentorName.js';
+import logout from './logout.js';
 
-module.exports = {
+// const adminController = {
+//   singup,
+//   login,
+//   getPurchase,
+//   putPurchase,
+//   queryName,
+//   logout,
+// }
+
+export {
   singup,
   login,
   getPurchase,
   putPurchase,
   queryName,
-  logout,
+  logout
 };

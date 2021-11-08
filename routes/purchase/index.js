@@ -1,8 +1,8 @@
-const express = require('express');
+import express from 'express';
+
+// const { userController } = require("../../controller");
+import { userController } from '../../controller/index.js';
 const router = express.Router();
-
-const { userController } = require('../../controller');
-
 // 결제 완료이후 데이터 검증
 router.post('/payment', userController.payment.post);
 
@@ -23,4 +23,4 @@ router.use('/*', (req, res) => {
   res.status(404).send();
 });
 
-module.exports = router;
+export default router;

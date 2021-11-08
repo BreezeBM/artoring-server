@@ -1,10 +1,12 @@
-require('dotenv').config();
-const { purchaseHistoryModel, adminModel, mongoose } = require('../../model');
-const { verifyJWTToken, aesDecrypt, AdminAccessException } = require('../tools');
+import dotenv from 'dotenv';
+import { tool } from '../tools/index.js';
+import { purchaseHistoryModel, mentoringModel, userModel, adminModel, mongoose } from '../../model/index.js';
+dotenv.config();
+// const { verifyJWTToken, aesDecrypt, AdminAccessException } = require('../tools');
 
-module.exports = async (req, res) => {
+export default async (req, res) => {
   try {
-    const decode = await verifyJWTToken(req);
+    const decode = await tool.verifyJWTToken(req);
     switch (decode) {
       case 401: {
         res.status(401).send();
@@ -21,17 +23,23 @@ module.exports = async (req, res) => {
 
         const { name, accessKey, authLevel } = decode;
 
-        if (!accessKey || authLevel === 0) throw new AdminAccessException('need authorize');
+        if (!accessKey || authLevel === 0) throw new tool.AdminAccessException('need authorize');
 
         // AES 암호화된 데이터를 복호하 하여 권한을 검증.
-        const accKey = await aesDecrypt(accessKey);
+        const accKey = await tool.aesDecrypt(accessKey);
 
         const adminData = await adminModel.find({ name, accessKey: accKey });
-        if (!adminData) throw new AdminAccessException('no match found');
+        if (!adminData) throw new tool.AdminAccessException('no match found');
 
         const { id: _id, inProgress: progress } = req.body;
 
-        await purchaseHistoryModel.findByIdAndUpdate({ _id: mongoose.Types.ObjectId(_id) }, { progress });
+        purchaseHistoryModel.findByIdAndUpdate({ _id: mongoose.Types.ObjectId(_id) }, { progress })
+          .then((purchaseData) => {
+            if (progress === 'completed') {
+              mentoringModel.findById(purchaseData.targetId)
+                .then((programData) => userModel.findOneAndUpdate({ _id: programData.moderatorId }, { $inc: { 'mentor.settledAmount': programData.price } }));
+            }
+          });
 
         res.status(200).json();
       }

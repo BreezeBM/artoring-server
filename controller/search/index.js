@@ -1,6 +1,8 @@
-require('dotenv').config();
+import dotenv from 'dotenv';
 
-const { Client } = require('@elastic/elasticsearch');
+import { Client } from '@elastic/elasticsearch';
+dotenv.config();
+// const { Client } = require('@elastic/elasticsearch');
 
 // 엘라스틱 서치 연결
 const client = new Client({
@@ -271,4 +273,4 @@ const searchEngine = async (callback, keyword, model, page) => {
 }
 ;
 
-module.exports = searchEngine;
+export default searchEngine;

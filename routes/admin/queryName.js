@@ -1,11 +1,11 @@
-const express = require('express');
-const router = express.Router();
+import express from 'express';
 
 // const gradeRouter = require('./grade');
 // const calculateRouter = require('./adminCalculate');
 // const adminCareerInfoRouter = require('./adminCareerInfo');
 // const adminCareerTeachRouter = require('./adminCareerTeach');
-const adminController = require('../../controller/admin');
+import { adminController } from '../../controller/index.js';
+const router = express.Router();
 
 // router.use('/grade', gradeRouter);
 // router.use('/calculate', calculateRouter);
@@ -16,4 +16,4 @@ router.post('/', adminController.queryName);
 
 router.use('/*', (req, res) => res.status(404).send());
 
-module.exports = router;
+export default router;

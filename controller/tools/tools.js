@@ -1,9 +1,12 @@
+import crypto from 'crypto';
+import jwt from 'jsonwebtoken';
+import axios from 'axios';
+// const crypto = require('crypto');
+// const jwt = require('jsonwebtoken');
+// const axios = require('axios');
 
-const crypto = require('crypto');
-const jwt = require('jsonwebtoken');
-const axios = require('axios');
-
-require('dotenv').config();
+import dotenv from 'dotenv';
+dotenv.config();
 
 /**
  * * 자주 사용되는 함수, 생성자들이 작성되어 있음
@@ -200,4 +203,4 @@ const verifyAndCallback = async function (callback, type, accessToken, res, user
     });
 };
 
-module.exports = { verifyJWTToken, createJWT, verifyAndCallback, sha256Encrypt, aesEncrypt, aesDecrypt, AdminAccessException, UserException };
+export { verifyJWTToken, createJWT, verifyAndCallback, sha256Encrypt, aesEncrypt, aesDecrypt, AdminAccessException, UserException };

@@ -94,5 +94,5 @@ const trimUserData = (userData) => {
     { name: '구분 외 관심사 or 기타', val: false }];
 };
 
-module.exports = { trimKakao, trimNaver, trimFacebook, trimUserData }
+export { trimKakao, trimNaver, trimFacebook, trimUserData }
 ;

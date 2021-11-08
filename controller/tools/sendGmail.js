@@ -1,16 +1,22 @@
-const { google, gmail_v1 } = require('googleapis');
+import * as googleapis from 'googleapis';
+import path from 'path';
+// const { google, gmail_v1 } = require('googleapis');
 
-require('dotenv').config();
+import dotenv from 'dotenv';
 
-const { createJWT, aesEncrypt } = require('./tools');
+import { tool as tools } from './index.js';
+dotenv.config();
+// const { createJWT, aesEncrypt } = require('./tools');
+const __dirname = path.resolve();
 
-const sendGMAIL = async function (data, email = data.email, res, emailData) {
+const sendGMAIL = async function (data, res, emailData, email = data.email) {
   const { userData, accessToken } = data;
-  const encryptEmail = await aesEncrypt(email);
-  const verifyToken = await createJWT({ encryptEmail }, 600);
+  const encryptEmail = await tools.tool.aesEncrypt(email);
+  const verifyToken = await tools.tool.createJWT({ encryptEmail }, 600);
 
-  const authClient = new google.auth.JWT({
-    keyFile: __dirname + '/../../credentials.json',
+  const authClient = new googleapis.google.auth.JWT({
+  // keyFile: __dirname + '/../../credentials.json',
+    keyFile: __dirname + '/config/s3.json',
     scopes: [
       'https://mail.google.com/',
       'https://www.googleapis.com/auth/gmail.modify',
@@ -21,7 +27,7 @@ const sendGMAIL = async function (data, email = data.email, res, emailData) {
   });
 
   await authClient.authorize();
-  const gmail = new gmail_v1.Gmail({ auth: authClient });
+  const gmail = new googleapis.gmail_v1.Gmail({ auth: authClient });
 
   // emailData가 있는 경우는 인증과 관련없는 메일 -> 로그인 처리가 되어서는 안된다.
   if (emailData) {
@@ -135,4 +141,4 @@ const sendGMAIL = async function (data, email = data.email, res, emailData) {
   }
 };
 
-module.exports = sendGMAIL;
+export default sendGMAIL;

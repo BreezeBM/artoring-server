@@ -1,8 +1,8 @@
-const express = require('express');
+import express from 'express';
+
+// const { userController } = require("../../controller");
+import { userController } from '../../controller/index.js';
 const router = express.Router();
-
-const { userController } = require('../../controller');
-
 // 이메일 찾기
 router.post('/email', userController.findCredential.email);
 
@@ -12,4 +12,4 @@ router.post('/pwd', userController.findCredential.pwdReq);
 // 비밀번호 검증 및 반영
 router.post('/check', userController.findCredential.pwdVerify);
 
-module.exports = router;
+export default router;

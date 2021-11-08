@@ -1,13 +1,13 @@
-const express = require('express');
-const router = express.Router();
+import express from 'express';
 
 // const gradeRouter = require('./grade');
 // const calculateRouter = require('./adminCalculate');
 // const adminCareerInfoRouter = require('./adminCareerInfo');
 // const adminCareerTeachRouter = require('./adminCareerTeach');
-const authorityRouter = require('./authority');
-const purchaseRouter = require('./adminPurchase');
-const nameRouter = require('./queryName');
+import authorityRouter from './authority.js';
+import purchaseRouter from './adminPurchase.js';
+import nameRouter from './queryName.js';
+const router = express.Router();
 
 // router.use('/grade', gradeRouter);
 // router.use('/calculate', calculateRouter);
@@ -20,4 +20,4 @@ router.use('/', authorityRouter);
 
 router.use('/*', (req, res) => res.status(404).send());
 
-module.exports = router;
+export default router;

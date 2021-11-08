@@ -1,15 +1,17 @@
-require('dotenv').config();
-const bcrypt = require('bcrypt');
-const { userModel, mongoose } = require('../../model');
-const { verifyJWTToken } = require('../tools');
+import dotenv from 'dotenv';
+import bcrypt from 'bcrypt';
+import { userModel, mongoose } from '../../model/index.js';
+import { tool } from '../tools/index.js';
+dotenv.config();
+// const { verifyJWTToken } = require('../tools');
 
-module.exports = async (req, res) => {
+export default async (req, res) => {
   if (!req.cookies.authorization) {
     res.status(200).json({ code: 401, message: 'not authorized' });
     return null;
   }
 
-  const decode = await verifyJWTToken(req);
+  const decode = await tool.verifyJWTToken(req);
   const { pwd, pwdChk } = req.body;
 
   const saltRounds = Number(process.env.NODE_ENV === 'development' ? process.env.HASHING_TIME_DEV : process.env.HASHING_TIME_PRO);

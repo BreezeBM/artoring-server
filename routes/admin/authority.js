@@ -1,11 +1,10 @@
-const express = require('express');
+import express from 'express';
+
+import { adminController } from '../../controller/index.js';
 const router = express.Router();
 
-const authorityController = require('../../controller/admin');
+router.use('/login', adminController.login);
+router.use('/logout', adminController.logout);
+router.use('/signup', adminController.singup);
 
-router.use('/login', authorityController.login);
-router.use('/logout', authorityController.logout);
-router.use('/signup', authorityController.singup);
-
-module.exports = router
-;
+export default router;

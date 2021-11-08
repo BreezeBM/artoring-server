@@ -1,13 +1,14 @@
-const express = require('express');
-const router = express.Router();
+import express from 'express';
 
-const { userController } = require('../../controller');
+import { userController } from '../../controller/index.js';
+const router = express.Router();
+// const { userController } = require("../../controller");
 
 router.post('/', (req, res) => {
   if (req.cookies.authorization) {
     const target = req.cookies.authorization.split(' ')[2];
     if (!target) res.status(400).send();
-    else { res.redirect(307, './' + target); }
+    else res.redirect(307, './' + target);
   } else res.status(400).send();
 });
 
@@ -21,4 +22,4 @@ router.use('/*', (req, res) => {
   res.status(404).send();
 });
 
-module.exports = router;
+export default router;

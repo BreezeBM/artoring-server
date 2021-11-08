@@ -1,11 +1,11 @@
-const express = require('express');
-const router = express.Router();
+import express from 'express';
 
-const loginRouter = require('./login');
-const logoutRouter = require('./logout');
-const profileRouter = require('./profile');
-const signupRouter = require('./signup');
-const dropRouter = require('./drop');
+import loginRouter from './login.js';
+import logoutRouter from './logout.js';
+import profileRouter from './profile.js';
+import signupRouter from './signup.js';
+import dropRouter from './drop.js';
+const router = express.Router();
 
 router.use('/login', loginRouter);
 router.use('/logout', logoutRouter);
@@ -14,5 +14,5 @@ router.use('/signup', signupRouter);
 router.use('/drop', dropRouter);
 
 router.use('/*', (req, res) => res.status(404).send());
-module.exports = router
-;
+
+export default router;

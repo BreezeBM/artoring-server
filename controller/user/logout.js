@@ -1,9 +1,11 @@
-require('dotenv').config();
-const axios = require('axios');
+import dotenv from 'dotenv';
+import axios from 'axios';
 
-const { verifyJWTToken, createJWT, verifyAndCallback, sha256Encrypt } = require('../tools');
+import { tool } from '../tools/index.js';
+dotenv.config();
+// const { verifyJWTToken, createJWT, verifyAndCallback, sha256Encrypt } = require('../tools');
 
-module.exports = async (req, res) => {
+export default async (req, res) => {
   if (!req.cookies.authorization) {
     res.status(200).json({ code: 401, message: 'not authorized' });
     return null;
@@ -15,7 +17,7 @@ module.exports = async (req, res) => {
   if (type) {
     if (type === 'email') {
       try {
-        const decode = await verifyJWTToken(req);
+        const decode = await tool.verifyJWTToken(req);
 
         switch (decode) {
           case 401: {
@@ -28,7 +30,7 @@ module.exports = async (req, res) => {
           }
           default: {
             // 즉시만료 JWT 토큰을 생성하여 리턴. 유출되어도 염려 없다.
-            const fakeToken = await createJWT({ email: 'expired' }, 0);
+            const fakeToken = await tool.createJWT({ email: 'expired' }, 0);
             res.cookie('authorization', fakeToken, {
               secure: true,
               httpOnly: true,
@@ -46,13 +48,13 @@ module.exports = async (req, res) => {
         if (e.type) { res.status(404).send(e.message); } else { res.status(500).send(e.message); }
       }
     } else {
-      verifyAndCallback(async (userinfo) => {
+      tool.verifyAndCallback(async (userinfo) => {
         let proof;
 
         if (type === 'facebook') {
           // 시크릿코드, 엑세스 토큰을 활용하여 증명데이터를 생성하고 이를 제거하고자하는 엑세스토큰과 함께 전송.
 
-          proof = sha256Encrypt(999, accessToken.split(' ')[1], process.env.FACEBOOK_SEC);
+          proof = tool.sha256Encrypt(999, accessToken.split(' ')[1], process.env.FACEBOOK_SEC);
           const response = await axios.get(`https://graph.facebook.com/${Number(userinfo.user_id)}/permissions?appsecret_proof=${proof}&access_token=${accessToken.split(' ')[1]}`);
 
           res.cookie('authorization', '', {

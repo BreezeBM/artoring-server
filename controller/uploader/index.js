@@ -1,5 +1,4 @@
-
-module.exports = {
+export default {
   middle: (req, res, next) => {
     next();
   },
@@ -11,5 +10,4 @@ module.exports = {
     req.file.location = 'https://artoring.com/'.concat(req.file.key);
     res.json(req.file);
   }
-}
-;
+};

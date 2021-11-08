@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 import axios from 'axios';
-import { purchaseHistoryModel, mentoringModel, mongoose } from '../../model/index.js';
+import { purchaseHistoryModel, mentoringModel, mongoose, userModel } from '../../model/index.js';
 import { tool, date } from '../tools/index.js';
 // const { verifyJWTToken, verifyAndCallback, date } = require('../tools');
 // 아임포트 결제이후 결제 내역 검증 및 저장
@@ -271,6 +271,9 @@ const revoke = async (req, res) => {
           .then(() => {
             return mentoringModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(purchaseData.targetId) }, { $inc: { joinedParticipants: -1 } });
           })
+          .then((mentoringData) => {
+            if (purchaseData.progress === 'completed') return userModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(mentoringData.moderatorId) }, { $inc: { 'mentor.settledAmount': purchaseData.price * -1 } });
+          })
           .then(() => res.status(200).send())
           .catch(e => {
             console.log(e);
@@ -338,6 +341,9 @@ const revoke = async (req, res) => {
         .then(() => {
           return mentoringModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(purchaseData.targetId) }, { $inc: { joinedParticipants: -1 } });
         })
+        .then((mentoringData) => {
+          if (purchaseData.progress === 'completed') return userModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(mentoringData.moderatorId) }, { $inc: { 'mentor.settledAmount': purchaseData.price * -1 } });
+        })
         .then(() => res.status(200).send())
         .catch(e => {
           console.log(e);
@@ -399,8 +405,13 @@ const webhook = (req, res) => {
               }
               case 'cancelled': {
                 purchaseHistoryModel.findOneAndDelete({ merchantUid }, { $set: { progress: 'cancelled' } })
-                  .then(() => {
-                    mentoringModel.findOneAndUpdate({ _id: document.targetId }, { $inc: { joinedParticipants: -1 } });
+                  .then((purchaseData) => {
+                    mentoringModel.findOneAndUpdate({ _id: document.targetId }, { $inc: { joinedParticipants: -1 } })
+                      .then(() => {
+                        if (purchaseData.process === 'completed') {
+                          return userModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(purchaseData.moderatorId) }, { $inc: { 'mentor.settledAmount': purchaseData.price * -1 } });
+                        }
+                      });
                     res.send({ status: 'success', message: '결제 취소 완료' });
                   });
                 break;

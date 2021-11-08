@@ -1,6 +1,6 @@
 
 import { userModel } from '../../model/index.js';
-import { tools } from '../tools/index.js';
+import { tool as tools } from '../tools/index.js';
 // const { verifyJWTToken, verifyAndCallback } = require('../tools');
 
 export default async (req, res) => {
@@ -16,7 +16,7 @@ export default async (req, res) => {
   const { id } = req.query;
   try {
     if (type === 'email') {
-      const decode = await tools.tool.verifyJWTToken(req);
+      const decode = await tools.verifyJWTToken(req);
 
       switch (decode) {
         case 401: {
@@ -34,7 +34,7 @@ export default async (req, res) => {
         }
       }
     } else {
-      tools.tool.verifyAndCallback(async () => {
+      tools.verifyAndCallback(async () => {
         const userInfo = await userModel.findOne({ _id: id }).select({ pwd: 0 });
 
         res.status(200).json(userInfo);

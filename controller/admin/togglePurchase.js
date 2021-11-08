@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 import { tool } from '../tools/index.js';
-import { purchaseHistoryModel, adminModel, mongoose } from '../../model/index.js';
+import { purchaseHistoryModel, mentoringModel, userModel, adminModel, mongoose } from '../../model/index.js';
 dotenv.config();
 // const { verifyJWTToken, aesDecrypt, AdminAccessException } = require('../tools');
 
@@ -33,7 +33,13 @@ export default async (req, res) => {
 
         const { id: _id, inProgress: progress } = req.body;
 
-        await purchaseHistoryModel.findByIdAndUpdate({ _id: mongoose.Types.ObjectId(_id) }, { progress });
+        purchaseHistoryModel.findByIdAndUpdate({ _id: mongoose.Types.ObjectId(_id) }, { progress })
+          .then((purchaseData) => {
+            if (progress === 'completed') {
+              mentoringModel.findById(purchaseData.targetId)
+                .then((programData) => userModel.findOneAndUpdate({ _id: programData.moderatorId }, { $inc: { 'mentor.settledAmount': programData.price } }));
+            }
+          });
 
         res.status(200).json();
       }

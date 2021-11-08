@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 import { tool, date } from '../tools/index.js';
 // const { aesEncrypt, aesDecrypt, createJWT, verifyJWTToken, AdminAccessException } = require('../tools');
 // const { date } = require('../tools');
-
+import { RecaptchaEnterpriseServiceClient } from '@google-cloud/recaptcha-enterprise';
 import { adminModel } from '../../model/index.js';
 import bcrypt from 'bcrypt';
 dotenv.config();
@@ -68,9 +68,6 @@ export default async (req, res) => {
             const recaptchaSiteKey = process.env.CAPTCHA_KEY;
             const token = captcha;
             const assessmentName = 'your_assessment_name';
-
-            const { RecaptchaEnterpriseServiceClient } =
-         require('@google-cloud/recaptcha-enterprise');
 
             // Create the reCAPTCHA client.
             const client = new RecaptchaEnterpriseServiceClient();

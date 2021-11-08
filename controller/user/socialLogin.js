@@ -185,7 +185,6 @@ export default async (req, res) => {
       }).status(200).json({ trimedData: userData, signup: true });
     }
   } catch (e) {
-    console.log('\n', e, e.response ? e.response.data : '');
     res.status(500).send(e.message);
   }
 };

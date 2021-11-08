@@ -4,7 +4,7 @@ import path from 'path';
 
 import dotenv from 'dotenv';
 
-import { tools } from './index.js';
+import { tool as tools } from './index.js';
 dotenv.config();
 // const { createJWT, aesEncrypt } = require('./tools');
 const __dirname = path.resolve();

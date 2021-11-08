@@ -3,11 +3,11 @@ import jsdom from 'jsdom';
 // const createDOMPurify = require('dompurify');
 // const { JSDOM } = require('jsdom');
 
-import { tool, seo } from '../tools/index.js';
+import { tool, seo, date } from '../tools/index.js';
 // const { verifyJWTToken, AdminAccessException, aesDecrypt, createSeo } = require(
 //   '../tools'
 // );
-import { mentoringModel, careerInfoModel, adminModel, mongoose } from '../../model/index.js';
+import { mentoringModel, careerInfoModel, adminModel, mongoose, purchaseHistoryModel } from '../../model/index.js';
 
 const window = new jsdom.JSDOM().window;
 const DOMPurify = createDOMPurify(window);
@@ -116,10 +116,23 @@ export default async (req, res) => {
                       });
                   } else {
                     targetModel.findOneAndUpdate({ _id }, {
-                      $set: postCardData
+                      $set: { ...postCardData, updatedAt: new Date(date().add(9, 'hours').format()) }
                     }, { new: true })
-                      .then(() => {
-                        return res.sendStatus(200);
+                      .then((cardData) => {
+                        return purchaseHistoryModel.find({ targetId: _id, bookedStartTime: { $lte: cardData.startDate } })
+                          .then(list => {
+                            Promise.all(list.map(ele => {
+                              return purchaseHistoryModel.findOneAndUpdate({ _id: ele._id }, {
+                                $set: {
+                                  bookedStartTime: cardData.startDate,
+                                  bookedEndTime: cardData.endDate
+                                }
+                              });
+                            }));
+                          })
+                          .then(() => {
+                            return res.sendStatus(200);
+                          });
                       });
                   }
                 });

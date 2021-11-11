@@ -26,11 +26,11 @@ export default async (req, res) => {
             break;
           }
           default: {
-            const { _id, questions } = req.body;
+            const { _id, questions, hopeTime } = req.body;
 
             purchaseHistoryModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(_id) }, {
               $set: {
-                questions
+                questions, hopeTime
               }
             })
               .then((data) => {

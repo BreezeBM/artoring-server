@@ -58,22 +58,15 @@ export default async (req, res) => {
         current: {},
         interestedIn: [],
         isMentor: false,
-        mentor: {
-          name: '탈퇴한 사용자입니다.',
-          descriptionText: null,
-          likesCount: 0,
-          price: 0,
-          tags: [],
-          descriptionForMentor: encodeURIComponent('<p>탈퇴한 사용자입니다</p>'),
-          category: {
-            employment: -1,
-            founded: -1,
-            professional: -1,
-            free: -1,
-            edu: -1
-          },
-          paymentInfo: ''
-        }
+        isDrop: 1,
+        'mentor.likesCount': 0,
+        'mentor.price': 0,
+        'mentor.category.free': -1,
+        'mentor.category.employment': -1,
+        'mentor.category.founded': -1,
+        'mentor.category.professional': -1,
+        'mentor.category.edu': -1,
+        'mentor.paymentInfo': ''
       }
     }, { new: false })
     // userModel.findOne({ _id: mongoose.Types.ObjectId(req.body._id) })
@@ -162,7 +155,7 @@ export default async (req, res) => {
 
                 rate /= count--;
 
-                return mentoringModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(ele._id) }, { $set: { count, rate, tags: [], category: [], subCategory: [] } });
+                return mentoringModel.find({ _id: mongoose.Types.ObjectId(ele._id) });
               })))
             // 멘토였던 사람의 경우 좋아요를 해둔 다른 사람들 정보까지 제거.
               .then(list => Promise.all(list.map(ele => userModel.findOneAndUpdate({ $or: [{ likedCareerEdu: { $in: [ele._id] } }, { likedMentor: { $in: [userId] } }] }, { $pull: { likedCareerEdu: ele._id, likedMentor: userId } }))))
@@ -233,7 +226,6 @@ export default async (req, res) => {
       .then(() => userModel.findOneAndUpdate({ userId: mongoose.Types.ObjectId(userId) }, {
         $set: {
           thumb: 'https://artoring.com/image/1626851218536.png',
-          name: '탈퇴한 사용자입니다.',
           appId: '',
           nickName: '',
           email: tool.sha256Encrypt(999, randomWords, Date.toString()),
@@ -246,22 +238,15 @@ export default async (req, res) => {
           current: {},
           interestedIn: [],
           isMentor: false,
-          mentor: {
-            name: '탈퇴한 사용자입니다.',
-            descriptionText: null,
-            likesCount: 0,
-            price: 0,
-            tags: [],
-            descriptionForMentor: encodeURIComponent('<p>탈퇴한 사용자입니다</p>'),
-            category: {
-              employment: -1,
-              founded: -1,
-              professional: -1,
-              free: -1,
-              edu: -1
-            },
-            paymentInfo: ''
-          },
+          isDrop: 1,
+          'mentor.likesCount': 0,
+          'mentor.price': 0,
+          'mentor.category.free': -1,
+          'mentor.category.employment': -1,
+          'mentor.category.founded': -1,
+          'mentor.category.professional': -1,
+          'mentor.category.edu': -1,
+          'mentor.paymentInfo': '',
           drop: {
             name: userName,
             reason: req.body.reason,
@@ -308,7 +293,7 @@ export default async (req, res) => {
 
             rate /= count--;
 
-            return mentoringModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(ele._id) }, { $set: { count, rate, tags: [], category: [], subCategory: [] } });
+            return mentoringModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(ele._id) }, { $set: { count, rate } });
           })))
         // 멘토였던 사람의 경우 좋아요를 해둔 다른 사람들 정보까지 제거.
           .then(list => Promise.all(list.map(ele => userModel.findOneAndUpdate({ $or: [{ likedCareerEdu: { $in: [ele._id] } }, { likedMentor: { $in: [userId] } }] }, { $pull: { likedCareerEdu: ele._id, likedMentor: userId } }))))

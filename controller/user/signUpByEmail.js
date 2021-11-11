@@ -53,7 +53,7 @@ export default async (req, res) => {
             const accessToken = await tool.createJWT({ _id: userData._id, name: userData.name }, 3600);
 
             // 유저정보를 이용하여 구글 메일 서버를 활용하여 이메일을 보낸다
-            await sendGmail({ userData, accessToken }, userData.email, res);
+            await sendGmail({ userData, accessToken, email: userData.email }, res);
           })
           .catch(err => {
             console.log(err);

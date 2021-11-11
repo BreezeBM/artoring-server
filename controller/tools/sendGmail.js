@@ -11,12 +11,12 @@ const __dirname = path.resolve();
 
 const sendGMAIL = async function (data, res, emailData, email = data.email) {
   const { userData, accessToken } = data;
-  const encryptEmail = await tools.tool.aesEncrypt(email);
-  const verifyToken = await tools.tool.createJWT({ encryptEmail }, 600);
+  const encryptEmail = await tools.aesEncrypt(email);
+  const verifyToken = await tools.createJWT({ encryptEmail }, 600);
 
   const authClient = new googleapis.google.auth.JWT({
-  // keyFile: __dirname + '/../../credentials.json',
-    keyFile: __dirname + '/config/s3.json',
+    // keyFile: __dirname + '/../../credentials.json',
+    keyFile: __dirname + '/credentials.json',
     scopes: [
       'https://mail.google.com/',
       'https://www.googleapis.com/auth/gmail.modify',
@@ -37,7 +37,7 @@ const sendGMAIL = async function (data, res, emailData, email = data.email) {
     }?=`;
     const messageParts = [
       'From: no-reply@artoring.com',
-      `To: ${userData.email}`,
+      `To: ${email || data.email || userData.email}`,
       'Content-Type: text/html; charset=utf-8',
       'MIME-Version: 1.0',
       `Subject: ${utf8Subject}`,

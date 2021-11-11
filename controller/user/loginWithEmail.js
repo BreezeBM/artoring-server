@@ -42,6 +42,7 @@ export default async (req, res) => {
             likedCareerEdu: 1,
             likedMentor: 1,
             likedInfo: 1,
+            isDrop: 1,
             verifiedEmail: 1,
             verifiedPhone: 1,
             createdAt: 1
@@ -65,6 +66,7 @@ export default async (req, res) => {
         likedCareerEdu: 1,
         likedMentor: 1,
         likedInfo: 1,
+        isDrop: 1,
         verifiedEmail: 1,
         verifiedPhone: 1,
         createdAt: 1
@@ -86,7 +88,7 @@ export default async (req, res) => {
                   maxAge: 3600 * 1000,
                   sameSite: 'none',
                   path: '/'
-                }).status(201).json({ userData: data });
+                }).status(201).json(data);
               } else {
                 res.status(401).send({ message: '잘못된 비밀번호' });
               }

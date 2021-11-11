@@ -115,10 +115,12 @@ const aesDecrypt = (string) => {
 };
 
 // 어드민 요청을 처리하는 도중 에러시 throw를 하기위한 템플릿
-const AdminAccessException = (message) => {
+function AdminAccessException (message) {
   this.message = message;
-  this.toString = () => this.message.toString();
-};
+  this.toString = function () {
+    return this.message;
+  };
+}
 
 // 유저의 요청를 처리하는도중에 에러시 throw를 하기위한 템플릿
 function UserException (type, message) {

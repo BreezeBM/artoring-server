@@ -25,6 +25,7 @@ export default async (req, res) => {
         const accKey = await tool.aesDecrypt(accessKey);
 
         const adminData = await adminModel.find({ name, accessKey: accKey });
+
         if (!adminData) throw new tool.AdminAccessException('no match found');
 
         const { _id, userName, descriptionForMentor, descriptionText, thumb, category } =

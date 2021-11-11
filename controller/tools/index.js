@@ -1,7 +1,6 @@
 import * as tool from './tools.js';
 import * as profileTrim from './profileTrim.js';
-import * as sendEmail from './sendEmail.js';
-import * as sendGmail from './sendGmail.js';
+import sendGmail from './sendGmail.js';
 import date from './date.js';
 import * as seo from './seo.js';
 
@@ -13,6 +12,6 @@ import * as seo from './seo.js';
 // const { createSeo, deleteSeo } = require('./seo');
 
 export {
-  tool, profileTrim, sendEmail, sendGmail, date, seo
+  tool, profileTrim, sendGmail, date, seo
 }
 ;

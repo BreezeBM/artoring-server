@@ -94,6 +94,7 @@ export default async (req, res) => {
         phone: 1,
         verifiedPhone: 1,
         isMentor: 1,
+        isDrop: 1,
         likedCareerEdu: 1,
         likedMentor: 1,
         likedInfo: 1,

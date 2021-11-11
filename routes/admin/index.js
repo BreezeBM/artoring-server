@@ -7,6 +7,8 @@ import express from 'express';
 import authorityRouter from './authority.js';
 import purchaseRouter from './adminPurchase.js';
 import nameRouter from './queryName.js';
+import dropRouter from './dropMentor.js';
+
 const router = express.Router();
 
 // router.use('/grade', gradeRouter);
@@ -16,6 +18,7 @@ const router = express.Router();
 
 router.use('/purchase', purchaseRouter);
 router.use('/name', nameRouter);
+router.use('/mentor', dropRouter);
 router.use('/', authorityRouter);
 
 router.use('/*', (req, res) => res.status(404).send());

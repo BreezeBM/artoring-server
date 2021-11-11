@@ -179,6 +179,7 @@ TDD는 예정입니다.
   - address: { type: String } 주소 정보
   - pwd: { type: String, required: true } 로그인에 필요한 비밀번호 정보
   - isMentor: { type: Boolean, default: false } 멘토 여부
+  - isDrop: { type: Number, default: '-1'} 회원 탈퇴 여부. -1 = 탈퇴 안함 0 = (멘토한정)탈퇴요청중 1 = 탈퇴함
   - mentor: mentorSchema 멘토인 경우 해당 영역의 데이터가 있음. 자세한 내용은 [멘터스키마](#멘터스키마) 참고
   - major: { type: String } 전공 정보
   - current: {

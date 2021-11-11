@@ -31,7 +31,7 @@ const pwdReq = function (req, res) {
 
         tokenModel.create({ name: verifyToken })
           .then(() => {
-            sendGmail({ userData: { email } }, email, res, {
+            sendGmail({ email, userData: { email } }, res, {
               subject: '[아토링] 비밀번호 관련 이메일 입니다',
               html: `<table style="border-collapse: collapse; width: 490px; margin-left: auto; margin-right: auto; height: 435px;" border="0">
             <tbody>

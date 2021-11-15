@@ -79,6 +79,7 @@ const trimUserData = (userData) => {
   if (!userData.likedMentor) userData.likedMentor = [];
   if (!userData.outdoorAct) userData.outdoorAct = '';
   if (!userData.workHistory) userData.workHistory = '';
+  if (!userData.isDrop) userData.isDrop = -1;
   userData.isMentor = false;
   userData.interestedIn = [
     { name: '창업', val: false },

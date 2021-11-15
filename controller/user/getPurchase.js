@@ -231,7 +231,14 @@ export default async (req, res) => {
                 targetId: '$mentoring._id',
                 isReviewed: '$isReviewed',
                 questions: '$questions',
-                isGroup: '$mentoring.isGroup'
+                isGroup: '$mentoring.isGroup',
+                vbank: {
+                  code: '$paymentData.vbank_code',
+                  date: '$paymentData.vbank_date',
+                  holder: '$paymentData.vbank_holder',
+                  issued_at: '$paymentData.vbank_issued_at',
+                  num: '$paymentData.vbank_num'
+                }
               }
             },
 

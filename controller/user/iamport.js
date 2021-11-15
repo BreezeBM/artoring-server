@@ -52,7 +52,7 @@ const post = (req, res) => {
             return purchaseHistoryModel.findOne({ merchantUid: merchant_uid })
               .then((document) => {
                 if (document.price === paymentData.amount) {
-                  return purchaseHistoryModel.findOneAndUpdate({ merchantUid: merchant_uid }, { $set: { paymentData, progress: 'paid', questions: req.body.questions } }, { new: true });
+                  return purchaseHistoryModel.findOneAndUpdate({ merchantUid: merchant_uid }, { $set: { paymentData, progress: paymentData.status, questions: req.body.questions } }, { new: true });
                 } else { throw new Error({ status: 'forgery', message: '위조된 결제시도' }); }
               });
           })
@@ -61,6 +61,19 @@ const post = (req, res) => {
               case 'paid':
                 res.send({ status: 'success', message: '일반 결제 성공' });
                 break;
+              case 'ready':
+                res.json({
+                  status: 'ready',
+                  message: '발급 완료',
+                  data: {
+                    code: document.paymentData.vbank_code,
+                    date: document.paymentData.vbank_date,
+                    holder: document.paymentData.vbank_holder,
+                    issued: document.paymentData.vbank_issued_at,
+                    name: document.paymentData.vbank_name,
+                    num: document.paymentData.vbank_num
+                  }
+                });
             }
           })
           .catch(e => {
@@ -90,7 +103,7 @@ const post = (req, res) => {
           return purchaseHistoryModel.findOne({ merchantUid: merchant_uid })
             .then((document) => {
               if (document.price === paymentData.amount) {
-                return purchaseHistoryModel.findOneAndUpdate({ merchantUid: merchant_uid }, { $set: { paymentData, progress: 'paid', questions: req.body.questions } }, { new: true });
+                return purchaseHistoryModel.findOneAndUpdate({ merchantUid: merchant_uid }, { $set: { paymentData, progress: paymentData.status, questions: req.body.questions } }, { new: true });
               } else { throw new Error({ status: 'forgery', message: '위조된 결제시도' }); }
             });
         })
@@ -99,6 +112,19 @@ const post = (req, res) => {
             case 'paid':
               res.send({ status: 'success', message: '일반 결제 성공' });
               break;
+            case 'ready':
+              res.json({
+                status: 'ready',
+                message: '발급 완료',
+                data: {
+                  code: document.paymentData.vbank_code,
+                  date: document.paymentData.vbank_date,
+                  holder: document.paymentData.vbank_holder,
+                  issued: document.paymentData.vbank_issued_at,
+                  name: document.paymentData.vbank_name,
+                  num: document.paymentData.vbank_num
+                }
+              });
           }
         })
         .catch(e => {
@@ -380,7 +406,7 @@ const webhook = (req, res) => {
 
       const { imp_uid: impUid, merchant_uid: merchantUid } = paymentData;
 
-      return purchaseHistoryModel.findOne({ merchantUid, impUid })
+      return purchaseHistoryModel.findOne({ 'paymentData.merchant_uid': merchantUid, 'paymentData.imp_uid': impUid })
         .then((document) => {
           if (document.price === paymentData.amount) {
             switch (paymentData.status) {
@@ -392,13 +418,11 @@ const webhook = (req, res) => {
                 break;
               }
               case 'ready': {
-                const { vbank_num: bankNum, vbank_date: bankDate, vbank_name: bankName } = paymentData;
-
                 purchaseHistoryModel.findOneAndUpdate({ merchantUid }, { $set: { paymentData, progress: 'ready' } }, { new: true })
                   .then(() => {
                   // 가상계좌 발급 안내 문자메시지 발송
                   // SMS.send({ text: `가상계좌 발급이 성공되었습니다. 계좌 정보 ${vbank_num} ${vbank_date} ${vbank_name}` });
-                    res.json({ status: 'vbankIssued', message: '가상계좌 발급 성공', vbank: { bankName, bankNum, bankDate } });
+                    res.json({ status: 'vbankIssued', message: '가상계좌 발급 성공' });
                   });
 
                 break;

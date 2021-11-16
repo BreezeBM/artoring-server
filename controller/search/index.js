@@ -158,7 +158,7 @@ const searchEngine = async (callback, keyword, model, page) => {
           }
         })
       .then(data => {
-        teachQueryResult = data.body.hits;
+        mentorQueryResult = data.body.hits;
 
         return client.search(keyword[0] !== ''
           ? {
@@ -220,7 +220,7 @@ const searchEngine = async (callback, keyword, model, page) => {
             });
       })
       .then(data => {
-        mentorQueryResult = data.body.hits;
+        teachQueryResult = data.body.hits;
 
         return client.search(keyword[0] !== ''
           ? {

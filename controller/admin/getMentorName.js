@@ -103,7 +103,7 @@ export default async (req, res) => {
         //   mentorData = mentorData.splice((page - 1) * 8, 8);
         // }
 
-        res.status(200).json(mentorData);
+        res.status(200).json(mentorData[0]);
       }
         break;
     }

@@ -404,11 +404,14 @@ const webhook = (req, res) => {
     .then(({ data }) => {
       const paymentData = data.response;
 
-      const { imp_uid: impUid, merchant_uid: merchantUid } = paymentData;
+      const { merchant_uid: merchantUid } = paymentData;
 
-      return purchaseHistoryModel.findOne({ 'paymentData.merchant_uid': merchantUid, 'paymentData.imp_uid': impUid })
+      return purchaseHistoryModel.findOne({ merchantUid })
         .then((document) => {
-          if (document.price === paymentData.amount) {
+          if (!document) {
+            purchaseHistoryModel.create({ merchantUid, paymentData, progress: paymentData.status })
+              .then(() => res.status(201).send());
+          } else if (document.price === paymentData.amount) {
             switch (paymentData.status) {
               case 'paid': {
                 purchaseHistoryModel.findOneAndUpdate({ merchantUid }, { $set: { paymentData, progress: 'paid' } }, { new: true })

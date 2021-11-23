@@ -171,7 +171,7 @@ TDD는 예정입니다.
   - sns: [] 소셜 로그인의 경우 appId, snsType이 객체 형태로 저장됨. 소셜로그인을 취소해야 하는경우 여기 데이터를 이용하여 연동 취소 API 요청을 보냄.
   - nickName: { type: String } 유저 닉네임. 현재 사용안함.
   - email: { type: String, required: true, unique: true } 로그인에 필요한 이메일 정보. 현재 검증중임.
-  - verifiedEmail: { type: Boolean, default: false } 이메일 검증 성공 여부. 없으면 홈페이지 / 에서 인증관련 모달 렌더링
+  - ~verifiedEmail: { type: Boolean, default: false } 이메일 검증 성공 여부. 없으면 홈페이지 / 에서 인증관련 모달 렌더링~ 이메일 인증은 더이상 진행하지 않습니다.
   - verifiedPhone: { type: Boolean, default: false } 향후 본인인증에 사용할 핸드폰 인증 여부.
   - gender: { type: String } 성별 여부
   - birth: { type: String } 생일

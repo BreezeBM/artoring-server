@@ -9,6 +9,8 @@ import https from 'https';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import inactiveAccount from './controller/tools/inactiveAccount.js';
+
+import apm from 'elastic-apm-node';
 // const fs = require("fs");
 // const https = require("https");
 // const cookieParser = require("cookie-parser");
@@ -17,6 +19,19 @@ import inactiveAccount from './controller/tools/inactiveAccount.js';
 import moment from 'moment-timezone';
 import connectDB from './db/index.js';
 dotenv.config();
+
+if (process.env.NODE_ENV === 'production') {
+  apm.start({
+    serviceName: 'backend status',
+    secretToken: process.env.APM_TOKEN,
+
+    // Set the custom APM Server URL (default: http://localhost:8200)
+    serverUrl: process.env.APM_URL,
+
+    // Set the service environment
+    environment: 'production'
+  });
+}
 
 const port = process.env.PORT || 4000;
 

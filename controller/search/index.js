@@ -18,23 +18,24 @@ const client = new Client({
 // 서치 핸들러
 const searchEngine = async (callback, keyword, model, page) => {
   // 모델이 있음 === 상세검색
+
   if (model) {
     client.search({
       // 엘라스틱서치가 인덱싱을 하고 있는 이름
-      index: 'mentoring',
+      index: model === 'info' ? 'news' : 'mentoring',
 
       // 페이지 네이션용, from 만큼 데이터 스킵.
-      from: (Number(page) - 1) * 16,
+      from: (Number(page) - 1) * (model === 'info' ? 9 : 16),
 
       // 16개의 데이터 리턴
-      size: 16,
+      size: model === 'info' ? 9 : 16,
       body: keyword[0] !== ''
         ? {
 
             // 키워드 검색 상세 결과를 리턴
             // 소팅 방법 명시. 1순위 최신순, 2순위 유사도 순
             sort: [
-              { startDate: { order: 'desc', format: 'strict_date_optional_time_nanos' } }
+              model === 'info' ? { issuedDate: { order: 'desc', format: 'strict_date_optional_time_nanos' } } : { startDate: { order: 'desc', format: 'strict_date_optional_time_nanos' } }
 
             ],
             // 엘라스틱서치 문서 쿼리 방법 명시
@@ -59,30 +60,39 @@ const searchEngine = async (callback, keyword, model, page) => {
                 minimum_should_match: 1,
                 // 반드시 있어야 함.
                 must: {
-                  term: {
-                    // 개인 멘토링 유무
-                    isGroup: model === 'career'
-                  }
+                  term: model !== 'info'
+                    ? {
+                        // 개인 멘토링 유무
+                        isGroup: model === 'career'
+                      }
+                    : undefined
                 }
               }
             }
           }
-        : {
-            sort: [
-              { startDate: { order: 'desc', format: 'strict_date_optional_time_nanos' } }
+        : model !== 'info'
+          ? {
+              sort: [
+                { startDate: { order: 'desc', format: 'strict_date_optional_time_nanos' } }
 
-            ],
-            // 모델 명시 안함 === 전체문서검색 상세 페이지 개인 멘토링 여부만 체크.
-            query: {
-              bool: {
-                must: {
-                  term: {
-                    isGroup: model === 'career'
+              ],
+              // 모델 명시 안함 === 전체문서검색 상세 페이지 개인 멘토링 여부만 체크.
+              query: {
+                bool: {
+                  must: {
+                    term: {
+                      isGroup: model === 'career'
+                    }
                   }
                 }
               }
             }
-          }
+          : {
+              sort: [
+                { issuedDate: { order: 'desc', format: 'strict_date_optional_time_nanos' } }
+
+              ]
+            }
 
     }, (error, data) => {
       if (error) {

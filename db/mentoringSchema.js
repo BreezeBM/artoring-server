@@ -31,6 +31,8 @@ const mentoringSchema = new Schema({
   maximumParticipants: Number,
   joinedParticipants: { type: Number, default: 0 },
   price: { type: Number, default: 0 },
+  // 커리어 클래스에서만 사용되는 연사료
+  fee: Number,
   rate: { type: Number, default: 0 },
   rateCount: { type: Number, default: 0 },
   reviews: [Schema.ObjectId], // _id가 아닌 자동증가 id정보들이 담깁니다.

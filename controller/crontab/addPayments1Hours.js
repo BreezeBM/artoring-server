@@ -8,7 +8,7 @@ const addSettlementMentoring = schedule.scheduleJob({ minute: 0, tz: 'Asia/Seoul
     // 현재시각과 한시간 이전 사이에 종료된 프로그램 리스트를 불러와 이를 멘토 정산금액에 집어넣어야 한다.
     // 멘토링 클래스의 경우에는 여러 유저가 같은 프로그램을 동시에 듣기에 구매내역을 기반으로 동작하면 아니된다.
     purchaseHistoryModel.aggregate([
-      { $match: { isSettled: false, originType: 'mentor' } },
+      { $match: { isSettled: false, originType: 'mentor', progress: 'completed' } },
       { $set: { isSettled: true } },
       {
         $lookup: {
@@ -63,7 +63,7 @@ const addSettlementMentoring = schedule.scheduleJob({ minute: 0, tz: 'Asia/Seoul
 const addSettlementClass = schedule.scheduleJob({ hour: 0, tz: 'Asia/Seoul' }, () => {
   console.log('test2');
   purchaseHistoryModel.aggregate([
-    { $match: { isSettled: false, originType: 'teach' } },
+    { $match: { isSettled: false, originType: 'teach', progress: 'completed' } },
     { $set: { isSettled: true } },
     {
       $lookup: {

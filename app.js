@@ -9,6 +9,7 @@ import https from 'https';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import inactiveAccount from './controller/tools/inactiveAccount.js';
+import { addSettlementMentoring, addSettlementClass } from './controller/crontab/addPayments1Hours.js';
 
 import apm from 'elastic-apm-node';
 // const fs = require("fs");
@@ -18,7 +19,12 @@ import apm from 'elastic-apm-node';
 
 import moment from 'moment-timezone';
 import connectDB from './db/index.js';
+
 dotenv.config();
+
+addSettlementClass.schedule();
+addSettlementMentoring.schedule();
+inactiveAccount.schedule();
 
 if (process.env.NODE_ENV === 'production') {
   apm.start({

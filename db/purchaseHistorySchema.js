@@ -15,6 +15,8 @@ const purchaseHistorySchema = new Schema({
   merchantUid: { type: String, required: true },
   isReviewed: { type: Boolean, default: false },
   isRefund: { type: Boolean, default: false },
+  // 멘토에게 정산이 되었는지 여부
+  isSettled: { type: Boolean, default: false },
   progress: { type: String, default: 'inprogress' },
   zoomLink: String,
   questions: [{ type: String }],

@@ -48,6 +48,7 @@ export default async (req, res) => {
           availableTime,
           maximumParticipants,
           price,
+          fee,
           issuedDate,
           createrName
         } = req.body.cardData;
@@ -80,6 +81,7 @@ export default async (req, res) => {
           availableTime,
           maximumParticipants,
           price,
+          fee,
           issuedDate,
           createrName
         };

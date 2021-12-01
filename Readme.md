@@ -145,6 +145,7 @@ TDD는 예정입니다.
   - hopeTime: String 예약자가 희망하는 시간대 정보. 1차 개발에서만 사용될듯.
   - createdAt: { type: Date, default: new Date(date().add(9, 'hours').format()) } 데이터 생성일
   - paymentData: { type: Object }, 아임포트 결제 정보 저장
+  - isSettled: { type: Boolean, default: false } 프로그램 정산 여부
 
 ## 리뷰스키마
   - userThumb: { type: String, required: true } 유저 섬네일

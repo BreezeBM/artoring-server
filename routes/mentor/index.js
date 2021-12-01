@@ -10,6 +10,9 @@ router.use('/calculate', calculatorRouter);
 
 router.get('/project', mentorController.getProject);
 
+// 정산 관련 데이터 요청 혹은 수정
+router.post('/settle', mentorController.getOrChangeSettle);
+
 router.get('/', mentorController.getMentor);
 router.get('/:id', mentorController.getMentor);
 router.post('/', mentorController.modifiMentor);

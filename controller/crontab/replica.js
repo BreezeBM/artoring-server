@@ -11,7 +11,7 @@ import reviewSchema from '../../db/reviewSchema.js';
 import adminSchema from '../../db/adminSchema.js';
 
 // 1시간마다 종료된 멘토의 프로그램을 찾아서 멘토의 정산금액을 추가해주는 크론탭
-const writeToReplica = schedule.scheduleJob({ hour: 3, tz: 'Asia/Seoul' }, () => {
+const writeToReplica = schedule.scheduleJob({ hour: 3, minute: 0, tz: 'Asia/Seoul' }, () => {
   // const writeToReplica = async () => {
   const pass = encodeURIComponent(process.env.MONGO_SEC_KEY);
   const uri = process.env.NODE_ENV === 'development'

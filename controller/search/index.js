@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 
 import { Client } from '@elastic/elasticsearch';
+import axios from 'axios';
 dotenv.config();
 // const { Client } = require('@elastic/elasticsearch');
 
@@ -16,7 +17,7 @@ const client = new Client({
 });
 
 // 서치 핸들러
-const searchEngine = async (callback, keyword, model, page) => {
+const searchEngine = async (callback, keyword, model, page, userData) => {
   // 모델이 있음 === 상세검색
 
   if (model) {
@@ -279,6 +280,18 @@ const searchEngine = async (callback, keyword, model, page) => {
         callback(null, { teachQueryResult, mentorQueryResult, newsQueryResult });
       })
       .catch(e => callback(e, null));
+  }
+
+  const url = 'https://artoring-engine.ent.us-east-1.aws.found.io/api/as/v1/engines/artoring-search/documents';
+
+  if (process.env.NODE_ENV === 'production') {
+    // 데이터 분석을 위해 ML 엔터프라이즈서치에 데이터 업로드
+    await axios.post(url, userData, {
+      headers: {
+        Authorization: `Bearer ${process.env.ENTERPRISE_KEY}`,
+        'Content-Type': 'application/json'
+      }
+    });
   }
 }
 ;

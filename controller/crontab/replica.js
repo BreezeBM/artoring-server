@@ -11,17 +11,16 @@ import reviewSchema from '../../db/reviewSchema.js';
 import adminSchema from '../../db/adminSchema.js';
 
 // 1시간마다 종료된 멘토의 프로그램을 찾아서 멘토의 정산금액을 추가해주는 크론탭
-const writeToReplica = schedule.scheduleJob({ hour: 3, minute: 0, tz: 'Asia/Seoul' }, () => {
+const writeToReplica = schedule.scheduleJob({ hour: 3, minute: 0, tz: 'Asia/Seoul' }, async () => {
   // const writeToReplica = async () => {
   const pass = encodeURIComponent(process.env.MONGO_SEC_KEY);
   const uri = process.env.NODE_ENV === 'development'
-    ? 'mongodb://localhost:27017/artoring-replica'
+    ? 'mongodb://localhost:27017'
     : `mongodb+srv://${process.env.MONGO_ACC_KEY}:${pass}@cluster0.pij1x.mongodb.net/artoring-replica?authSource=%24external&authMechanism=MONGODB-AWS&retryWrites=true&w=majority`;
 
   let replica;
   try {
     replica = mongoose.createConnection(uri, {
-      dbName: 'artoring-replica',
       useNewUrlParser: true,
       useUnifiedTopology: true,
       useCreateIndex: true,
@@ -61,7 +60,9 @@ const writeToReplica = schedule.scheduleJob({ hour: 3, minute: 0, tz: 'Asia/Seou
       .then(async (docs) => {
         let count = 0;
         for (let i = 0; i < docs.length; i++) {
-          replicaModels[n].findByIdAndUpdate(docs[i]._id, { $set: docs[i] }, { upsert: true });
+          const id = docs[i]._id;
+          await replicaModels[n].findByIdAndUpdate(mongoose.Types.ObjectId(id), { $set: docs[i] }, { new: true, upsert: true });
+
           if (count === 2000) {
             await stopwatch();
             count = 0;

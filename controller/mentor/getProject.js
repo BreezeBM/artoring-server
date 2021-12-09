@@ -77,7 +77,8 @@ export default async (req, res) => {
                     gender: '$users.gender',
                     current: '$users.current',
                     interestedIn: '$users.interestedIn',
-                    questions: '$questions'
+                    questions: '$questions',
+                    settlementInfo: 1
                   }
                 },
                 // 페이지 네이션에 필요한 데이터 및 토탈 카운트 리턴.
@@ -141,7 +142,8 @@ export default async (req, res) => {
                   major: '$users.major',
                   current: '$users.current',
                   interestedIn: '$users.interestedIn',
-                  questions: '$questions'
+                  questions: '$questions',
+                  settlementInfo: 1
                 }
               },
               // 페이지 네이션에 필요한 데이터 및 토탈 카운트 리턴.

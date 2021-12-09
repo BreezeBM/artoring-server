@@ -60,8 +60,7 @@ const addSettlementMentoring = schedule.scheduleJob({ minute: 0, tz: 'Asia/Seoul
 );
 
 // 매일 서버시간 자정에 커리어 클래스 정산
-const addSettlementClass = schedule.scheduleJob({ hour: 0, tz: 'Asia/Seoul' }, () => {
-  console.log('test2');
+const addSettlementClass = schedule.scheduleJob({ hour: 0, minute: 0, second: 0, tz: 'Asia/Seoul' }, () => {
   purchaseHistoryModel.aggregate([
     { $match: { isSettled: false, originType: 'teach', progress: 'completed' } },
     { $set: { isSettled: true } },

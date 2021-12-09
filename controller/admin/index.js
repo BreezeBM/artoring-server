@@ -5,6 +5,7 @@ import putPurchase from './togglePurchase.js';
 import queryName from './getMentorName.js';
 import logout from './logout.js';
 import dropMentor from './dropMentor.js';
+import settlement from './settlement.js';
 
 // const adminController = {
 //   singup,
@@ -26,5 +27,6 @@ export {
   queryName,
   logout,
   getDrop,
-  setDrop
+  setDrop,
+  settlement
 };

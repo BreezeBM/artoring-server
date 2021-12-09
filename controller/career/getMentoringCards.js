@@ -14,27 +14,28 @@ export default async (req, res) => {
         {
           // match와 lookup으로 가져온 데이터중 어떤것들을 결과물에 나타나게 할것인가
           $project: {
-            availableTime: '$availableTime',
-            likesCount: '$likesCount',
-            joinedParticipants: '$joinedParticipants',
-            moderatorId: '$moderatorId',
-            price: '$price',
-            rate: '$rate',
-            reviews: '$reviews',
-            thumb: '$thumb',
-            tags: '$tags',
-            title: '$title',
-            startDate: '$startDate',
-            endDate: '$endDate',
-            detailInfo: '$detailInfo',
-            textDetailInfo: '$textDetailInfo',
-            maximumParticipants: '$maximumParticipants',
-            category: '$category',
-            subCategory: '$subCategory',
+            availableTime: 1,
+            likesCount: 1,
+            joinedParticipants: 1,
+            moderatorId: 1,
+            price: 1,
+            rate: 1,
+            reviews: 1,
+            thumb: 1,
+            tags: 1,
+            title: 1,
+            startDate: 1,
+            endDate: 1,
+            detailInfo: 1,
+            textDetailInfo: 1,
+            maximumParticipants: 1,
+            category: 1,
+            subCategory: 1,
             descriptionForMentor: '$mentor.mentor.descriptionForMentor',
             intro: '$mentor.intro',
-            isGroup: '$isGroup',
-            _id: '$_id'
+            isGroup: 1,
+            _id: 1,
+            settlementInfo: 1
           }
         }
       ]);

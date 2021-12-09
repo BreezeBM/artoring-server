@@ -8,6 +8,7 @@ import authorityRouter from './authority.js';
 import purchaseRouter from './adminPurchase.js';
 import nameRouter from './queryName.js';
 import dropRouter from './dropMentor.js';
+import settlementRouter from './adminCalculate.js';
 
 const router = express.Router();
 
@@ -19,6 +20,7 @@ const router = express.Router();
 router.use('/purchase', purchaseRouter);
 router.use('/name', nameRouter);
 router.use('/mentor', dropRouter);
+router.use('/settle', settlementRouter);
 router.use('/', authorityRouter);
 
 router.use('/*', (req, res) => res.status(404).send());

@@ -102,6 +102,6 @@ export default async (req, res) => {
         res.status(500).json(e.message);
       });
   } else {
-    res.status(400).send({ message: 'Invalid Access' });
+    res.status(401).send({ message: 'Invalid Access' });
   }
 };

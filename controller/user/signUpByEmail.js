@@ -2,7 +2,7 @@ import { userModel } from '../../model/index.js';
 import { tool, sendGmail } from '../tools/index.js';
 // const { sha256Encrypt, sendGmail, createJWT } = require('../tools');
 
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
 import dotenv from 'dotenv';
 dotenv.config();

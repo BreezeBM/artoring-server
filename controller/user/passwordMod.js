@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import { userModel, mongoose } from '../../model/index.js';
 import { tool } from '../tools/index.js';
 dotenv.config();

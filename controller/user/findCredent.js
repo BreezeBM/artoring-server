@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import { userModel, tokenModel } from '../../model/index.js';
 import { tool, sendGmail } from '../tools/index.js';
 dotenv.config();

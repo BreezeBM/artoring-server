@@ -5,7 +5,7 @@ import { tool, date } from '../tools/index.js';
 // const { date } = require('../tools');
 import { RecaptchaEnterpriseServiceClient } from '@google-cloud/recaptcha-enterprise';
 import { adminModel } from '../../model/index.js';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 dotenv.config();
 // const bcrypt = require('bcrypt');
 

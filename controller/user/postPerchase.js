@@ -29,10 +29,9 @@ export default async (req, res) => {
           const { _id } = decode;
           const session = await purchaseHistoryModel.startSession();
 
-          const targetData = await mentoringModel.findOne({ _id: cardId }).select({ price: 1, startDate: 1, endDate: 1 });
-
+          const targetData = await mentoringModel.findOne({ _id: mongoose.Types.ObjectId(cardId) }).select({ price: 1, startDate: 1, endDate: 1 });
           // 같은 멘토링 5회 초과 예약 금지
-          const reserveTimes = await purchaseHistoryModel.find({ targetId: cardId, userId: _id });
+          const reserveTimes = await purchaseHistoryModel.find({ targetId: mongoose.Types.ObjectId(cardId), userId: mongoose.Types.ObjectId(_id) });
           if (reserveTimes.length > 5) res.status(409).send('exceed limits');
           else {
             const transactionOptions = {
@@ -57,7 +56,12 @@ export default async (req, res) => {
                   loginType: type,
                   startDate,
                   endDate,
-                  questions: ['', '', '']
+                  questions: ['', '', ''],
+                  settlementInfo: (reservationType === 'mentor'
+                    ? {
+                        progress: -1
+                      }
+                    : undefined)
                 })
                 .then((data) => {
                   createdDoc = data;
@@ -100,57 +104,62 @@ export default async (req, res) => {
 
         const targetData = await mentoringModel.findOne({ _id: cardId }).select({ price: 1, startDate: 1, endDate: 1 });
 
-        const transactionOptions = {
-          readPreference: 'primary',
-          readConcern: { level: 'majority' },
-          writeConcern: { w: 'majority' }
-        };
-        const createdDoc = {};
-        await session.withTransaction(() => {
-          return purchaseHistoryModel.create(
-            {
-              userId,
-              targetId: cardId,
-              price: targetData.price,
-              bookedStartTime: startDate || targetData.startDate,
-              bookedEndTime: endDate || targetData.endDate,
-              merchantUid: `mid_${tool.sha256Encrypt(36, userId, Date().toString())}`,
-              originType: reservationType,
-              loginType: type,
-              startDate,
-              endDate,
-              questions: ['', '', '']
-            })
-            .then((data) => {
-              for (const n of Object.keys(data._doc)) { createdDoc[n] = data._doc[n]; }
-              return mentoringModel.findById({ _id: mongoose.Types.ObjectId(cardId) });
-            })
-            .then((data) => {
+        // 같은 멘토링 5회 초과 예약 금지
+        const reserveTimes = await purchaseHistoryModel.find({ targetId: mongoose.Types.ObjectId(cardId), userId: mongoose.Types.ObjectId(_id) });
+        if (reserveTimes.length > 5) res.status(409).send('exceed limits');
+        else {
+          const transactionOptions = {
+            readPreference: 'primary',
+            readConcern: { level: 'majority' },
+            writeConcern: { w: 'majority' }
+          };
+          const createdDoc = {};
+          await session.withTransaction(() => {
+            return purchaseHistoryModel.create(
+              {
+                userId,
+                targetId: cardId,
+                price: targetData.price,
+                bookedStartTime: startDate || targetData.startDate,
+                bookedEndTime: endDate || targetData.endDate,
+                merchantUid: `mid_${tool.sha256Encrypt(36, userId, Date().toString())}`,
+                originType: reservationType,
+                loginType: type,
+                startDate,
+                endDate,
+                questions: ['', '', '']
+              })
+              .then((data) => {
+                for (const n of Object.keys(data._doc)) { createdDoc[n] = data._doc[n]; }
+                return mentoringModel.findById({ _id: mongoose.Types.ObjectId(cardId) });
+              })
+              .then((data) => {
               // 예약이 완료되지 않았더라도 예약자 추가시켜 추가 예약을 방지
-              if (data.joinedParticipants >= data.maximumParticipants) res.status(400).send();
-              else {
-                createdDoc.programTitle = data._doc.title;
-                return userModel.findById({ _id: mongoose.Types.ObjectId(userId) });
-              }
-            })
-            .then(data => {
-              setTimeout((merchantUid) => {
-                purchaseHistoryModel.findOne({ merchantUid })
-                  .then(data => {
-                    if (data && data.progress === 'inprogress') {
-                      purchaseHistoryModel.findByIdAndDelete({ _id: mongoose.Types.ObjectId(data._id) })
-                        .then((data) => {
-                          return mentoringModel.findByIdAndUpdate({ _id: mongoose.Types.ObjectId(data.targetId) }, { $inc: { joinedParticipants: -1 } });
-                        })
-                        .then(() => {});
-                    }
-                  });
-              }, 1000 * 60 * 20, createdDoc.merchantUid);
-              return mentoringModel.findByIdAndUpdate({ _id: mongoose.Types.ObjectId(cardId) }, { $inc: { joinedParticipants: 1 } });
-            });
-        }, transactionOptions);
-        session.endSession();
-        res.status(201).send(createdDoc);
+                if (data.joinedParticipants >= data.maximumParticipants) res.status(400).send();
+                else {
+                  createdDoc.programTitle = data._doc.title;
+                  return userModel.findById({ _id: mongoose.Types.ObjectId(userId) });
+                }
+              })
+              .then(data => {
+                setTimeout((merchantUid) => {
+                  purchaseHistoryModel.findOne({ merchantUid })
+                    .then(data => {
+                      if (data && data.progress === 'inprogress') {
+                        purchaseHistoryModel.findByIdAndDelete({ _id: mongoose.Types.ObjectId(data._id) })
+                          .then((data) => {
+                            return mentoringModel.findByIdAndUpdate({ _id: mongoose.Types.ObjectId(data.targetId) }, { $inc: { joinedParticipants: -1 } });
+                          })
+                          .then(() => {});
+                      }
+                    });
+                }, 1000 * 60 * 20, createdDoc.merchantUid);
+                return mentoringModel.findByIdAndUpdate({ _id: mongoose.Types.ObjectId(cardId) }, { $inc: { joinedParticipants: 1 } });
+              });
+          }, transactionOptions);
+          session.endSession();
+          res.status(201).send(createdDoc);
+        }
       }, type, accessToken, res);
     }
   } catch (e) {

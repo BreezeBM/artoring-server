@@ -105,7 +105,7 @@ export default async (req, res) => {
         const targetData = await mentoringModel.findOne({ _id: cardId }).select({ price: 1, startDate: 1, endDate: 1 });
 
         // 같은 멘토링 5회 초과 예약 금지
-        const reserveTimes = await purchaseHistoryModel.find({ targetId: mongoose.Types.ObjectId(cardId), userId: mongoose.Types.ObjectId(_id) });
+        const reserveTimes = await purchaseHistoryModel.find({ targetId: mongoose.Types.ObjectId(cardId), userId: mongoose.Types.ObjectId(req.body.userId) });
         if (reserveTimes.length > 5) res.status(409).send('exceed limits');
         else {
           const transactionOptions = {

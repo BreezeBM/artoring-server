@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 import { userModel, mongoose } from '../../model/index.js';
 import { tool } from '../tools/index.js';
 // const { createJWT, verifyJWTToken, sha256Encrypt } = require("../tools");
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 dotenv.config();
 
 export default async (req, res) => {

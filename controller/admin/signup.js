@@ -5,7 +5,7 @@ import { tool } from '../tools/index.js';
 import { adminModel } from '../../model/index.js';
 
 import randWords from 'random-words';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 dotenv.config();
 // const randWords = require('random-words');
 // const bcrypt = require('bcrypt');

@@ -16,3 +16,7 @@ uploads/
 credentials.json
 token.json
 oauthCredentials.json
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml

@@ -96,10 +96,10 @@ if [[ ! -d "/home/webapp/dl.fedoraproject.org" ]]; then
 
   sudo firewall-cmd --reload;
 
-  if [[ ! -f "/home/webapp/credentials.json" ]];
+  if [[ ! -f "/home/webapp/credentials.json" ]]; then
     sudo echo {\"type\": \"service_account\", \"project_id\": \"cultivated-cove-320001\",  \"private_key_id\": \"$CAPTCHA_KEY_ID\",     \"private_key\": \"$CAPTCHA_PEM\", \"client_email\": \"$CAPTCHA_EMAIL\",  \"client_id\": \"115405318409515778219\",     \"auth_uri\": \"https://accounts.google.com/o/oauth2/auth\",  \"token_uri\": \"https://oauth2.googleapis.com/token\",     \"auth_provider_x509_cert_url\": \"https://www.googleapis.com/oauth2/v1/certs\", \"client_x509_cert_url\":\" $CAPTCHA_X509\" } >> /home/webapp/credentials.json
   fi
-  
+
   # elastic
   curl -L -O https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-agent-7.15.2-amd64.deb;
   sudo dpkg -i elastic-agent-7.15.2-amd64.deb;

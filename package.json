@@ -6,13 +6,18 @@
   "engines": {
     "node": "14.17.0"
   },
+  
   "scripts": {
     "nodemon": "nodemon app.js",
     "poststart": "node ./node_modules/pm2/bin/pm2 logs",
     "start": "node ./node_modules/pm2/bin/pm2 start app.js --name server",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "semistandard --verbose | snazzy",
-    "lint-fix": "semistandard --fix | snazzy"
+    "lint-fix": "semistandard --fix | snazzy",
+    "lint-staged": "npm run lint-stage && git update-index --chmod=+x .platform/hooks/postbuild/*.sh && git update-index --chmod=+x .platform/hooks/prebuild/*.sh"
+  },
+  "lint-stage" :{
+    "{controller,routes,model,app.js}/**/*.js": "lint-fix" 
   },
   "repository": {
     "type": "git",

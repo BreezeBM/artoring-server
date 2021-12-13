@@ -6,18 +6,29 @@ if [[ ! -d "/home/webapp/dl.fedoraproject.org" ]]; then
   sudo rpm -Uvh dl.fedoraproject.org/pub/epel/7/x86_64/Packages/e/epel-release-*.rpm;
   sudo yum-config-manager --enable epel*;
   sudo yum update -y --skip-broken;
-  sudo yum install dpkg -y;
-  sudo yum -y install fcgiwrap;
-  sudo systemctl start fcgiwrap@nginx.socket;
-  sudo systemctl enable fcgiwrap@nginx.socket;
+  if ! command -v "dpkg" &> /dev/null then
+    sudo yum install dpkg -y;
+  fi
+  if ! command -v "fcgiwrap" &> /dev/null then
+    sudo yum -y install fcgiwrap;
+    sudo systemctl start fcgiwrap@nginx.socket;
+    sudo systemctl enable fcgiwrap@nginx.socket;
+  fi
+  
+  
   sudo yum -y install conntrack-tools;
-  sudo yum -y install firewalld;
+
+  if ! command -v "firewalld" &> /dev/null then
+    sudo yum -y install firewalld;
+  fi
 
   # letsEncrypt
-  sudo yum install -y certbot python2-certbot-nginx;
-  sudo yum install -y certbot-dns-route53;
-  sudo certbot certonly --dns-route53 --dns-route53-propagation-seconds 30 -d *.${DOMAIN} --email ${EMAIL} -q --agree-tos;
-  sudo ln -sf /etc/letsencrypt/live/${DOMAIN} /etc/letsencrypt/ebcert;
+  if ! command -v "certbot" &> /dev/null then
+    sudo yum install -y certbot python2-certbot-nginx;
+    sudo yum install -y certbot-dns-route53;
+    sudo certbot certonly --dns-route53 --dns-route53-propagation-seconds 30 -d *.${DOMAIN} --email ${EMAIL} -q --agree-tos;
+    sudo ln -sf /etc/letsencrypt/live/${DOMAIN} /etc/letsencrypt/ebcert;
+  fi
 
   # honeypot 파일
   if [[ ! -d "/etc/nginx/includes" ]]; then
@@ -94,15 +105,28 @@ if [[ ! -d "/home/webapp/dl.fedoraproject.org" ]]; then
     sudo echo $"nginx ALL=(ALL) NOPASSWD: /usr/local/bin/block-ip.sh" >> /etc/sudoers.d/nginx-block-ip;
   fi
 
-  sudo firewall-cmd --reload;
+  if pgrep -x "firewalld" > /dev/null
+  then
+      firewall-cmd --reload
+  else
+      systemctl start firewalld
+  fi
 
   if [[ ! -f "/home/webapp/credentials.json" ]]; then
     sudo echo {\"type\": \"service_account\", \"project_id\": \"cultivated-cove-320001\",  \"private_key_id\": \"$CAPTCHA_KEY_ID\",     \"private_key\": \"$CAPTCHA_PEM\", \"client_email\": \"$CAPTCHA_EMAIL\",  \"client_id\": \"115405318409515778219\",     \"auth_uri\": \"https://accounts.google.com/o/oauth2/auth\",  \"token_uri\": \"https://oauth2.googleapis.com/token\",     \"auth_provider_x509_cert_url\": \"https://www.googleapis.com/oauth2/v1/certs\", \"client_x509_cert_url\":\" $CAPTCHA_X509\" } >> /home/webapp/credentials.json
   fi
 
+
   # elastic
-  curl -L -O https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-agent-7.15.2-amd64.deb;
-  sudo dpkg -i elastic-agent-7.15.2-amd64.deb;
-  sudo rm elastic-agent-7.15.2-amd64.deb;
-  sudo elastic-agent enroll --url=${FLEETURL} --enrollment-token=${FLEETTOKEN} -f && sudo systemctl enable elastic-agent && sudo systemctl start elastic-agent;
+  if ! pgrep -x "elastic-agent" > /dev/null
+  then
+    if ! command -v "elastic-agent" &> /dev/null
+    then
+      curl -L -O https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-agent-7.15.2-amd64.deb;
+      sudo dpkg -i elastic-agent-7.15.2-amd64.deb;
+      sudo rm elastic-agent-7.15.2-amd64.deb;
+    
+    sudo elastic-agent enroll --url=${FLEETURL} --enrollment-token=${FLEETTOKEN} -f && sudo systemctl enable elastic-agent && sudo systemctl start elastic-agent;
+    fi
+  fi
 fi

@@ -16,7 +16,7 @@ dotenv.config();
  *
  * * req.header.auth = 어드민 토큰 있어야함.
  * * page - 페이지네이션 페이지
- * * size - 요청한 페이지 숫자 test 123
+ * * size - 요청한 페이지 숫자
  */
 const getDrop = async (req, res) => {
   try {
@@ -173,7 +173,7 @@ const setDrop = async (req, res) => {
           .then(promise => {
             return Promise.all(promise.map(ele => {
               // 2사 앱 연결끊기.
-              const { access_token, refresh_token } = ele.data || ele;
+              const { access_token } = ele.data || ele;
 
               let proof;
               if (ele.snsType === 'facebook') proof = tool.sha256Encrypt(999, access_token, process.env.FACEBOOK_SEC);

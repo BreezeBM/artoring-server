@@ -10,7 +10,7 @@ const post = (req, res) => {
     return null;
   }
 
-  const { imp_uid, merchant_uid } = req.body;
+  const { imp_uid } = req.body;
 
   const split = req.cookies.authorization.split(' ');
   const accessToken = split[0].concat(' ', split[1]);
@@ -46,7 +46,7 @@ const post = (req, res) => {
           .then(({ data }) => {
             const paymentData = data.response;
 
-            const { imp_uid, merchant_uid } = paymentData;
+            const { merchant_uid } = paymentData;
 
             // 결제 데이터 상호 검증
             return purchaseHistoryModel.findOne({ merchantUid: merchant_uid })
@@ -98,7 +98,7 @@ const post = (req, res) => {
         .then(({ data }) => {
           const paymentData = data.response;
 
-          const { imp_uid, merchant_uid } = paymentData;
+          const { merchant_uid } = paymentData;
 
           return purchaseHistoryModel.findOne({ merchantUid: merchant_uid })
             .then((document) => {
@@ -247,7 +247,6 @@ const revoke = async (req, res) => {
 
             if (!data || data.isRefund) res.status(404).send();
             else {
-              let amount;
               const bookedTime = new Date(data.bookedStartTime);
               bookedTime.setHours(0, 0, 0, 0);
 
@@ -261,7 +260,7 @@ const revoke = async (req, res) => {
               //   res.status(501).send();
               //   return;
               // }
-              amount = data.price;
+              const amount = data.price;
 
               // 아임포트 서버 토큰 발급
               const tokenUrl = 'https://api.iamport.kr/users/getToken';
@@ -274,7 +273,7 @@ const revoke = async (req, res) => {
                   // 아임포트 PG 환불 요청
                   return axios.post(paymentUrl, {
                     imp_uid: data.paymentData.imp_uid, // 주문번호
-                    // amount, // 환불금액
+                    amount, // 환불금액
                     reason: 'etc', // 환불사유
                     checksum: data.price
                     // refund_holder: holder, // [가상계좌 환불시 필수입력] 환불 수령계좌 예금주

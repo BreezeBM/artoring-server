@@ -23,7 +23,7 @@ const inactiveAccount = schedule.scheduleJob(
       }).sort({ loginedAt: 1 });
       // 위의 조건에 맞는 모든 유저에게 휴면계정 이메일 전송 및 active컬럼 false로 변경
       targets.forEach((target) => {
-        const userData = models.userModel.find({ _id: target._id }).select({
+        models.userModel.find({ _id: target._id }).select({
           _id: 0,
           email: 1
         });
@@ -31,9 +31,9 @@ const inactiveAccount = schedule.scheduleJob(
       // 이메일 전송
 
       // active 변경
-      await models.userModel.updateOne({ _id: target._id }, {
-        $set: { active: false }
-      });
+      // await models.userModel.updateOne({ _id: target._id }, {
+      //   $set: { active: false }
+      // });
       // await session.commitTransaction();
       // session.endSession();
     } catch (error) {

@@ -55,7 +55,7 @@ export default async (req, res) => {
           // 시크릿코드, 엑세스 토큰을 활용하여 증명데이터를 생성하고 이를 제거하고자하는 엑세스토큰과 함께 전송.
 
           proof = tool.sha256Encrypt(999, accessToken.split(' ')[1], process.env.FACEBOOK_SEC);
-          const response = await axios.get(`https://graph.facebook.com/${Number(userinfo.user_id)}/permissions?appsecret_proof=${proof}&access_token=${accessToken.split(' ')[1]}`);
+          await axios.get(`https://graph.facebook.com/${Number(userinfo.user_id)}/permissions?appsecret_proof=${proof}&access_token=${accessToken.split(' ')[1]}`);
 
           res.cookie('authorization', '', {
             secure: true,
@@ -71,7 +71,7 @@ export default async (req, res) => {
             ? `https://nid.naver.com/oauth2.0/token?grant_type=delete&client_id=${process.env.NAVER_ID}&client_secret=${process.env.NAVER_SEC}&access_token=${accessToken}&service_provider=NAVER`
             : 'https://kauth.kakao.com/v1/user/logout';
 
-          const response = await axios.get(url, {
+          await axios.get(url, {
             headers: {
               authorization: accessToken
             }

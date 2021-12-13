@@ -18,7 +18,6 @@ import apm from 'elastic-apm-node';
 // const cookieParser = require("cookie-parser");
 // const inactiveAccount = require("./controller/tools/inactiveAccount");
 
-import moment from 'moment-timezone';
 import connectDB from './db/index.js';
 
 dotenv.config();

@@ -16,7 +16,7 @@ export default async (req, res) => {
     const { code, state, id } = req.body; // 여기의 id는 페이스북만의 특수한 숫자 아이디.
 
     let { token } = req.body;
-    let access_token, refresh_token;
+    let access_token;
 
     if (!req.cookies.authorization || req.cookies.authorization === '') {
       const redirect_uri = process.env.NODE_ENV === 'development'
@@ -47,7 +47,8 @@ export default async (req, res) => {
         );
 
         // 선언없이 구조분해 할당을 사용/
-        ({ access_token, refresh_token } = response.data);
+        // ({ access_token, refresh_token } = response.data);
+        ({ access_token } = response.data);
 
         // 프로필 요청 혹은 토큰검증을 통해 id를 가져와야 한다.
       }

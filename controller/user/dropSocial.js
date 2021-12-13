@@ -124,7 +124,7 @@ export default async (req, res) => {
               .all(promise.map(ele => {
               // 3사 앱 연결끊기.
 
-                const { access_token, refresh_token } = ele.data || ele;
+                const { access_token } = ele.data || ele;
 
                 let proof;
                 if (ele.snsType === 'facebook') proof = tool.sha256Encrypt(999, fbToken || access_token || split[1], process.env.FACEBOOK_SEC);
@@ -155,7 +155,7 @@ export default async (req, res) => {
 
                 rate /= count--;
 
-                return mentoringModel.find({ _id: mongoose.Types.ObjectId(ele._id) });
+                return mentoringModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(ele._id) }, { $set: { rate } });
               })))
             // 멘토였던 사람의 경우 좋아요를 해둔 다른 사람들 정보까지 제거.
               .then(list => Promise.all(list.map(ele => userModel.findOneAndUpdate({ $or: [{ likedCareerEdu: { $in: [ele._id] } }, { likedMentor: { $in: [userId] } }] }, { $pull: { likedCareerEdu: ele._id, likedMentor: userId } }))))
@@ -265,7 +265,8 @@ export default async (req, res) => {
       .then(promise => {
         return Promise.all(promise.map(ele => {
           // 2사 앱 연결끊기.
-          const { access_token, refresh_token } = ele.data || ele;
+          // const { access_token, refresh_token } = ele.data || ele;
+          const { access_token } = ele.data || ele;
 
           let proof;
           if (ele.snsType === 'facebook') proof = tool.sha256Encrypt(999, access_token, process.env.FACEBOOK_SEC);

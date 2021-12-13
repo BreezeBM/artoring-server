@@ -6,10 +6,11 @@ if [[ ! -d "/home/webapp/dl.fedoraproject.org" ]]; then
   sudo rpm -Uvh dl.fedoraproject.org/pub/epel/7/x86_64/Packages/e/epel-release-*.rpm;
   sudo yum-config-manager --enable epel*;
   sudo yum update -y --skip-broken;
-  if ! command -v "dpkg" &> /dev/null then
+  if ! command -v "dpkg" &> /dev/null; then
     sudo yum install dpkg -y;
   fi
-  if ! command -v "fcgiwrap" &> /dev/null then
+
+  if ! command -v "fcgiwrap" &> /dev/null; then
     sudo yum -y install fcgiwrap;
     sudo systemctl start fcgiwrap@nginx.socket;
     sudo systemctl enable fcgiwrap@nginx.socket;
@@ -18,12 +19,12 @@ if [[ ! -d "/home/webapp/dl.fedoraproject.org" ]]; then
   
   sudo yum -y install conntrack-tools;
 
-  if ! command -v "firewalld" &> /dev/null then
+  if ! command -v "firewalld" &> /dev/null; then
     sudo yum -y install firewalld;
   fi
 
   # letsEncrypt
-  if ! command -v "certbot" &> /dev/null then
+  if ! command -v "certbot" &> /dev/null; then
     sudo yum install -y certbot python2-certbot-nginx;
     sudo yum install -y certbot-dns-route53;
     sudo certbot certonly --dns-route53 --dns-route53-propagation-seconds 30 -d *.${DOMAIN} --email ${EMAIL} -q --agree-tos;
@@ -106,7 +107,7 @@ if [[ ! -d "/home/webapp/dl.fedoraproject.org" ]]; then
     sudo echo $"nginx ALL=(ALL) NOPASSWD: /usr/local/bin/block-ip.sh" >> /etc/sudoers.d/nginx-block-ip;
   fi
 
-  if pgrep -x "firewalld" > /dev/null
+  if pgrep -x "firewalld" > /dev/null;
   then
       firewall-cmd --reload
   else
@@ -119,9 +120,9 @@ if [[ ! -d "/home/webapp/dl.fedoraproject.org" ]]; then
 
 
   # elastic
-  if ! pgrep -x "elastic-agent" > /dev/null
+  if ! pgrep -x "elastic-agent" > /dev/null;
   then
-    if ! command -v "elastic-agent" &> /dev/null
+    if ! command -v "elastic-agent" &> /dev/null;
     then
       curl -L -O https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-agent-7.15.2-amd64.deb;
       sudo dpkg -i elastic-agent-7.15.2-amd64.deb;

@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-sudo cron /etc/cron.d/cert
+sudo crontab /etc/cron.d/cert

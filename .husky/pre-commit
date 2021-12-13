@@ -1,7 +1,0 @@
-#!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
-
-npm run lint-fix
-git update-index --chmod=+x .platform/hooks/prebuild/*.sh
-git update-index --chmod=+x .platform/hooks/postdeploy/*.sh
-git add -A .

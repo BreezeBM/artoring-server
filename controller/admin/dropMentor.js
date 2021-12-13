@@ -16,7 +16,7 @@ dotenv.config();
  *
  * * req.header.auth = 어드민 토큰 있어야함.
  * * page - 페이지네이션 페이지
- * * size - 요청한 페이지 숫자
+ * * size - 요청한 페이지 숫자 test 123
  */
 const getDrop = async (req, res) => {
   try {

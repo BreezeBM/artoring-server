@@ -14,10 +14,12 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "semistandard --verbose | snazzy",
     "lint-fix": "semistandard --fix | snazzy",
-    "lint-staged": "npm run lint-stage && git update-index --chmod=+x .platform/hooks/postbuild/*.sh && git update-index --chmod=+x .platform/hooks/prebuild/*.sh"
+    "lint-staged": "npm run lint-stage",
+    "excutable": "git update-index --chmod=+x .platform/hooks/postbuild/*.sh && git update-index --chmod=+x .platform/hooks/prebuild/*.sh"
   },
   "lint-stage" :{
-    "{controller,routes,model,app.js}/**/*.js": "lint-fix" 
+    "{controller,routes,model,app.js}/**/*.js": "npm run lint-fix",
+    "{.platform}/**/*.sh": "npm run excutable"
   },
   "repository": {
     "type": "git",

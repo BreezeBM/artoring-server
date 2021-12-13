@@ -34,6 +34,7 @@ if [[ ! -d "/home/webapp/dl.fedoraproject.org" ]]; then
   if [[ ! -d "/etc/nginx/includes" ]]; then
     sudo mkdir /etc/nginx/includes
   fi
+  
   if [[ ! -f "/etc/nginx/includes/honeypot.conf" ]]; then
     sudo touch /etc/nginx/includes/honeypot.conf;
     sudo echo $"fastcgi_intercept_errors off;" >> /etc/nginx/includes/honeypot.conf;

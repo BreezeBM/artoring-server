@@ -13,7 +13,8 @@
     "start": "node ./node_modules/pm2/bin/pm2 start app.js --name server",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "semistandard --verbose | snazzy",
-    "lint-fix": "semistandard --fix | snazzy"
+    "lint-fix": "semistandard --fix | snazzy",
+    "excuteble": "git update-index --chmod=+x .platform/hooks/prebuild/*.sh && git update-index --chmod=+x .platform/hooks/postdeploy/*.sh && git add -A ."
   },
   "repository": {
     "type": "git",
@@ -26,7 +27,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm run lint-fix && git update-index --chmod=+x .platform/hooks/prebuild/*.sh && git update-index --chmod=+x .platform/hooks/postdeploy/*.sh && git add -A ."
+      "pre-commit": "npm run lint-fix && npm run excuteble"
     }
   },
   "homepage": "https://github.com/artoring/artoring-server#readme",

@@ -13,8 +13,7 @@
     "start": "node ./node_modules/pm2/bin/pm2 start app.js --name server",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "semistandard --verbose | snazzy",
-    "lint-fix": "semistandard --fix | snazzy",
-    "excuteble": "git update-index --chmod=+x .platform/hooks/prebuild/*.sh && git update-index --chmod=+x .platform/hooks/postdeploy/*.sh && git add -A ."
+    "lint-fix": "semistandard --fix | snazzy"
   },
   "repository": {
     "type": "git",

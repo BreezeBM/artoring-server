@@ -11,7 +11,7 @@ import dotenv from 'dotenv';
 import inactiveAccount from './controller/tools/inactiveAccount.js';
 import { addSettlementMentoring, addSettlementClass } from './controller/crontab/addPayments1Hours.js';
 import writeToReplica from './controller/crontab/replica.js';
-import deletePurchase from './controller/tools/deletePurchase20Minutes';
+import deletePurchase from './controller/tools/deletePurchase';
 
 import apm from 'elastic-apm-node';
 // const fs = require("fs");
@@ -26,7 +26,7 @@ dotenv.config();
 addSettlementClass.schedule();
 addSettlementMentoring.schedule();
 inactiveAccount.schedule();
-// deletePurchase.schedule();
+deletePurchase.schedule();
 
 writeToReplica.schedule();
 

@@ -26,7 +26,7 @@ dotenv.config();
 addSettlementClass.schedule();
 addSettlementMentoring.schedule();
 inactiveAccount.schedule();
-deletePurchase.schedule();
+// deletePurchase.schedule();
 
 writeToReplica.schedule();
 
